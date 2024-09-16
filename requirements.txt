@@ -1,0 +1,11 @@
+fastapi[all]
+uvicorn
+psycopg2-binary
+pandas
+numpy
+statsmodels
+arch
+Patsy
+Scipy
+yfinance
+apscheduler
