@@ -1,14 +1,13 @@
 services:
-  db:
-    image: postgres:13
+  nextjs:
+    build:
+      context: ./nextjs
     ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: temp
-      POSTGRES_PASSWORD: temp
-      POSTGRES_DB: advcompro
+      - "3000:3000"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./nextjs:/src
+      - /src/node_modules # This masks the node_modules directory from the host system and prevents it from being mapped from your local filesystem. The container will manage its own node_modules directory.
+    working_dir: /src
+    command: npm run dev
 
-volumes:
-  postgres_data:
+
