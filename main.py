@@ -1,51 +1,69 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from pydantic import BaseModel
 from daily_fetch import fetch_and_store_stock_data
-from database import store_prediction
+from database import *
 from models import arima_prediction, garch_prediction
 import psycopg2
+from utils import merge_sort
 
-# FastAPI app
 app = FastAPI()
 
-# Database connection setup
 conn = psycopg2.connect(
     host="localhost",
-    database="your_database",
-    user="your_username",
-    password="your_password"
+    database="advcompro",
+    user="temp",
+    password="temp"
 )
 cur = conn.cursor()
 
-# Define request schema for prediction
 class PredictionRequest(BaseModel):
     ticker: str
 
-# API to fetch 2 years of stock data and make predictions
-@app.post("/predict/")
-def predict_stock(request: PredictionRequest):
-    ticker = request.ticker.upper()
+@app.get("/predictions/")
+def get_predictions(
+    sort_by: str = Query("predicted_price", description="Field to sort by: predicted_price or predicted_volatility"),
+    sort_order: str = Query("desc", description="Sort order: asc or desc"),
+    min_price: float = Query(None, description="Minimum predicted price"),
+    max_price: float = Query(None, description="Maximum predicted price"),
+    ticker: str = Query(None, description="Filter by specific stock ticker")
+):
+    query = "SELECT ticker, predicted_price, predicted_volatility FROM stock_predictions WHERE 1=1"
 
-    # Fetch stock data and store it in the database
-    fetch_and_store_stock_data(ticker)
+    if ticker is not None:
+        query += f" AND ticker = '{ticker}'"
 
-    # Fetch stock data for ARIMA and GARCH models
-    cur.execute("SELECT close FROM stock_history WHERE ticker = %s ORDER BY trade_date ASC", (ticker,))
-    stock_data = [row[0] for row in cur.fetchall()]
+    if min_price is not None:
+        query += f" AND predicted_price >= {min_price}"
+    if max_price is not None:
+        query += f" AND predicted_price <= {max_price}"
 
-    # Run ARIMA and GARCH models
-    predicted_price = arima_prediction(stock_data)
-    predicted_volatility = garch_prediction(stock_data)
+    cur.execute(query)
+    predictions = cur.fetchall()
 
-    # Store predictions in the database
-    store_prediction(ticker, predicted_price, predicted_volatility)
+    # Sorting using the merge_sort function from utils.py
+    if sort_by == "predicted_price":
+        sorted_predictions = merge_sort(predictions)
+    elif sort_by == "predicted_volatility":
+        sorted_predictions = merge_sort([(p[0], p[2]) for p in predictions])  # Sort by volatility and then adjust back
 
-    return {"ticker": ticker, "predicted_price": predicted_price, "predicted_volatility": predicted_volatility}
+    if sort_order == "desc":
+        sorted_predictions.reverse()
 
-# API to fetch historical data
-@app.get("/history/{ticker}")
-def get_stock_history(ticker: str):
+    return {"predictions": sorted_predictions}
+
+@app.get("/predictions/{ticker}")
+def search_prediction(ticker: str):
     ticker = ticker.upper()
-    cur.execute("SELECT trade_date, close FROM stock_history WHERE ticker = %s ORDER BY trade_date ASC", (ticker,))
-    history = cur.fetchall()
-    return {"ticker": ticker, "history": history}
+    query = "SELECT ticker, predicted_price, predicted_volatility FROM stock_predictions WHERE ticker = %s"
+    
+    cur.execute(query, (ticker,))
+    prediction = cur.fetchone()
+
+    if not prediction:
+        return {"message": "Stock not found"}
+
+    return {
+        "ticker": prediction[0], 
+        "predicted_price": prediction[1], 
+        "predicted_volatility": prediction[2]
+    }
