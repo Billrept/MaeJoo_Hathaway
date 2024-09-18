@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from passlib.context import CryptContext
 from database import get_db_connection
 from auth.auth_handler import create_access_token
+
 router = APIRouter()
 
 # Password hashing context
