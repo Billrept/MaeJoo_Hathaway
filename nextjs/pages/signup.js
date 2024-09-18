@@ -42,13 +42,12 @@ const Signup = () => {
       return;
     }
 
-    try {
-      const response = await axios.post('http://localhost:8000/auth/signup', {
-        username: username,      // Sending username
-        email: email,         // Sending email
-        password: password,      // Sending password (backend will hash it)
-      });
-      
+	try {
+	  const response = await axios.post('http://localhost:8000/auth/signup', {
+		username: username,      // Sending username
+		email: email,            // Sending email
+		password: password,      // Sending password (backend will hash it)
+	  });
       console.log('User created:', response.data);
       router.push('/login'); // Redirect to login page on successful signup
     } catch (error) {

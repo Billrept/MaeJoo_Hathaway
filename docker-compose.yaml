@@ -25,7 +25,10 @@ services:
     volumes:
       - ./fastapi:/app  # <-- Updated to reflect the path to `app` inside `fastapi`# <-- Updated to make sure it works in the `/app/app` directory
     environment:
-      DATABASE_URL: postgres://temp:temp@postgres:5432/advcompro
+      DB_HOST: postgres
+      DB_NAME: advcompro
+      DB_USER: temp
+      DB_PASSWORD: temp
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     depends_on:
       - postgres
@@ -51,3 +54,4 @@ volumes:
 
 networks:
   app-network:
+    driver: bridge

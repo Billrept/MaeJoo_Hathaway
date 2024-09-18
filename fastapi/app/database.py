@@ -1,21 +1,21 @@
 import psycopg2
 import pandas as pd
 from datetime import datetime, timedelta
-
+import os
 # Database connection details
 DATABASE_CONFIG = {
-    "host": "postgres",  # Use 'postgres' as the host instead of 'localhost'
-    "database": "advcompro",
-    "user": "temp",
-    "password": "temp"
+    "host": os.getenv("DB_HOST", "postgres"),  # 'postgres' is the service name in Docker Compose
+    "database": os.getenv("DB_NAME", "advcompro"),
+    "user": os.getenv("DB_USER", "temp"),
+    "password": os.getenv("DB_PASSWORD", "temp")
 }
+
 
 # Utility function to get a database connection
 def get_db_connection():
     conn = psycopg2.connect(**DATABASE_CONFIG)
     return conn
 
-# Fetch stock history for a specific ticker
 def get_stock_history(ticker):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -41,7 +41,6 @@ def get_stock_history(ticker):
         return df
     return None
 
-# Store predictions
 def store_prediction(ticker, predicted_price, predicted_volatility, model_used="ARIMA-GARCH"):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -61,7 +60,6 @@ def store_prediction(ticker, predicted_price, predicted_volatility, model_used="
     cur.close()
     conn.close()
 
-# Get a prediction for a specific ticker
 def get_prediction(ticker):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -80,7 +78,6 @@ def get_prediction(ticker):
 
     return result
 
-# Get all predictions
 def get_all_predictions():
     conn = get_db_connection()
     cur = conn.cursor()
@@ -98,7 +95,6 @@ def get_all_predictions():
 
     return result
 
-# Insert stock history
 def insert_stock_history(ticker, trade_date, close_price):
     conn = get_db_connection()
     cur = conn.cursor()
