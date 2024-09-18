@@ -58,8 +58,12 @@ services:
       - app-network
 
 volumes:
+<<<<<<< HEAD:docker-compose.yaml
   postgres_data:
 
 networks:
   app-network:
 
+=======
+  postgres_data:
+>>>>>>> de3969e (Update):app/docker-compose.yaml
