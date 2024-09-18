@@ -1,6 +1,11 @@
-import React from "react";
-import { Box } from "@mui/material";
+import React from 'react';
+import SubmitForm from '../components/SubmitForm';
 
-export default function Test() {
-  return <Box>Page1</Box>;
+export default function Page1() {
+  return (
+    <div>
+      <h1>Submit your title</h1>
+      <SubmitForm />
+    </div>
+  );
 }

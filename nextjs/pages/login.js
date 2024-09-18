@@ -25,7 +25,7 @@ const Login = () => {
     try {
       const response = await axios.post('/api/login', { username, password });
       if (response.data.success) {
-        router.push('/dashboard'); // Redirect after successful login
+        router.push('/dashboard');
       }
     } catch (error) {
       setError('Invalid username or password');

@@ -1,3 +1,17 @@
+# services:
+#   nextjs:
+#     build:
+#       context: ./nextjs
+#     ports:
+#       - "3000:3000"
+#     volumes:
+#       - ./nextjs:/src
+#       - /src/node_modules # This masks the node_modules directory from the host system and prevents it from being mapped from your local filesystem. The container will manage its own node_modules directory.
+#     working_dir: /src
+#     command: npm run dev
+
+version: '3.8'
+
 services:
   nextjs:
     build:
@@ -6,8 +20,46 @@ services:
       - "3000:3000"
     volumes:
       - ./nextjs:/src
-      - /src/node_modules # This masks the node_modules directory from the host system and prevents it from being mapped from your local filesystem. The container will manage its own node_modules directory.
+      - /src/node_modules # Manage node_modules inside the container
     working_dir: /src
     command: npm run dev
+    depends_on:
+      - fastapi
+      - postgres # Ensure the database is available when Next.js starts
+    networks:
+      - app-network
 
+  fastapi:
+    build:
+      context: ./fastapi
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./fastapi:/app
+    working_dir: /app
+    command: uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      - postgres # Ensure the database is available when FastAPI starts
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_USER: temp
+      POSTGRES_PASSWORD: temp
+      POSTGRES_DB: advcompro
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
 
