@@ -3,7 +3,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta
 
-SECRET_KEY = "your_secret_key"  # Replace with your actual secret key
+SECRET_KEY = "dwqofwiqno"  # Replace with your actual secret key
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -34,3 +34,10 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
         return username  # Or return a more detailed user object if needed
     except JWTError:
         raise credentials_exception
+    
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
