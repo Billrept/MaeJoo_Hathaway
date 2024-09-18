@@ -27,11 +27,11 @@ async def disconnect_db():
     print("Database disconnected")
 
 # Utility function to get a database connection
-def get_db_connection():
+async def get_db_connection():
     conn = psycopg2.connect(**DATABASE_CONFIG)
     return conn
 
-def get_stock_history(ticker):
+async def get_stock_history(ticker):
     conn = get_db_connection()
     cur = conn.cursor()
 
@@ -56,7 +56,7 @@ def get_stock_history(ticker):
         return df
     return None
 
-def store_prediction(ticker, predicted_price, predicted_volatility, model_used="ARIMA-GARCH"):
+async def store_prediction(ticker, predicted_price, predicted_volatility, model_used="ARIMA-GARCH"):
     conn = get_db_connection()
     cur = conn.cursor()
 
@@ -75,7 +75,7 @@ def store_prediction(ticker, predicted_price, predicted_volatility, model_used="
     cur.close()
     conn.close()
 
-def get_prediction(ticker):
+async def get_prediction(ticker):
     conn = get_db_connection()
     cur = conn.cursor()
 
@@ -93,7 +93,7 @@ def get_prediction(ticker):
 
     return result
 
-def get_all_predictions():
+async def get_all_predictions():
     conn = get_db_connection()
     cur = conn.cursor()
 
@@ -110,7 +110,7 @@ def get_all_predictions():
 
     return result
 
-def insert_stock_history(ticker, trade_date, close_price):
+async def insert_stock_history(ticker, trade_date, close_price):
     conn = get_db_connection()
     cur = conn.cursor()
 
