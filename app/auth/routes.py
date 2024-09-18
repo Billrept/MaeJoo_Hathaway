@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from passlib.context import CryptContext
 from database import get_db_connection
-import bcrypt
+from auth.auth_handler import create_access_token
 router = APIRouter()
 
 # Password hashing context
@@ -70,7 +70,7 @@ def login(user: UserLogin):
     if not db_user or not verify_password(user.password, db_user[1]):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
-    # Generate a token (use JWT in a real system)
-    access_token = "fake_token_for_demo"  # Replace with actual JWT generation
+    # Generate a valid JWT token for the user
+    access_token = create_access_token(data={"sub": user.username})
 
     return {"access_token": access_token, "token_type": "bearer"}
