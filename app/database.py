@@ -1,5 +1,10 @@
 import psycopg2
 import pandas as pd
+from psycopg2 import sql
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
+from database import Base
+from passlib.context import CryptContext
 from datetime import datetime, timedelta
 
 conn = psycopg2.connect(
@@ -9,6 +14,25 @@ conn = psycopg2.connect(
 	password="temp"
 )
 cur = conn.cursor()
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+class User(Base):
+	__tabename__ = "users"
+
+	id = Column(Integer, primary_key=True, index=True)
+	username = Column(String, unique=True, index=True)
+	first_name = Column(String)
+	last_name = Column(String)
+	email = Column(String, unique=True, index=True)
+	hashed_password = Column(String)
+
+	def verify_password(self, password: str) -> bool:
+		return pwd_context.verify(password, self.hashed_password)
+	
+	@staticmethod
+	def get_password_hash(password: str) -> str:
+		return pwd_context.hash(password)
 
 def get_stock_history(ticker):
 	query = """

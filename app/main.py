@@ -1,10 +1,8 @@
 from fastapi import FastAPI, Query
 from pydantic import BaseModel
-from daily_fetch import fetch_and_store_stock_data
 from database import *
-from models import arima_prediction, garch_prediction
 import psycopg2
-from utils import merge_sort
+from utils.utils import merge_sort
 
 app = FastAPI()
 
@@ -15,9 +13,6 @@ conn = psycopg2.connect(
     password="temp"
 )
 cur = conn.cursor()
-
-class PredictionRequest(BaseModel):
-    ticker: str
 
 @app.get("/predictions/")
 def get_predictions(
@@ -40,7 +35,6 @@ def get_predictions(
     cur.execute(query)
     predictions = cur.fetchall()
 
-    # Sorting using the merge_sort function from utils.py
     if sort_by == "predicted_price":
         sorted_predictions = merge_sort(predictions)
     elif sort_by == "predicted_volatility":
@@ -66,4 +60,4 @@ def search_prediction(ticker: str):
         "ticker": prediction[0], 
         "predicted_price": prediction[1], 
         "predicted_volatility": prediction[2]
-    }
+	}
