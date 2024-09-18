@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 # Database connection details
 DATABASE_CONFIG = {
-    "host": "localhost",
+    "host": "postgres",  # Use 'postgres' as the host instead of 'localhost'
     "database": "advcompro",
     "user": "temp",
     "password": "temp"
@@ -15,6 +15,7 @@ def get_db_connection():
     conn = psycopg2.connect(**DATABASE_CONFIG)
     return conn
 
+# Fetch stock history for a specific ticker
 def get_stock_history(ticker):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -40,6 +41,7 @@ def get_stock_history(ticker):
         return df
     return None
 
+# Store predictions
 def store_prediction(ticker, predicted_price, predicted_volatility, model_used="ARIMA-GARCH"):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -59,6 +61,7 @@ def store_prediction(ticker, predicted_price, predicted_volatility, model_used="
     cur.close()
     conn.close()
 
+# Get a prediction for a specific ticker
 def get_prediction(ticker):
     conn = get_db_connection()
     cur = conn.cursor()
@@ -77,6 +80,7 @@ def get_prediction(ticker):
 
     return result
 
+# Get all predictions
 def get_all_predictions():
     conn = get_db_connection()
     cur = conn.cursor()
@@ -94,6 +98,7 @@ def get_all_predictions():
 
     return result
 
+# Insert stock history
 def insert_stock_history(ticker, trade_date, close_price):
     conn = get_db_connection()
     cur = conn.cursor()
