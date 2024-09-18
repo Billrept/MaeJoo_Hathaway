@@ -43,7 +43,7 @@ def signup(user: UserCreate):
     hashed_password = hash_password(user.password)
     cur.execute(
         """
-        INSERT INTO users (username, first_name, last_name, hashed_password)
+        INSERT INTO users (username, email, hashed_password, hashed_password)
         VALUES (%s, %s, %s, %s)
         """,
         (user.username, user.first_name, user.last_name, hashed_password)
