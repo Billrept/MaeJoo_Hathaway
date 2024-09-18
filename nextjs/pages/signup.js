@@ -7,12 +7,13 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 const Signup = () => {
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [password_hash, setPassword_hash] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [passwordValid, setPasswordValid] = useState(false);
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const [email, setEmail] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -30,7 +31,7 @@ const Signup = () => {
 
   const handlePasswordChange = (e) => {
     const newPassword = e.target.value;
-    setPassword(newPassword);
+    setPassword_hash(newPassword);
 
     if (!validatePassword(newPassword)) {
       setPasswordValid(false);
@@ -51,7 +52,7 @@ const Signup = () => {
     const newConfirmPassword = e.target.value;
     setConfirmPassword(newConfirmPassword);
 
-    if (newConfirmPassword !== password) {
+    if (newConfirmPassword !== password_hash) {
       setConfirmPasswordError('Passwords do not match.');
     } else {
       setConfirmPasswordError('');
@@ -65,15 +66,20 @@ const Signup = () => {
         return;
     }
 
-    if (password !== confirmPassword) {
+    if (password_hash !== confirmPassword) {
         setConfirmPasswordError('Passwords do not match.');
         return;
     }
 
     try {
-      const response = await axios.post('/api/signup', { username, password });
+      const response = await axios.post('http://localhost:8000/api/users', {
+        username: username,
+        password_hash: password_hash,
+        email: email,
+      });
       if (response.data.success) {
-        router.push('/login');
+        console.log("User created successfully")
+        // router.push('/login');
       } else {
         setError(response.data.message || 'An error occurred. Please try again.');
       }
@@ -104,12 +110,21 @@ const Signup = () => {
                     required
                 />
                 <TextField
+                    label="Email"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                />
+                <TextField
                     label="Password"
                     variant="outlined"
                     type="password"
                     fullWidth
                     margin="normal"
-                    value={password}
+                    value={password_hash}
                     onChange={handlePasswordChange}
                     required
                     helperText={passwordError || ' '}
@@ -133,8 +148,7 @@ const Signup = () => {
                     color="primary"
                     fullWidth
                     style={{ marginTop: '2rem', marginBottom:'2rem', backgroundColor:'#68BB59'}}
-                    disabled={!passwordValid || !!confirmPasswordError}
-                >
+                    disabled={!passwordValid || !!confirmPasswordError}>
                     Sign Up
                 </Button>
             </form>
