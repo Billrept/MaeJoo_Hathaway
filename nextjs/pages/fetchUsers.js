@@ -29,7 +29,7 @@ const FetchUsers = () => {
       <ul>
         {users.map((user) => (
           <li key={user.user_id}>
-            <Typography variant="body1">{user.username}</Typography>
+            <Typography variant="body1">Username : {user.username} password :{user.password_hash} email:{user.email}</Typography>
           </li>
         ))}
       </ul>

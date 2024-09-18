@@ -64,7 +64,7 @@ async def get_users():
 
 @app.post("/api/users", status_code=201)
 async def create_user(user: User):
-    query = "INSERT INTO users (name, email) VALUES (:name, :email)"
-    values = {"name": user.name, "email": user.email}
+    query = "INSERT INTO users (username, password_hash, email) VALUES (:username, :password_hash, :email)"
+    values = {"username": user.username, "password_hash":user.password_hash, "email": user.email}
     await database.execute(query, values)
     return {"message": "User created successfully"}

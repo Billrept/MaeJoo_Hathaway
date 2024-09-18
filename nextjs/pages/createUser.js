@@ -2,7 +2,8 @@ import { useState } from "react";
 import axios from "axios";
 
 const CreateUser = () => {
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [password_hash, setPassword_hash] = useState("");
   const [email, setEmail] = useState("");
   const [responseMessage, setResponseMessage] = useState("");
 
@@ -10,8 +11,9 @@ const CreateUser = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("/api/users", {
-        name: name,
+      const response = await axios.post("http://localhost:8000/api/users", {
+        username: username,
+        password_hash: password_hash,
         email: email,
       });
 
@@ -31,11 +33,20 @@ const CreateUser = () => {
       <h1>Create User</h1>
       <form onSubmit={handleCreateUser}>
         <div>
-          <label>Name: </label>
+          <label>Username: </label>
           <input
             type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label>Password: </label>
+          <input
+            type="text"
+            value={password_hash}
+            onChange={(e) => setPassword_hash(e.target.value)}
             required
           />
         </div>
