@@ -36,6 +36,11 @@ class UserResponse(BaseModel):
     email: str
     created_at: datetime
 
+class User(BaseModel):
+    username: str
+    password_hash: str
+    email: str
+
 # Connect to the database on startup
 @app.on_event("startup")
 async def startup():
@@ -56,3 +61,10 @@ async def get_users():
     query = users_table.select()
     results = await database.fetch_all(query)
     return results
+
+@app.post("/api/users", status_code=201)
+async def create_user(user: User):
+    query = "INSERT INTO users (name, email) VALUES (:name, :email)"
+    values = {"name": user.name, "email": user.email}
+    await database.execute(query, values)
+    return {"message": "User created successfully"}
