@@ -2,3 +2,4 @@ fastapi
 uvicorn[standard]
 databases
 asyncpg
+psycopg2-binary

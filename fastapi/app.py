@@ -1,23 +1,10 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, APIRouter
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
 from database import * 
-import sqlalchemy
 from fastapi.middleware.cors import CORSMiddleware
-
-# Define your user table schema
-metadata = sqlalchemy.MetaData()
-
-users_table = sqlalchemy.Table(
-    "users",
-    metadata,
-    sqlalchemy.Column("user_id", sqlalchemy.Integer, primary_key=True),
-    sqlalchemy.Column("username", sqlalchemy.String, nullable=False),
-    sqlalchemy.Column("password_hash", sqlalchemy.String, nullable=False),
-    sqlalchemy.Column("email", sqlalchemy.String, nullable=False),
-    sqlalchemy.Column("created_at", sqlalchemy.DateTime, default=datetime.utcnow),
-)
+from routes import router as users_router
 
 app = FastAPI()
 
@@ -55,16 +42,4 @@ async def shutdown():
 async def read_root():
     return {"message": "Hello World"}
 
-# GET route to fetch users
-@app.get("/api/users", response_model=List[UserResponse])
-async def get_users():
-    query = users_table.select()
-    results = await database.fetch_all(query)
-    return results
-
-@app.post("/api/users", status_code=201)
-async def create_user(user: User):
-    query = "INSERT INTO users (username, password_hash, email) VALUES (:username, :password_hash, :email)"
-    values = {"username": user.username, "password_hash":user.password_hash, "email": user.email}
-    await database.execute(query, values)
-    return {"message": "User created successfully"}
+app.include_router(users_router, prefix="/api")
