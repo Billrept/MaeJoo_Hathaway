@@ -23,7 +23,9 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/auth/login', { username, password });
+      const response = await axios.post('http://localhost:8000/auth/login', { 
+		username, password 
+	});
       if (response.data.success) {
         router.push('/dashboard');
       }

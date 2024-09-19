@@ -1,4 +1,4 @@
-import psycopg2
+from psycopg2 import sql
 from psycopg2.extras import RealDictCursor
 
 def create_user(db, username: str, email: str, hashed_password: str):
@@ -20,3 +20,17 @@ def create_user(db, username: str, email: str, hashed_password: str):
         raise e
     finally:
         cursor.close()
+        
+def get_user_by_username(conn, username: str):
+    with conn.cursor() as cur:
+        # Raw SQL query to fetch user by username
+        query = sql.SQL("""
+            SELECT id, username, email, password_hash
+            FROM users
+            WHERE username = %s;
+        """)
+        
+        cur.execute(query, (username,))
+        result = cur.fetchone()
+    
+    return result
