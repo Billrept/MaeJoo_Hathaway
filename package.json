@@ -1,5 +1,7 @@
 {
   "dependencies": {
-    "next-auth": "^4.24.7"
+    "chart.js": "^4.4.4",
+    "next-auth": "^4.24.7",
+    "react-chartjs-2": "^5.2.0"
   }
 }
