@@ -2,16 +2,15 @@ import psycopg2
 import pandas as pd
 from datetime import datetime, timedelta
 import os
-# Database connection details
+
 DATABASE_CONFIG = {
-    "host": os.getenv("DB_HOST", "postgres"),  # 'postgres' is the service name in Docker Compose
+    "host": os.getenv("DB_HOST", "postgres"),
     "database": os.getenv("DB_NAME", "advcompro"),
     "user": os.getenv("DB_USER", "temp"),
     "password": os.getenv("DB_PASSWORD", "temp")
 }
 
 
-# Utility function to get a database connection
 def get_db_connection():
     conn = psycopg2.connect(**DATABASE_CONFIG)
     return conn
