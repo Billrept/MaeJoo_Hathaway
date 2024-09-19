@@ -11,7 +11,6 @@ export default function StockChart() {
   const [inputValue, setInputValue] = useState('');
   const [error, setError] = useState('');
 
-  // Handle adding stock price to the graph
   const handleAddStockPrice = () => {
     if (!inputValue || isNaN(inputValue)) {
       setError('Please enter a valid number');
