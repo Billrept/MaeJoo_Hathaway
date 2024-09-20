@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 
-# Create a new declarative base within the file itself
 Base = declarative_base()
 
 class User(Base):

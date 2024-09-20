@@ -23,14 +23,13 @@ def signup(user: UserSignup, db: Session = Depends(get_db_connection)):
     return {"message": "User created successfully", "user": new_user}
 
 @router.post("/login")
-def login(user: UserLogin, conn = Depends(get_db_connection)):  # Direct psycopg2 connection
-    # Fetch the user by username using raw psycopg2
+def login(user: UserLogin, conn = Depends(get_db_connection)):
+
     db_user = get_user_by_username(conn, user.username)
     
     if not db_user:
         raise HTTPException(status_code=400, detail="Invalid username or password")
     
-    # Unpack the tuple to access fields
     user_id, username, email, password_hash = db_user
     
     # Verify the password

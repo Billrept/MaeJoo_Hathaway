@@ -26,10 +26,10 @@ const Login = () => {
       const response = await axios.post('http://localhost:8000/auth/login', { 
 		username, password 
 	});
-      if (response.data.success) {
-        router.push('/dashboard');
+		console.log(response.data.username);
+        router.push('/page1');
       }
-    } catch (error) {
+    catch (error) {
       setError('Invalid username or password');
     }
   };
