@@ -20,7 +20,7 @@ services:
       - "3000:3000"
     volumes:
       - ./nextjs:/src
-      - /src/node_modules # Manage node_modules inside the container
+      - /src/node_modules
     working_dir: /src
     command: npm run dev
     depends_on:
