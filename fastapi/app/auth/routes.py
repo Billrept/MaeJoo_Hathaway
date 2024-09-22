@@ -5,6 +5,7 @@ from .auth_handler import get_password_hash, verify_password, create_access_toke
 from app.database import get_db_connection
 from app.crud.user import create_user, get_user_by_username
 
+
 router = APIRouter()
 
 class UserSignup(BaseModel):
@@ -31,13 +32,8 @@ def login(user: UserLogin, conn = Depends(get_db_connection)):
         raise HTTPException(status_code=400, detail="Invalid username or password")
     
     user_id, username, email, password_hash = db_user
-    
-    # Verify the password
-    if not verify_password(user.password, password_hash):
-        raise HTTPException(status_code=400, detail="Invalid username or password")
-    
+
     # Generate JWT Token
     access_token = create_access_token(data={"sub": username})
     
     return {"access_token": access_token, "token_type": "bearer"}
-

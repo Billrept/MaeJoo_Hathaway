@@ -1,6 +1,6 @@
 FROM node:20.17-alpine3.20
 
-WORKDIR /src
+WORKDIR /src	
 
 COPY package.json package-lock.json ./
 RUN npm install

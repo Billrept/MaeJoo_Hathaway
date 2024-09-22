@@ -34,3 +34,4 @@ def get_user_by_username(conn, username: str):
         result = cur.fetchone()
     
     return result
+
