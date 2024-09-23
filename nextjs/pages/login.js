@@ -26,6 +26,11 @@ const Login = () => {
       const response = await axios.post('http://localhost:8000/auth/login', { 
 		username, password 
 	});
+    router.push({
+      pathname: '/dashboard',
+      query: { userId : 1 }
+      //query: { userId : response.data.userId } //axios.get
+    });
 		console.log(response.data.username);
         router.push('/page1');
       }

@@ -8,6 +8,7 @@ import {
   MenuItem,
   Box,
   ListItemIcon,
+  Switch
 } from "@mui/material";
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -15,10 +16,17 @@ import FunctionsIcon from "@mui/icons-material/Functions";
 import Divider from "@mui/material/Divider";
 import PersonIcon from "@mui/icons-material/Person";
 import useBearStore from "@/store/useBearStore";
+import { useState } from "react";
 
 const NavigationLayout = ({ children }) => {
   const router = useRouter();
   const appName = useBearStore((state) => state.appName);
+
+  const [ isDarkMode, setIsDarkMode ] = useState(false);
+
+  const handleSwitchChange = (event) => {
+    setIsDarkMode(event.target.checked)
+  };
 
   return (
     <>
@@ -38,8 +46,11 @@ const NavigationLayout = ({ children }) => {
             }}>
             MJ Hathaway
           </Typography>
-          <NavigationLink href="/page1" label="Page1" />
+          <NavigationLink href="/dashboard" label="Dashboard" />
           <div style={{ flexGrow: 1 }} />
+          <Typography> Dark mode: {String(isDarkMode)}</Typography>
+          <Switch checked={isDarkMode} onChange={handleSwitchChange}>
+          </Switch>
           <Button
             variant='contained'
             onClick={() => {
