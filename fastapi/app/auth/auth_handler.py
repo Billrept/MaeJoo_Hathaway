@@ -22,8 +22,7 @@ SERVER_SECRET_KEY = os.getenv("SERVER_SECRET_KEY", "some-very-secret-key")
 
 def generate_2fa_secret(user_email: str) -> str:
     secret_hash = hmac.new(SERVER_SECRET_KEY.encode(), user_email.encode(), hashlib.sha256).hexdigest()
-    return pyotp.random_base32()[:16]  # Use part of the hash to generate a TOTP secret
-
+    return pyotp.random_base32()[:16]
 
 def verify_totp_code(totp_secret: str, totp_code: str) -> bool:
     totp = pyotp.TOTP(totp_secret)
@@ -48,9 +47,9 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> Dict[str, str]:
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.utcnow(+7) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.utcnow(+7) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt

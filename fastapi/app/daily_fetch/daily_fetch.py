@@ -1,10 +1,12 @@
 import yfinance as yf
 from datetime import datetime, timedelta
-from model_handler import predict_next_day_price_and_volatility
-from database import insert_stock_history, store_prediction
+from ..model_handler import predict_next_day_price_and_volatility
+from ..database import insert_stock_history, store_prediction
 import numpy as np
+from fastapi import APIRouter
 
-# Fetch stock data and store it in stock_history table
+router = APIRouter()
+
 def fetch_and_store_stock_data(ticker):
     end_date = datetime.today().date()
     start_date = end_date - timedelta(days=730)  # 2 years of data
@@ -65,8 +67,8 @@ def fetch_predict_and_store_all():
     for ticker in tickers:
         close_prices = fetch_and_store_stock_data(ticker)  # Fetch and store stock data
         predict_and_store(ticker, close_prices)            # Predict and store results
-    
-    print("Data fetched and predictions stored successfully.")
 
-if __name__ == "__main__":
-    fetch_predict_and_store_all()
+@router.get("/")
+def fetch_data():
+	fetch_predict_and_store_all()
+	return {"message": "Data fetched and predictions stored successfully."}
