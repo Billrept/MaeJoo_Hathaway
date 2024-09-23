@@ -33,7 +33,7 @@ const Dashboard = () => {
 
         // *** function to get user-tracked ticker, wanted in 2D arrays specifically { ticker: str, pricing: float, pred_price: float, pred_vola: float } but can be in different order
 
-        const response = await axios.get('http://localhost:8000/auth/user_stocks', {input : userId})
+        const response = await axios.get('http://localhost:8000/auth/user-stocks', {input : userId})
         const newRows = response.data.map(item => [
             item.ticker,
             item.pricing,

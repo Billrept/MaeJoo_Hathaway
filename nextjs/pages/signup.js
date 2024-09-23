@@ -1,15 +1,19 @@
 import { useState, useEffect } from 'react';
-import { TextField, Button, Grid, Typography, Paper } from '@mui/material';
+import { TextField, Button, Grid, Typography, Paper, IconButton, InputAdornment } from '@mui/material';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import Link from "next/link";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 const Signup = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState(""); // Ensure this state is for email
   const [password, setPassword] = useState('');  
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // Toggle for password visibility
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Toggle for confirm password visibility
   const [error, setError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [passwordValid, setPasswordValid] = useState(false);
@@ -44,9 +48,9 @@ const Signup = () => {
 
 	try {
 	  const response = await axios.post('http://localhost:8000/auth/signup', {
-		username: username,      // Sending username
-		email: email,            // Sending email
-		password: password,      // Sending password (backend will hash it)
+		username: username,
+		email: email,
+		password: password,
 	  });
       console.log('User created:', response.data);
       router.push('/login'); // Redirect to login page on successful signup
@@ -88,7 +92,7 @@ const Signup = () => {
         <Grid item>
           <TextField
             label="Password"
-            type="password"
+            type={showPassword ? "text" : "password"} // Toggle between text and password
             variant="outlined"
             fullWidth
             value={password}
@@ -99,12 +103,24 @@ const Signup = () => {
             required
             error={!!passwordError}
             helperText={passwordError}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword(!showPassword)} // Toggle visibility
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
         </Grid>
         <Grid item>
           <TextField
             label="Confirm Password"
-            type="password"
+            type={showConfirmPassword ? "text" : "password"} // Toggle between text and password
             variant="outlined"
             fullWidth
             value={confirmPassword}
@@ -112,6 +128,18 @@ const Signup = () => {
             required
             error={!!confirmPasswordError}
             helperText={confirmPasswordError}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)} // Toggle visibility
+                    edge="end"
+                  >
+                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
         </Grid>
         {error && (
