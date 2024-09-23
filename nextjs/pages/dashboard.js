@@ -76,7 +76,7 @@ const Dashboard = () => {
   );
 
   return (
-    <Box marginTop='8rem' marginRight='10vw' marginLeft='10vw'>
+    <Box marginTop='8rem' marginRight='10vw' marginLeft='10vw' >
         <Typography variant='h4'>Your stocks</Typography>
         <h2>{selectedRow}</h2>
         <StockGraph prices={stockData[0]} dates={stockData[1]} />
@@ -86,7 +86,7 @@ const Dashboard = () => {
             variant="outlined"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            sx={{ bgcolor: '#fff', width: '300px', marginTop: '1rem', marginBottom: '1rem' }}
+            sx={{ bgcolor: 'background.default', width: '300px', marginTop: '1rem', marginBottom: '1rem' }}
         />
         <TableContainer component={Paper}>
             <Table>

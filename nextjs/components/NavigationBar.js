@@ -4,33 +4,22 @@ import {
   Toolbar,
   Typography,
   Button,
-  Menu,
-  MenuItem,
-  Box,
-  ListItemIcon,
   Switch
 } from "@mui/material";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import FunctionsIcon from "@mui/icons-material/Functions";
-import Divider from "@mui/material/Divider";
-import PersonIcon from "@mui/icons-material/Person";
 import useBearStore from "@/store/useBearStore";
-import { useState } from "react";
 
 const NavigationLayout = ({ children }) => {
   const router = useRouter();
   const appName = useBearStore((state) => state.appName);
-
-  const [ isDarkMode, setIsDarkMode ] = useState(false);
-
-  const handleSwitchChange = (event) => {
-    setIsDarkMode(event.target.checked)
-  };
+  const isDarkMode = useBearStore((state) => state.isDarkMode); // Global dark mode state
+  const toggleDarkMode = useBearStore((state) => state.toggleDarkMode); // Function to toggle dark mode
 
   return (
     <>
-      <AppBar position="sticky" sx={{ paddingRight:'60px', paddingLeft:'60px', backgroundColor: "#68BB59" }}>
+      <AppBar position="sticky" sx={{ paddingRight:'60px', paddingLeft:'60px', backgroundColor: isDarkMode ? "#333" : "#68BB59" }}>
         <Toolbar>
           <Link href={"/"}>
             <FunctionsIcon sx={{ color: "#ffffff" }} fontSize="large" />
@@ -48,9 +37,8 @@ const NavigationLayout = ({ children }) => {
           </Typography>
           <NavigationLink href="/dashboard" label="Dashboard" />
           <div style={{ flexGrow: 1 }} />
-          <Typography> Dark mode: {String(isDarkMode)}</Typography>
-          <Switch checked={isDarkMode} onChange={handleSwitchChange}>
-          </Switch>
+          <Typography>{isDarkMode ? 'Dark mode':'Light mode'}</Typography>
+          <Switch checked={isDarkMode} onChange={toggleDarkMode} />
           <Button
             variant='contained'
             onClick={() => {
@@ -82,9 +70,8 @@ const NavigationLink = ({ href, label }) => {
         sx={{
           fontSize: "14px",
           fontWeight: 500,
-          // textTransform: "uppercase",
           color: "#fff",
-          padding: "0 10px", // Add padding on left and right
+          padding: "0 10px",
         }}>
         {label}
       </Typography>{" "}
