@@ -6,8 +6,10 @@ import { create } from "zustand";
 */
 
 const useBearStore = create((set) => ({
-  appName: undefined,
-  setAppName: (state) => set({ appName: state })
+  appName: 'MJ Hathaway',
+  isDarkMode: false,
+  setAppName: (state) => set({ appName: state }),
+  toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode }))
 }));
 
 export default useBearStore;

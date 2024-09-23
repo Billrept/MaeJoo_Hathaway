@@ -1,15 +1,18 @@
 import { Box, Typography, Grid, Link } from '@mui/material';
+import useBearStore from "@/store/useBearStore";
 
 const FooterLayout = () => {
+  const isDarkMode = useBearStore((state) => state.isDarkMode);
+
   return (
     <Box
       component="footer"
       sx={{
-        backgroundColor: '#68BB59',
+        backgroundColor: isDarkMode ? "#333" : "#68BB59",
         padding: '1.5rem 0',
-        marginTop: '5rem',
         textAlign: 'center',
-        color: 'white'
+        color: 'white',
+        marginTop:'10vh'
       }}
     >
       <Grid container justifyContent="center" spacing={2}>

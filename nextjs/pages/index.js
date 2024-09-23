@@ -1,55 +1,58 @@
-import Head from "next/head";
-import Image from "next/image";
-import { Inter } from "next/font/google";
-import Grid from "@mui/material/Grid2";
-import { Box, Typography, Button, TextField } from "@mui/material"; // Use by LoginForm
-import useBearStore from "@/store/useBearStore";
+import Grid from "@mui/material/Grid";
+import { Box, Typography, Button } from "@mui/material";
 
 function Home() {
   return (
     <>
-
-      <main style={{paddingLeft:'15vw', paddingRight:'15vw'}}>
-        <Grid container wrap="nowrap" direction='row' alignItems="center" justifyContent="space-around" marginTop='8rem'>
-
-          <Grid item size={{ xs:12, md:6 }}>
-              <Typography variant="h2" gutterBottom>
+      <Box sx={{ minHeight: '100vh', paddingLeft: '15vw', paddingRight: '15vw', bgcolor: 'background.default', marginTop:'10vh'}}>
+        <main>
+          <Grid container wrap="nowrap" direction="row" alignItems="center" justifyContent="space-around">
+            
+            <Grid item xs={12} md={6}>
+              <Typography text variant="h2" gutterBottom>
                 Some cool text here
               </Typography>
-              <Typography variant="body1" paragraph>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+              <Typography text variant="body1">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
               </Typography>
-              <Button href='/login' variant="contained" color="primary" sx={{ backgroundColor: '#68BB59', marginTop: '1rem' }} >
+              <Button href='/login' variant="contained" sx={{ color:'#ffffff', backgroundColor:'#2da14c', marginTop: '1rem' }}>
                 Get Started
               </Button>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <Box sx={{ justifyContent: 'center', padding: '2rem' }}>
+                <img
+                  src="/images/placeholder.jpg"
+                  alt="Very cool image of something"
+                  style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
+                />
+              </Box>
+            </Grid>
+
           </Grid>
 
-          <Grid item size={{ xs:12, md:6 }}>
-            <Box sx={{ justifyContent: 'center', padding: '2rem' }}>
-              <img
-                src="/images/placeholder.jpg"
-                alt="Very very cool image of something"
-                style={{ maxWidth: '100%', height: 'auto', borderRadius: '8px' }}
-              />
-            </Box>
+          <Typography variant="h4" gutterBottom sx={{ marginTop: '10rem', marginBottom: '5rem', fontWeight: 'bold' }}>
+            Prediction Models
+          </Typography>
+
+          <Grid container wrap="nowrap" direction="row" alignItems="center" justifyContent="space-around">
+            <Grid item xs={12} md={6} sx={{ textAlign: 'center' }}>
+              <Typography variant="h6">ARIMA MODEL</Typography>
+              <Typography>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12} md={6} sx={{ textAlign: 'center' }}>
+              <Typography variant="h6">GARCH MODEL</Typography>
+              <Typography>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              </Typography>
+            </Grid>
           </Grid>
-        </Grid>
-        <Typography variant='h4'gutterBottom style={{marginTop:'10rem', marginBottom:'5rem'}} sx={{fontWeight:'bold'}}>Prediction Models</Typography>
-        <Grid container wrap="nowrap" direction='row' alignItems="center" justifyContent="space-around">
-            <Grid item size={{xs:12, md:6}} sx={{ textAlign:'center'}}>
-              <Typography variant='h6'>ARIMA MODEL</Typography>
-              <Typography>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-              </Typography>
-            </Grid>
-            <Grid item size={{xs:12, md:6}} sx={{ textAlign:'center'}}>
-              <Typography variant='h6'>GARCH MODEL</Typography>
-              <Typography>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-              </Typography>
-            </Grid>
-        </Grid>
-      </main>
+        </main>
+      </Box>
     </>
   );
 }

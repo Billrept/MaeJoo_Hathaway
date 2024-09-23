@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Grid from "@mui/material/Grid2";
-import { TextField, Card, CardContent, Typography, Container, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { TextField, Card, CardContent, Typography, Container, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button } from '@mui/material';
 import { create } from 'lodash';
 import { Line } from 'react-chartjs-2';
 import StockGraph from './stockData/stockData';
@@ -15,6 +15,8 @@ const Dashboard = () => {
   const [ search, setSearch ] = useState('');
   const [ selectedRow, setSelectedRow ] = useState('');
   const [ stockData, setStockData] = useState([]);
+  const [ stockSearch, setStockSearch ] = useState('');
+  const [ error, setError ] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,7 +35,7 @@ const Dashboard = () => {
 
         // *** function to get user-tracked ticker, wanted in 2D arrays specifically { ticker: str, pricing: float, pred_price: float, pred_vola: float } but can be in different order
 
-        const response = await axios.get('http://localhost:8000/auth/user_stocks', {input : userId})
+        const response = await axios.get('http://localhost:8000/auth/user-stocks', {input : userId})
         const newRows = response.data.map(item => [
             item.ticker,
             item.pricing,
@@ -50,7 +52,33 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
+  const handleTrackedStock = async (e) => {
+    e.preventDefault();
+    try {
+      // Fetch the tracked stock data
+      const response = await axios.get('http://localhost:8000/auth/track-stock', { params: { input: stockSearch } });
+      const trackedStockInfo = response.data;
+
+      const newStock = [
+        trackedStockInfo.ticker,
+        trackedStockInfo.pricing,
+        trackedStockInfo.pred_price,
+        trackedStockInfo.pred_vola
+      ];
+
+      setRows((prevRows) => [...prevRows, newStock]);
+  
+      setStockSearch('');
+      console.log('New stock added: ', trackedStockInfo);
+  
+    } catch (error) {
+      console.error('Error adding new stock: ', error);
+      setError('Failed to add new stock. Please try again.');
+    }
+  };
+
   const handleRowClick = async (row) => {
+
     try{
         setSelectedRow(`${row[0]}`);
 
@@ -59,8 +87,8 @@ const Dashboard = () => {
         setStockData(response.data);
     } catch(error){
         console.error('Error fetching data: ', error)
-    };
-  }
+    }
+  };
 
 //   const stockPrices = [198, 188, 184, 190, 197, 194, 190, 194, 192, 186, 187, 192, 192, 193, 185, 
 //     192, 186, 182, 192, 183, 191, 189, 182, 175, 171, 175, 172, 182, 174, 170, 
@@ -76,7 +104,7 @@ const Dashboard = () => {
   );
 
   return (
-    <Box marginTop='8rem' marginRight='10vw' marginLeft='10vw'>
+    <Box marginTop='8rem' marginRight='10vw' marginLeft='10vw' >
         <Typography variant='h4'>Your stocks</Typography>
         <h2>{selectedRow}</h2>
         <StockGraph prices={stockData[0]} dates={stockData[1]} />
@@ -86,7 +114,7 @@ const Dashboard = () => {
             variant="outlined"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            sx={{ bgcolor: '#fff', width: '300px', marginTop: '1rem', marginBottom: '1rem' }}
+            sx={{ bgcolor: 'background.default', width: '300px', marginTop: '1rem', marginBottom: '1rem' }}
         />
         <TableContainer component={Paper}>
             <Table>
@@ -110,6 +138,25 @@ const Dashboard = () => {
                 </TableBody>
             </Table>
         </TableContainer>
+        <form onSubmit={handleTrackedStock}>
+          <TextField
+            label="Stock ticker"
+            variant="outlined"
+            margin="normal"
+            value={stockSearch}
+            onChange={(e) => setStockSearch(e.target.value)}
+            required
+            style={{ marginTop: '2rem', minWidth: '30vw' }}
+          />
+          {error && <Typography color="error">{error}</Typography>}
+          <Button
+            type="submit"
+            variant="contained"
+            style={{ marginTop: '40px', marginLeft: '20px', backgroundColor: '#68BB59', color: '#ffffff' }}
+          >
+            Add new stock
+          </Button>
+        </form>
     </Box>
   );
 };

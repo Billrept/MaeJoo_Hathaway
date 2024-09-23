@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
-import { TextField, Button, Grid, Typography, Paper } from '@mui/material';
+import { TextField, Button, Grid, Typography, Paper, IconButton, InputAdornment } from '@mui/material';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import LoginIcon from '@mui/icons-material/Login';
 import Link from "next/link";
-
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
   const [error, setError] = useState('');
   const router = useRouter();
 
@@ -24,16 +26,16 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:8000/auth/login', { 
-		username, password 
-	});
-    router.push({
-      pathname: '/dashboard',
-      query: { userId : 1 }
-      //query: { userId : response.data.userId } //axios.get
-    });
-		console.log(response.data.username);
-        router.push('/page1');
-      }
+        username, password 
+      });
+      router.push({
+        pathname: '/dashboard',
+        query: { userId: 1 }
+        //query: { userId : response.data.userId } //axios.get
+      });
+      console.log(response.data.username);
+      router.push('/2fa');
+    }
     catch (error) {
       setError('Invalid username or password');
     }
@@ -42,48 +44,66 @@ const Login = () => {
   return (
     <Grid container justifyContent="center" alignItems="center" style={{ minHeight: '100vh' }}>
       <Grid item xs={12} sm={8} md={4}>
-        <Paper elevation={3} style={{ padding: '2rem', textAlign:'center'}}>
-            <LoginIcon sx={{fontSize: 80, marginBottom:'2rem'}}/>
-            <Typography text variant="h4" gutterBottom>
-                Log in
-            </Typography>
-            <Typography variant="body1">
-                Welcome user, please login to continue
-            </Typography>
-            <form onSubmit={handleLogin}>
-                <TextField
-                    label="Username"
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                    style={{marginTop:'2rem'}}
-                />
-                <TextField
-                    label="Password"
-                    variant="outlined"
-                    type="password"
-                    fullWidth
-                    margin="normal"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-                {error && <Typography color="error">{error}</Typography>}
-                <Button type="submit" variant="contained" color="primary" fullWidth style={{marginTop: '2rem',marginBottom: '2rem' , backgroundColor:'#68BB59'}}>
-                    Log in
-                </Button>
-            </form>
-            <Typography variant="body1" style={{ marginRight: '0.5rem' }}>
-              Don't have an account?
-            </Typography>
-            <Link href="/signup" passHref>
-              <Button variant="text" style={{ color: '#68BB59' }}>
-                Sign Up
-              </Button>
-            </Link>
+        <Paper elevation={3} style={{ padding: '2rem', textAlign: 'center' }}>
+          <LoginIcon sx={{ fontSize: 80, marginBottom: '2rem' }} />
+          <Typography text variant="h4" gutterBottom>
+            Log in
+          </Typography>
+          <Typography variant="body1">
+            Welcome user, please login to continue
+          </Typography>
+          <form onSubmit={handleLogin}>
+            <TextField
+              label="Username"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              style={{ marginTop: '2rem' }}
+            />
+            <TextField
+              label="Password"
+              variant="outlined"
+              type={showPassword ? 'text' : 'password'} // Toggle between text and password
+              fullWidth
+              margin="normal"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)} // Toggle visibility
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            {error && <Typography color="error">{error}</Typography>}
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              style={{ marginTop: '2rem', marginBottom: '2rem', backgroundColor: '#68BB59' }}
+            >
+              Log in
+            </Button>
+          </form>
+          <Typography variant="body1" style={{ marginRight: '0.5rem' }}>
+            Don't have an account?
+          </Typography>
+          <Link href="/signup" passHref>
+            <Button variant="text" style={{ color: '#68BB59' }}>
+              Sign Up
+            </Button>
+          </Link>
         </Paper>
       </Grid>
     </Grid>
