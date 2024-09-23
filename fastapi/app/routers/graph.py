@@ -13,7 +13,7 @@ class StockPrediction(BaseModel):
 	ticker: str
 	predicted_price: float
 	predicted_volatility: float
-	model_used: str
+	prediction_models: str
 
 @router.get("/{ticker}/history", response_model=List[StockHistoryRecord])
 def get_stock_history_endpoint(ticker: str):
@@ -40,7 +40,7 @@ def stock_prediction(ticker: str):
         "ticker": prediction[0],
         "predicted_price": float(prediction[1]),
         "predicted_volatility": float(prediction[2]),
-        "model_used": str(prediction[3])
+        "prediction_models": str(prediction[3])
     }
 
     return response
