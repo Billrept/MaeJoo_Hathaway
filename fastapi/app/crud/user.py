@@ -35,3 +35,23 @@ def get_user_by_username(conn, username: str):
     
     return result
 
+def update_user(db, username: str, email: str):
+	cursor = db.cursor(cursor_factory=RealDictCursor)
+	try:
+		cursor.execute(
+			"""
+			UPDATE users
+			SET username = %s, email = %s
+			WHERE id = %s
+			RETURNING id, username, email;
+			""",
+			(username, email)
+		)
+		updated_user = cursor.fetchone()
+		db.commit()
+		return updated_user
+	except Exception as e:
+		db.rollback()
+		raise e
+	finally:
+		cursor.close()

@@ -67,7 +67,7 @@ def get_prediction(ticker):
     SELECT ticker, predicted_price, predicted_volatility, model_used
     FROM stock_predictions
     WHERE ticker = %s
-    ORDER BY created_at DESC LIMIT 1;
+	ORDER BY prediction_date DESC
     """
     cur.execute(query, (ticker,))
     result = cur.fetchone()
