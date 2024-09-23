@@ -22,6 +22,24 @@ const theme = createTheme({
   },
 });
 
+const lightTheme = createTheme({
+  palette: {
+    mode: 'light',
+    background: {
+      default: '#ffffff',
+    },
+  },
+});
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    background: {
+      default: '#121212',
+    },
+  },
+});
+
 export default function App({ Component, pageProps, props }) {
   const router = useRouter();
   const [loading, setLoading] = React.useState(false);
@@ -32,7 +50,7 @@ export default function App({ Component, pageProps, props }) {
     console.log("App load", pageName, router.query);
     setLoading(true);
     // TODO: This section is use to handle page change.
-    setAppName("Say Hi")
+    setAppName("Maejoo Hathaway")
     setLoading(false);
   }, [router, pageName]);
 
@@ -46,7 +64,7 @@ export default function App({ Component, pageProps, props }) {
       </Head>
 
       <AppCacheProvider {...props}>
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={darkTheme}>
           <Layout>
             <Component {...pageProps} />
           </Layout>
