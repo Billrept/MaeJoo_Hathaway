@@ -11,11 +11,12 @@ import Link from "next/link";
 import FunctionsIcon from "@mui/icons-material/Functions";
 import useBearStore from "@/store/useBearStore";
 
+
 const NavigationLayout = ({ children }) => {
   const router = useRouter();
   const appName = useBearStore((state) => state.appName);
-  const isDarkMode = useBearStore((state) => state.isDarkMode); // Global dark mode state
-  const toggleDarkMode = useBearStore((state) => state.toggleDarkMode); // Function to toggle dark mode
+  const toggleDarkMode = useBearStore((state) => state.toggleDarkMode);
+  const isDarkMode = useBearStore((state) => state.isDarkMode);
 
   return (
     <>
@@ -36,6 +37,7 @@ const NavigationLayout = ({ children }) => {
             MJ Hathaway
           </Typography>
           <NavigationLink href="/dashboard" label="Dashboard" />
+          <NavigationLink href="/market" label="Market" />
           <div style={{ flexGrow: 1 }} />
           <Typography>{isDarkMode ? 'Dark mode':'Light mode'}</Typography>
           <Switch checked={isDarkMode} onChange={toggleDarkMode} />
@@ -63,15 +65,24 @@ const NavigationLayout = ({ children }) => {
 };
 
 const NavigationLink = ({ href, label }) => {
+  const isDarkMode = useBearStore((state) => state.isDarkMode);
+
   return (
     <Link href={href} style={{ textDecoration: "none" }}>
       <Typography
         variant="body1"
         sx={{
-          fontSize: "14px",
+          marginLeft:'20px',
+          fontSize: "17px",
           fontWeight: 500,
           color: "#fff",
           padding: "0 10px",
+          textDecoration: 'none',
+          color: 'white',
+          transition: 'color 0.3s ease',
+          '&:hover': {
+            color: isDarkMode ? '#68BB59' : '#0cab37',
+          }
         }}>
         {label}
       </Typography>{" "}
