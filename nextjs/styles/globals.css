@@ -51,3 +51,26 @@ html, body {
   font-family: var(--font-family);
   background-color: rgb(255, 255, 255);
 }
+
+@keyframes cash-splash {
+  0% {
+    opacity: 1;
+    transform: scale(1) translate(0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.5) translate(calc(100px * var(--x)), calc(100px * var(--y)));
+  }
+}
+
+.cash-splash {
+  position: absolute;
+  width: 40px;  /* Increased size */
+  height: 40px; /* Increased size */
+  background-image: url('/images/cash.png'); /* Adjust this image */
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  animation: cash-splash 0.7s ease-out forwards;
+}
+

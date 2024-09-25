@@ -21,7 +21,7 @@ const Login = () => {
         console.log('2FA required');
         router.push('/2fa');
     } catch (err) {
-      setError('kkkkk credentials. Please try again.');
+      setError('Invalid credentials. Please try again.');
     }
   };
 
