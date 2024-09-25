@@ -35,7 +35,13 @@ export default function Layout({ children }) {
   return (
     <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
       <CssBaseline />
-      <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
+      <Box
+        sx={{
+          minHeight: "100vh",
+          bgcolor: "background.default",
+          transition: "background-color 0.5s ease, color 0.5s ease", // Smooth transition for background and text color
+        }}
+      >
         <NavigationLayout />
         <main>{children}</main>
         <FooterLayout />
