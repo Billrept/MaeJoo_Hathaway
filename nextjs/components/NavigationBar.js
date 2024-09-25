@@ -6,7 +6,13 @@ import {
   Switch,
   Button,
   Box,
+  Menu,
+  MenuItem,
+  Typography,
+  FormControlLabel
 } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu"; // Import MenuIcon
+import AccountCircle from "@mui/icons-material/AccountCircle"; // Import AccountCircle
 import { useRouter } from "next/router";
 import Link from "next/link";
 import FunctionsIcon from "@mui/icons-material/Functions";
@@ -17,27 +23,77 @@ import { useState, useEffect } from "react";
 
 const NavigationLayout = ({ children }) => {
   const router = useRouter();
-  const isDarkMode = useBearStore((state) => state.isDarkMode); // Global dark mode state
-  const toggleDarkMode = useBearStore((state) => state.toggleDarkMode); // Function to toggle dark mode
+  const isDarkMode = useBearStore((state) => state.isDarkMode);
+  const toggleDarkMode = useBearStore((state) => state.toggleDarkMode);
+  const appName = useBearStore((state) => state.appName);
 
-  // States to handle icon transitions
   const [showSun, setShowSun] = useState(!isDarkMode);
   const [showMoon, setShowMoon] = useState(isDarkMode);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [username, setUsername] = useState("John Doe"); // Placeholder username
+  const [isCashMode, setIsCashMode] = useState(false); // Toggle cash mode
+
+  // State to manage the dropdown menu
+  const [anchorEl, setAnchorEl] = useState(null); // Menu anchor
+  const menuOpen = Boolean(anchorEl); // Menu open state
+
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget); // Set the anchor (target) for the dropdown menu
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null); // Close the menu
+  };
+
+  // Handle cash splash
+  const handleClick = (e) => {
+    if (!isCashMode) return; // Only trigger splash if cash mode is enabled
+
+    const cashCount = 10;
+    for (let i = 0; i < cashCount; i++) {
+      const cashSplash = document.createElement("div");
+      cashSplash.classList.add("cash-splash");
+      cashSplash.style.left = `${e.clientX}px`;
+      cashSplash.style.top = `${e.clientY}px`;
+      cashSplash.style.setProperty("--x", Math.random() * 2 - 1);
+      cashSplash.style.setProperty("--y", Math.random() * 2 - 1);
+      document.body.appendChild(cashSplash);
+
+      // Remove the cash splash element after animation
+      setTimeout(() => {
+        cashSplash.remove();
+      }, 700);
+    }
+  };
 
   useEffect(() => {
     if (isDarkMode) {
-      // Moon should rise, and sun should set
       setShowSun(false);
-      setTimeout(() => setShowMoon(true), 500); // Moon rises after sun sets
+      setTimeout(() => setShowMoon(true), 400); // Delay moon visibility until the sun is hidden
     } else {
-      // Sun should rise, and moon should set
       setShowMoon(false);
-      setTimeout(() => setShowSun(true), 500); // Sun rises after moon sets
+      setTimeout(() => setShowSun(true), 400); // Delay sun visibility until the moon is hidden
     }
   }, [isDarkMode]);
 
+  // Apply the cash icon as cursor when cash mode is enabled
+  useEffect(() => {
+    if (isCashMode) {
+      document.body.style.cursor = "url('/cashCursor.png'), auto";
+      document.addEventListener("click", handleClick);
+    } else {
+      document.body.style.cursor = "auto";
+      document.removeEventListener("click", handleClick);
+    }
+
+    // Clean up event listener on unmount
+    return () => {
+      document.removeEventListener("click", handleClick);
+    };
+  }, [isCashMode]);
+
   const handleToggle = () => {
-    toggleDarkMode(); // Toggle between dark and light mode
+    toggleDarkMode();
   };
 
   return (
@@ -51,13 +107,41 @@ const NavigationLayout = ({ children }) => {
         }}
       >
         <Toolbar>
+          {/* Functions Icon */}
           <Link href={"/"}>
-            <FunctionsIcon sx={{ color: "#ffffff" }} fontSize="large" />
+            <FunctionsIcon
+              sx={{
+                color: "#ffffff",
+                textDecoration: "none",
+                color: "white",
+                transition: "color 0.3s ease",
+                "&:hover": {
+                  color: isDarkMode ? "#68BB59" : "#0cab37",
+                },
+              }}
+              fontSize="large"
+            />
           </Link>
+
+          <Typography
+            variant="body1"
+            sx={{
+              fontSize: "22px",
+              fontWeight: 500,
+              color: "#ffffff",
+              padding: "0 10px",
+              fontFamily: "Sofia",
+            }}
+          >
+            {appName}
+          </Typography>
+
+          <NavigationLink href="/dashboard" label="Dashboard" />
+          <NavigationLink href="/market" label="Market" />
 
           <Box sx={{ flexGrow: 1 }} />
 
-          {/* Sun and Moon Icons next to Switch with Animation */}
+          {/* Cash Mode Switch and Dark Mode Switch */}
           <Box
             sx={{
               display: "flex",
@@ -67,67 +151,137 @@ const NavigationLayout = ({ children }) => {
               marginRight: "20px",
             }}
           >
-            {/* Sun icon */}
+            {/* Cash Mode Switch */}
+            <FormControlLabel
+              sx={{marginRight:'80px'}}
+              control={
+                <Switch
+                  checked={isCashMode}
+                  onChange={() => setIsCashMode(!isCashMode)}
+                  color="primary"
+                  sx={{ marginRight: "10px" }}
+                />
+              }
+              label="Cash Mode"
+            />
+
+            {/* Sun Icon */}
             <IconButton
               disableRipple
               sx={{
                 position: "absolute",
-                right: "10px", // Position next to the switch
-                opacity: showSun ? 1 : 0, // Show or hide based on state
-                transform: showSun ? "translateY(0)" : "translateY(20px)", // Sun rises/sets
-                transition: "opacity 0.55s, transform 0.7s ease", // Smooth transition
+                right: "10px",
+                opacity: showSun ? 1 : 0,
+                visibility: showSun ? "visible" : "hidden", // Hide sun completely when invisible
+                transform: showSun ? "translateY(0)" : "translateY(20px)",
+                transition: "opacity 0.55s, transform 0.7s ease, visibility 0.55s",
                 marginRight: "40px",
               }}
             >
               <WbSunnyIcon fontSize="large" sx={{ color: "#FFD700" }} />
             </IconButton>
 
-            {/* Moon icon */}
+            {/* Moon Icon */}
             <IconButton
               disableRipple
               sx={{
                 position: "absolute",
-                right: "10px", // Position next to the switch
-                opacity: showMoon ? 1 : 0, // Show or hide based on state
-                transform: showMoon ? "translateY(0)" : "translateY(20px)", // Moon rises/sets
-                transition: "opacity 0.55s, transform 0.7s ease", // Smooth transition
+                right: "10px",
+                opacity: showMoon ? 1 : 0,
+                visibility: showMoon ? "visible" : "hidden", // Hide moon completely when invisible
+                transform: showMoon ? "translateY(0)" : "translateY(20px)",
+                transition: "opacity 0.55s, transform 0.7s ease, visibility 0.55s",
                 marginRight: "40px",
               }}
             >
               <Brightness2Icon fontSize="large" sx={{ color: "#ffffff" }} />
             </IconButton>
 
+            {/* Dark Mode Switch */}
             <Switch checked={isDarkMode} onChange={handleToggle} />
           </Box>
 
-          {/* Sign In and Sign Up buttons */}
-          <Button
-            variant="contained"
-            onClick={() => {
-              router.push("/login");
-            }}
-            sx={{
-              backgroundColor: "#2da14c",
-              color: "#ffffff",
-              width: "100px",
-              marginRight: "20px",
-            }}
-          >
-            Sign In
-          </Button>
-          <Button
-            variant="contained"
-            onClick={() => {
-              router.push("/signup");
-            }}
-            sx={{
-              backgroundColor: "#ffffff",
-              color: "#68BB59",
-              width: "100px",
-            }}
-          >
-            Sign Up
-          </Button>
+          {/* Account Circle and Username */}
+          {isLoggedIn ? (
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Typography
+                sx={{
+                  fontSize: "16px",
+                  fontWeight: 500,
+                  color: "#ffffff",
+                  marginRight: "10px",
+                }}
+              >
+                {username}
+              </Typography>
+              <IconButton color="inherit">
+                <AccountCircle />
+              </IconButton>
+
+              {/* Menu Icon */}
+              <IconButton
+                edge="start"
+                color="inherit"
+                aria-label="menu"
+                onClick={handleMenuClick}
+                sx={{ marginLeft: 1 }}
+              >
+                <MenuIcon />
+              </IconButton>
+
+              <Menu
+                anchorEl={anchorEl} // Anchor for the menu
+                open={menuOpen} // Whether the menu is open
+                onClose={handleMenuClose} // Close handler
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "center", // Align the menu horizontally in the center of the anchor (MenuIcon)
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "center", // Transform the menu starting from its center
+                }}
+                MenuListProps={{
+                  "aria-labelledby": "basic-button",
+                }}
+              >
+                <MenuItem onClick={() => router.push("/profile")}>Profile</MenuItem>
+                <MenuItem onClick={() => router.push("/dashboard")}>Dashboard</MenuItem>
+                <MenuItem onClick={() => router.push("/settings")}>Settings</MenuItem>
+                <MenuItem onClick={() => setIsLoggedIn(false)}>Log out</MenuItem>
+              </Menu>
+            </Box>
+          ) : (
+            <>
+              <Button
+                variant="contained"
+                onClick={() => {
+                  router.push("/login");
+                }}
+                sx={{
+                  backgroundColor: "#2da14c",
+                  color: "#ffffff",
+                  width: "100px",
+                  marginRight: "20px",
+                }}
+              >
+                Sign In
+              </Button>
+              <Button
+                variant="contained"
+                onClick={() => {
+                  router.push("/signup");
+                }}
+                sx={{
+                  backgroundColor: "#ffffff",
+                  color: "#68BB59",
+                  width: "100px",
+                }}
+              >
+                Sign Up
+              </Button>
+            </>
+          )}
         </Toolbar>
       </AppBar>
       <main>{children}</main>
@@ -140,18 +294,23 @@ const NavigationLink = ({ href, label }) => {
 
   return (
     <Link href={href} style={{ textDecoration: "none" }}>
-      <Button
+      <Typography
+        variant="body1"
         sx={{
-          marginLeft: '20px',
-          fontSize: "17px",
+          fontSize: "14px",
           fontWeight: 500,
           color: "#fff",
-          padding: "0 10px",
+          padding: "0 10px", // Add padding on left and right
           textDecoration: "none",
+          color: "white",
+          transition: "color 0.3s ease",
+          "&:hover": {
+            color: isDarkMode ? "#68BB59" : "#0cab37",
+          },
         }}
       >
         {label}
-      </Button>
+      </Typography>
     </Link>
   );
 };
