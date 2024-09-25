@@ -1,49 +1,43 @@
 import { useState, useEffect } from 'react';
-import { TextField, Button, Grid, Typography, Paper, Link } from '@mui/material';
+import { TextField, Button, Grid, Typography, Paper } from '@mui/material';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import Link from 'next/link';  // Import Link from next/link
 
 const TwoFactorAuth = () => {
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const router = useRouter();
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, []);
+  
+  const email = localStorage.getItem('email');  // Retrieve the stored email for verification
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
 
     try {
-      // Replace with actual API call to verify the OTP
       const response = await axios.post('http://localhost:8000/auth/verify-otp', {
-        otp,
+        email,
+        otp
       });
 
       if (response.data.success) {
         setSuccess('OTP verified successfully!');
-        router.push('/dashboard');
+        router.push('/dashboard');  // Redirect to dashboard on success
       } else {
         setError('Invalid OTP. Please try again.');
       }
     } catch (err) {
       setError('Failed to verify OTP. Please try again.');
-      console.error('Error verifying OTP:', err);
     }
   };
 
   const resendCode = async (e) => {
-    try{
-        const response = await axios.post('http://localhost:8000/auth/resend-code');
-    }catch (error){
+    try {
+        const response = await axios.post('http://localhost:8000/auth/resend-otp');
+    } catch (error) {
         setError('Failed to resend code.');
-        console.error('Error resending code', error)
+        console.error('Error resending code', error);
     }
   };
 
@@ -79,7 +73,7 @@ const TwoFactorAuth = () => {
             </Button>
             <Typography variant="body1" gutterBottom>
                 Need a new code? 
-                <Link>
+                <Link href="/resend-otp"> {/* Link to the resend OTP page */}
                     <Button variant="text" onClick={resendCode} style={{ color: '#68BB59' }}>
                         Resend code
                     </Button>

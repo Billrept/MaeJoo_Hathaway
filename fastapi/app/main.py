@@ -6,10 +6,10 @@ from .daily_fetch.daily_fetch import router as daily_fetch
 
 app = FastAPI()
 
-# CORS configuration
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # You can adjust this based on where your frontend is hosted
+    allow_origins=["http://localhost:3000"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
