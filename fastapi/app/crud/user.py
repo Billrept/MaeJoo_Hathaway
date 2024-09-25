@@ -21,13 +21,13 @@ def create_user(db, username: str, email: str, hashed_password: str):
     finally:
         cursor.close()
         
-def get_user_by_username(conn, username: str):
+def get_user_by_email(conn, username: str):
     with conn.cursor() as cur:
         # Raw SQL query to fetch user by username
         query = sql.SQL("""
             SELECT id, username, email, password_hash
             FROM users
-            WHERE username = %s;
+            WHERE email = %s;
         """)
         
         cur.execute(query, (username,))

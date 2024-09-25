@@ -48,16 +48,22 @@ const Signup = () => {
 
 	try {
 	  const response = await axios.post('http://localhost:8000/auth/signup', {
-		username: username,
-		email: email,
-		password: password,
+		email,
+		username,
+		password
 	  });
-      console.log('User created:', response.data);
-      router.push('/login'); // Redirect to login page on successful signup
-    } catch (error) {
-      console.error('Error signing up user:', error);
-      setError("Failed to sign up. Please try again.");
-    }
+
+	  if (response.data.success && response.data['2fa_required']) {
+		localStorage.setItem('email', email);
+		router.push('/2fa');
+	  } else if (response.data.success) {
+		router.push('/dashboard');
+	  } else {
+		setError('Sign up failed. Please try again.');
+	  }
+	} catch (err) {
+	  setError('Sign up failed. Please try again.');
+	}
   };
 
   return (
