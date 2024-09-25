@@ -14,31 +14,53 @@ const Dashboard = () => {
   const [stockData, setStockData] = useState([]);
   const [stockSearch, setStockSearch] = useState('');
   const [error, setError] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Fetch the list of user-tracked stocks when the component mounts
+  // Check authentication when the component mounts
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        console.log('User Id: ', userId);
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      router.push('/login'); // Redirect to login if no token
+    } else {
+      // Verify the token with the backend
+      axios.post('http://localhost:8000/verify-token', { token })
+        .then(response => {
+          if (response.data.valid) {
+            setIsAuthenticated(true); // Token is valid, allow access
+          } else {
+            router.push('/login'); // Redirect if token is invalid
+          }
+        })
+        .catch(() => {
+          router.push('/login'); // Redirect on error
+        });
+    }
+  }, []);
 
-        // Fetch user-tracked stocks using the userId
-        const response = await axios.get('http://localhost:8000/auth/user-stocks', { params: { userId } });
-        const newRows = response.data.map(item => [
-          item.ticker,
-          item.pricing,
-          item.pred_price,
-          item.pred_vola
-        ]);
-        setRows(newRows);
-        console.log('Data fetched: ', response.data);
-      } catch (error) {
-        console.error('Error fetching data: ', error);
-      }
-    };
-    fetchData();
-  }, [userId]);
+  useEffect(() => {
+    if (isAuthenticated) {
+      const fetchData = async () => {
+        try {
+          console.log('User Id: ', userId);
+          // Fetch user-tracked stocks using the userId
+          const response = await axios.get('http://localhost:8000/auth/user-stocks', { params: { userId } });
+          const newRows = response.data.map(item => [
+            item.ticker,
+            item.pricing,
+            item.pred_price,
+            item.pred_vola
+          ]);
+          setRows(newRows);
+          console.log('Data fetched: ', response.data);
+        } catch (error) {
+          console.error('Error fetching data: ', error);
+        }
+      };
+      fetchData();
+    }
+  }, [userId, isAuthenticated]);
 
-  // Handle adding a new tracked stock
   const handleTrackedStock = async (e) => {
     e.preventDefault();
     try {
@@ -53,46 +75,22 @@ const Dashboard = () => {
         trackedStockInfo.pred_vola
       ];
 
-      setRows((prevRows) => [...prevRows, newStock]);
-
-      setStockSearch('');
-      console.log('New stock added: ', trackedStockInfo);
-
-    } catch (error) {
-      console.error('Error adding new stock: ', error);
-      setError('Failed to add new stock. Please try again.');
+      setRows([...rows, newStock]);
+      setError('');
+    } catch (err) {
+      setError('Error tracking stock');
     }
   };
 
-  // Handle fetching and displaying stock history when a row is clicked
-  const handleRowClick = async (row) => {
-    try {
-      setSelectedRow(`${row[0]}`);
-
-      // Fetch the past stock data based on the selected stock ticker
-      const response = await axios.get(`http://localhost:8000/stocks/${row[0]}/history`);
-      setStockData(response.data);
-    } catch (error) {
-      console.error('Error fetching stock data: ', error);
-    }
-  };
-
-  // Filter stocks based on the search input
-  const filteredRows = rows.filter((row) =>
-    row[0].toLowerCase().includes(search.toLowerCase())
-  );
+  if (!isAuthenticated) {
+    return <div>Loading...</div>; // Show a loading state while checking authentication
+  }
 
   return (
-    <Box marginTop="8rem" marginRight="10vw" marginLeft="10vw">
-      <Typography variant="h4">Your Stocks</Typography>
-      <Typography variant="h6">{selectedRow}</Typography>
-      
-      {/* Display the stock graph */}
-      <StockGraph prices={stockData.map(d => d.close)} dates={stockData.map(d => d.trade_date)} />
-
-      {/* Search bar */}
+    <Box>
+      <Typography variant="h4">Dashboard</Typography>
       <TextField
-        label="Search"
+        label="Search stocks"
         variant="outlined"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
@@ -111,8 +109,8 @@ const Dashboard = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredRows.map((row) => (
-              <TableRow key={row[0]} onClick={() => handleRowClick(row)} sx={{ cursor: 'pointer', '&:hover': { backgroundColor: '#f5f5f5' } }}>
+            {rows.map((row) => (
+              <TableRow key={row[0]} onClick={() => setSelectedRow(row)} sx={{ cursor: 'pointer', '&:hover': { backgroundColor: '#f5f5f5' } }}>
                 <TableCell component="th" scope="row">{row[0]}</TableCell>
                 <TableCell align="right">{row[1]}</TableCell>
                 <TableCell align="right">{row[2]}</TableCell>

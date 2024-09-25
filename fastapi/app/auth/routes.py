@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from .auth_handler import get_password_hash, verify_otp, create_access_token, generate_otp, send_otp_via_email
 from app.database import get_db_connection
 from app.crud.user import create_user, get_user_by_email
+import logging
 
 
 router = APIRouter()
@@ -22,6 +23,9 @@ class UserLogin(BaseModel):
 class VerifyOtpRequest(BaseModel):
     email: str
     otp: int
+
+class resendOtpRequest(BaseModel):
+    email: str
 
 @router.post("/signup")
 def signup(user: UserSignup, db: Session = Depends(get_db_connection)):
@@ -46,13 +50,26 @@ def login(user: UserLogin, conn = Depends(get_db_connection)):
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post("/verify-otp")
-def validared(data: VerifyOtpRequest):
-    if not verify_otp(data.email, data.otp):
-        raise HTTPException(status_code=400, detail="Invalid OTP")
-    return {"success": True}
+def verify_otp_endpoint(data: VerifyOtpRequest):
+    # Convert OTP to an integer for comparison, assuming OTP is stored/generated as an integer
+    try:
+        user_otp = int(data.otp)  # Convert the user-provided OTP to an integer
+    except ValueError:
+        # Handle cases where the provided OTP is not a valid number
+        raise HTTPException(status_code=400, detail="Invalid OTP format.")
+
+    if verify_otp(data.email, user_otp):  # Ensure OTPs are compared as integers
+        return {"success": True, "message": "OTP verified successfully"}
+    else:
+        raise HTTPException(status_code=400, detail="Invalid OTP.")
 
 @router.post("/resend-otp")
-def resend_otp(data: VerifyOtpRequest):
-    otp = generate_otp(data.email)
-    send_otp_via_email(data.email, otp)
-    return {"message": "OTP sent successfully"}
+async def resend_otp(data: resendOtpRequest):
+    try:
+        otp = generate_otp(data.email)
+        
+        send_otp_via_email(data.email, otp)
+        
+        return {"message": "OTP sent successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to resend OTP: {str(e)}")

@@ -18,10 +18,11 @@ const Login = () => {
         password
       });
         localStorage.setItem('email', email);
+        localStorage.setItem('token', response.data.access_token);
         console.log('2FA required');
         router.push('/2fa');
     } catch (err) {
-      setError('kkkkk credentials. Please try again.');
+      setError('False credentials. Please try again.');
     }
   };
 
