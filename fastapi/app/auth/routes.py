@@ -21,7 +21,7 @@ class UserLogin(BaseModel):
 
 class VerifyOtpRequest(BaseModel):
     email: str
-    otp: str
+    otp: int
 
 @router.post("/signup")
 def signup(user: UserSignup, db: Session = Depends(get_db_connection)):
@@ -47,7 +47,6 @@ def login(user: UserLogin, conn = Depends(get_db_connection)):
 
 @router.post("/verify-otp")
 def validared(data: VerifyOtpRequest):
-    # OTP verification logic
     if not verify_otp(data.email, data.otp):
         raise HTTPException(status_code=400, detail="Invalid OTP")
     return {"success": True}

@@ -2,15 +2,30 @@ import { useState, useEffect } from 'react';
 import { TextField, Button, Grid, Typography, Paper } from '@mui/material';
 import { useRouter } from 'next/router';
 import axios from 'axios';
-import Link from 'next/link';  // Import Link from next/link
+import Link from 'next/link';
 
 const TwoFactorAuth = () => {
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [email, setEmail] = useState('');  // State to store email
   const router = useRouter();
-  
-  const email = localStorage.getItem('email');  // Retrieve the stored email for verification
+
+  useEffect(() => {
+    const storedEmail = localStorage.getItem('email');
+    if (storedEmail) {
+      setEmail(storedEmail);
+    }
+  }, []);  // Empty dependency array ensures this runs only once after the component mounts
+ 
+  const resendCode = async () => {
+    try {
+      const response = await axios.post('http://localhost:8000/auth/resend-otp', { email });
+    } catch (error) {
+      setError('Failed to resend code.');
+      console.error('Error resending code', error);
+    }
+  };
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
@@ -26,18 +41,12 @@ const TwoFactorAuth = () => {
         router.push('/dashboard');  // Redirect to dashboard on success
       } else {
         setError('Invalid OTP. Please try again.');
+        router.reload();  // Refresh the page
       }
     } catch (err) {
       setError('Failed to verify OTP. Please try again.');
-    }
-  };
-
-  const resendCode = async (e) => {
-    try {
-        const response = await axios.post('http://localhost:8000/auth/resend-otp');
-    } catch (error) {
-        setError('Failed to resend code.');
-        console.error('Error resending code', error);
+      await resendCode();  // Resend the code
+      router.reload();  // Refresh the page
     }
   };
 
@@ -49,7 +58,7 @@ const TwoFactorAuth = () => {
             Two-Factor Authentication
           </Typography>
           <Typography variant="body1" gutterBottom>
-            Please enter the OTP sent to your email/phone
+            Please enter the OTP sent to your email
           </Typography>
           <form onSubmit={handleVerifyOtp}>
             <TextField
