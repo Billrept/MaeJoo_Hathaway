@@ -24,7 +24,7 @@ const Dashboard = () => {
       router.push('/login'); // Redirect to login if no token
     } else {
       // Verify the token with the backend
-      axios.post('http://localhost:8000/verify-token', { token })
+      axios.post('http://localhost:8000/auth/verify-token', { token })
         .then(response => {
           if (response.data.valid) {
             setIsAuthenticated(true); // Token is valid, allow access

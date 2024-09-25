@@ -40,6 +40,28 @@ def get_stock_history(ticker):
         return df
     return None
 
+def get_all_stock_prices():
+    connection = get_db_connection()
+    cursor = connection.cursor()
+
+    # Query to get the most recent close_price for each ticker
+    query = """
+    SELECT ticker, close
+    FROM stock_history
+    WHERE (ticker, trade_date) IN (
+        SELECT ticker, MAX(trade_date)
+        FROM stock_history
+        GROUP BY ticker
+    )
+    """
+    
+    cursor.execute(query)
+    stock_prices = cursor.fetchall()
+    connection.close()
+
+    # Convert the data to a list of dictionaries
+    return [{"ticker": ticker, "current_price": f'{float(close_price):.2f}'} for ticker, close_price in stock_prices]
+
 def store_prediction(ticker, predicted_price, predicted_volatility, model_used="ARIMA-GARCH"):
     conn = get_db_connection()
     cur = conn.cursor()

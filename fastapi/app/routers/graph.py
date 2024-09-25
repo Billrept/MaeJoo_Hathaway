@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List
-from ..database import get_stock_history, get_prediction
+from ..database import get_stock_history, get_prediction, get_all_stock_prices
 
 router = APIRouter()
 
@@ -44,3 +44,7 @@ def stock_prediction(ticker: str):
     }
 
     return response
+
+@router.get("/prices")
+def fetch_current_stock_prices():
+    return get_all_stock_prices()

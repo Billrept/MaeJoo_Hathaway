@@ -14,6 +14,8 @@ import pyotp
 import smtplib
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+
 SECRET_KEY = "1wakrai6_kmitlzaza"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
@@ -81,7 +83,6 @@ def send_otp_via_email(email, otp):
         body = f"Your OTP code is: {otp}"
         message.attach(MIMEText(body, 'plain'))
 
-        # Establish connection to the Gmail SMTP server
         server = smtplib.SMTP('smtp.gmail.com', 587)  # Use port 587 for TLS
         server.starttls()  # Upgrade the connection to a secure encrypted TLS connection
         server.login(sender_email, sender_password)
@@ -93,3 +94,19 @@ def send_otp_via_email(email, otp):
         server.quit()
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error sending OTP")
+    
+def decode_token(token: str):
+    try:
+        # Decode the token using the secret key and algorithm
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        
+        # Optional: You can check token expiration here
+        if payload["exp"] < datetime.utcnow().timestamp():
+            raise HTTPException(status_code=401, detail="Token has expired")
+        
+        return payload  # If token is valid, return the payload (user info)
+    
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")

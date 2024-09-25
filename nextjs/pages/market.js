@@ -1,49 +1,64 @@
-import { Typography, Box, TextField, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton } from '@mui/material';
 import React, { useState, useEffect } from 'react';
-import StockGraph from './stockData/stockData';
-import StarIcon from '@mui/icons-material/Star'; // Import StarIcon from Material UI
+import axios from 'axios';
+import { Typography, Box, TextField, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton } from '@mui/material';
+import StarIcon from '@mui/icons-material/Star';
 import useBearStore from "@/store/useBearStore";
+import StockGraph from './stockData/stockData';
+
+const tickers = [
+    "AAPL", "ABNB", "ADBE", "ADI", "ADP", "ADSK", "AEP", "AMAT", "AMD", "AMGN", 
+    "AMZN", "ANSS", "ARM", "ASML", "AVGO", "AZN", "BIIB", "BKNG", "BKR", "CCEP", 
+    "CDNS", "CDW", "CEG", "CHTR", "CMCSA", "COST", "CPRT", "CRWD", "CSCO", "CSGP", 
+    "CSX", "CTAS", "CTSH", "DASH", "DDOG", "DLTR", "DXCM", "EA", "EXC", "FANG", 
+    "FAST", "FTNT", "GEHC", "GFS", "GILD", "GOOG", "GOOGL", "HON", "IDXX", "ILMN", 
+    "INTC", "INTU", "ISRG", "KDP", "KHC", "KLAC", "LIN", "LRCX", "LULU", "MAR", 
+    "MCHP", "MDB", "MDLZ", "MELI", "META", "MNST", "MRNA", "MRVL", "MSFT", "MU", 
+    "NFLX", "NVDA", "NXPI", "ODFL", "ON", "ORLY", "PANW", "PAYX", "PCAR", "PDD", 
+    "PEP", "PYPL", "QCOM", "REGN", "ROP", "ROST", "SBUX", "SMCI", "SNPS", "TEAM", 
+    "TMUS", "TSLA", "TTD", "TTWO", "TXN", "VRSK", "VRTX", "WBD", "WDAY", "XEL", "ZS"
+];
 
 const Market = () => {
     const isDarkMode = useBearStore((state) => state.isDarkMode);
-    const [stockData, setStockData] = useState('');
+    const [stockData, setStockData] = useState({ prices: [], dates: [] });
     const [search, setSearch] = useState('');
-    const [rows, setRows] = useState([
-        // Temporary stock data
-        { ticker: "AAPL", pricing: 150.50, favorited: false },
-        { ticker: "GOOGL", pricing: 2800.75, favorited: false },
-        { ticker: "TSLA", pricing: 750.30, favorited: false },
-        { ticker: "MSFT", pricing: 299.50, favorited: false },
-    ]);
+    
+    const [rows, setRows] = useState(
+        tickers.map(ticker => ({
+            ticker: ticker,
+            pricing: 0,  // Initial placeholder for pricing
+            favorited: false
+        }))
+    );
 
-    // const handleToggleFavorite = async (ticker) => {
-    //     setRows(prevRows => 
-    //         prevRows.map(row => 
-    //             row.ticker === ticker ? { ...row, favorited: !row.favorited } : row
-    //         )
-    //     );
-    
-    //     try {
-    //         const userId = localStorage.getItem('userId');  // Assuming userId is stored in localStorage
-    //         const response = await axios.post('http://localhost:8000/auth/favorite', { ticker, userId });
-    
-    //         console.log('Ticker added to favorites: ', response.data);
-    //     } catch (error) {
-    //         console.error('Error adding stock to favorites: ', error);
-    //         setRows(prevRows => 
-    //             prevRows.map(row => 
-    //                 row.ticker === ticker ? { ...row, favorited: !row.favorited } : row
-    //             )
-    //         );
-    //     }
-    // };
+    // Fetch latest stock prices from backend
+    useEffect(() => {
+        const fetchStockPrices = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:8000/stocks/prices');
+                const stockPrices = response.data;
+                const updatedRows = rows.map(row => {
+                    const stock = stockPrices.find(stock => stock.ticker === row.ticker);
+                    return {
+                        ...row,
+                        pricing: stock ? stock.current_price : row.pricing  // Update price if found
+                    };
+                });
+
+                setRows(updatedRows);
+            } catch (error) {
+                console.error('Error fetching stock prices:', error);
+            }
+        };
+
+        fetchStockPrices();
+    }, []); // Empty dependency array to run once on mount
 
     const handleToggleFavorite = (ticker) => {
         setRows(prevRows => prevRows.map(row => 
             row.ticker === ticker ? { ...row, favorited: !row.favorited } : row
         ));
     };
-    
 
     const filteredRows = rows.filter(row =>
         row.ticker.toLowerCase().includes(search.toLowerCase())
@@ -51,11 +66,16 @@ const Market = () => {
 
     const handleRowClick = async (row) => {
         try {
-            setSelectedRow(`${row.ticker}`);
-            const response = await axios.get('http://localhost:8000/auth/graph', { input: row.ticker });
-            setStockData(response.data);
+            const response = await axios.get(`http://127.0.0.1:8000/stocks/${row.ticker}/history`);
+            const historyData = response.data;
+
+            // Extract dates and prices
+            const dates = historyData.map(item => item.date);
+            const prices = historyData.map(item => item.close_price);
+
+            setStockData({ dates, prices });
         } catch (error) {
-            console.error('Error fetching graph data:', error);
+            console.error('Error fetching stock history data:', error);
         }
     };
 
@@ -93,7 +113,7 @@ const Market = () => {
                         height: '500px'
                     }}
                 >
-                    <StockGraph prices={stockData[0]} dates={stockData[1]} />
+                    <StockGraph prices={stockData.prices} dates={stockData.dates} />
                 </Box>
                 <Box 
                     component={Paper} 
@@ -121,7 +141,6 @@ const Market = () => {
                                       '&:hover': { backgroundColor: isDarkMode ? '#3E3E3E' : '#f5f5f5' } 
                                     }}
                                   >
-                                  
                                         <TableCell component="th" scope="row" align="center" sx={{ width: '50%', display: 'flex', alignItems: 'center' }}>
                                             <IconButton onClick={() => handleToggleFavorite(row.ticker)}>
                                                 <StarIcon sx={{ color: row.favorited ? '#FFCE2E' : 'gray' }} />
@@ -131,35 +150,6 @@ const Market = () => {
                                         <TableCell align="center" sx={{ width: '50%' }}>{row.pricing}</TableCell>
                                     </TableRow>
                                 ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </Box>
-            </Box>
-            <Box sx={{ 
-                    display: 'block', 
-                    paddingTop:'40px',
-                    paddingRight: '10vw', 
-                    paddingLeft: '10vw', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'flex-start', 
-                    gap: 2,
-                    transition: "background-color 1.5s ease-in-out",
-                }}>
-                <Box component={Paper}>
-                    <TableContainer>
-                        <Table stickyHeader>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell align="center" sx={{ width: '50%' }}>Estimated Price</TableCell>
-                                    <TableCell align="center" sx={{ width: '50%' }}>Estimated Volatility</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell align="center" sx={{ width: '50%' }}></TableCell>
-                                    <TableCell align="center" sx={{ width: '50%' }}></TableCell>
-                                </TableRow>
                             </TableBody>
                         </Table>
                     </TableContainer>
