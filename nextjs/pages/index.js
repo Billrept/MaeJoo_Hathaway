@@ -4,11 +4,11 @@ import { Box, Typography, Button } from "@mui/material";
 function Home() {
   return (
     <>
-      <Box sx={{ minHeight: '100vh', paddingLeft: '15vw', paddingRight: '15vw', bgcolor: 'background.default', marginTop:'10vh'}}>
+      <Box sx={{ minHeight: '100vh', paddingLeft: '15vw', paddingRight: '15vw', bgcolor: 'background.default', paddingTop:'10vh'}}>
         <main>
           <Grid container wrap="nowrap" direction="row" alignItems="center" justifyContent="space-around">
             
-            <Grid item xs={12} md={6}>
+            <Grid item size={{xs:12, md:6}}>
               <Typography text variant="h2" gutterBottom>
                 Some cool text here
               </Typography>
@@ -20,7 +20,7 @@ function Home() {
               </Button>
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            <Grid item size={{xs:12, md:6}}>
               <Box sx={{ justifyContent: 'center', padding: '2rem' }}>
                 <img
                   src="/images/placeholder.jpg"
