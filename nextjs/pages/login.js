@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
-import { TextField, Button, Typography, Paper, Grid } from '@mui/material';
-import Link from 'next/link';
+import { TextField, Button, Typography, Paper, Grid, Link } from '@mui/material';
 import useBearStore from '@/store/useBearStore'; // Assuming you're using Zustand
 
 const Login = () => {
@@ -24,6 +23,7 @@ const Login = () => {
       });
       localStorage.setItem('email', email);
       localStorage.setItem('token', response.data.access_token);
+      localStorage.setItem('user_id', response.data.user_id);
       router.push('/2fa');
     } catch (err) {
       setError('Invalid credentials. Please try again.');
