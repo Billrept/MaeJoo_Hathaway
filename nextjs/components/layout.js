@@ -2,9 +2,15 @@ import NavigationLayout from "./NavigationBar";
 import FooterLayout from "./footer";
 import { ThemeProvider, createTheme, CssBaseline, Box } from "@mui/material";
 import useBearStore from "@/store/useBearStore";
+import { useEffect, useState } from "react";
 
 export default function Layout({ children }) {
   const isDarkMode = useBearStore((state) => state.isDarkMode);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true); // Ensures the transition effect happens after the component mounts
+  }, []);
 
   const darkTheme = createTheme({
     palette: {
@@ -39,7 +45,11 @@ export default function Layout({ children }) {
         sx={{
           minHeight: "100vh",
           bgcolor: "background.default",
-          transition: "color 0.85s ease-in-out", // Smooth transition for background and text color
+          transition: mounted
+            ? "background-color 0.95s ease-in-out, color 0.85s ease-in-out, transform 0.85s ease-in-out"
+            : "none",
+          opacity: mounted ? 1 : 0,
+          transform: mounted ? "translateY(0)" : "translateY(10px)",
         }}
       >
         <NavigationLayout />

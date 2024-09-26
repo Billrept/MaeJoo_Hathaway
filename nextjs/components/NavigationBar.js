@@ -170,7 +170,7 @@ const NavigationLayout = ({ children }) => {
                 opacity: showSun ? 1 : 0,
                 visibility: showSun ? "visible" : "hidden", // Hide sun completely when invisible
                 transform: showSun ? "translateY(0)" : "translateY(20px)",
-                transition: "opacity 0.55s, transform 0.7s ease, visibility 0.55s",
+                transition: "opacity 0.55s, transform 0.55s ease, visibility 0.55s",
                 marginRight: "40px",
               }}
             >
@@ -186,7 +186,7 @@ const NavigationLayout = ({ children }) => {
                 opacity: showMoon ? 1 : 0,
                 visibility: showMoon ? "visible" : "hidden", // Hide moon completely when invisible
                 transform: showMoon ? "translateY(0)" : "translateY(20px)",
-                transition: "opacity 0.55s, transform 0.7s ease, visibility 0.55s",
+                transition: "opacity 0.55s, transform 0.55s ease, visibility 0.55s",
                 marginRight: "40px",
               }}
             >

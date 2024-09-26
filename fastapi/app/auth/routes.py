@@ -1,9 +1,8 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from pydantic import BaseModel
 from .auth_handler import get_password_hash, verify_otp, create_access_token, generate_otp, send_otp_via_email, decode_token
 from app.database import get_db_connection
 from app.crud.user import create_user, get_user_by_email
-import logging
 from sqlalchemy.orm import Session
 
 
@@ -39,17 +38,13 @@ def signup(user: UserSignup, db: Session = Depends(get_db_connection)):
     return {"message": "User created successfully", "user": new_user}
 
 @router.post("/login")
-def login(user: UserLogin, conn = Depends(get_db_connection)):
-
+def login(user: UserLogin, background_tasks: BackgroundTasks, conn = Depends(get_db_connection)):
     db_user = get_user_by_email(conn, user.email)
-    
     if not db_user:
         raise HTTPException(status_code=400, detail="Invalid username or password")
-
     otp = generate_otp(user.email)
-    send_otp_via_email(user.email, otp)
+    background_tasks.add_task(send_otp_via_email, user.email, otp)
     access_token = create_access_token(data={"sub": user.email})
-
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post("/verify-otp")
@@ -65,9 +60,7 @@ def verify_otp_endpoint(data: VerifyOtpRequest):
 async def resend_otp(data: resendOtpRequest):
     try:
         otp = generate_otp(data.email)
-        
         send_otp_via_email(data.email, otp)
-        
         return {"message": "OTP sent successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to resend OTP: {str(e)}")
@@ -76,8 +69,7 @@ async def resend_otp(data: resendOtpRequest):
 def verify_token(token_request: TokenRequest):
     token = token_request.token
     try:
-        # Use the decode_token function to verify the JWT token
         payload = decode_token(token)
-        return {"valid": True}  # If the token is valid
+        return {"valid": True} 
     except:
         raise HTTPException(status_code=401, detail="Invalid token")  # Return 401 if token is invalid
