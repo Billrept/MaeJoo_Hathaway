@@ -4,38 +4,24 @@ import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Title, Tooltip, Legend);
 
-
 const StockGraph = ({ prices, dates }) => {
 
-    const data = {
-      labels: dates,
-      datasets: [
-        {
-          label: 'Stock Price',
-          data: prices,
-          borderColor: 'rgba(75, 192, 192, 1)',
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          fill: true,
-          tension:0,
-        },
-      ],
-    };
-
-// const StockGraph = ({ prices }) => {
-
-//   const data = {
-//     labels: prices.map((_, index) => `Day ${index + 1}`),
-//     datasets: [
-//       {
-//         label: 'Stock Price',
-//         data: prices,
-//         borderColor: 'rgba(75, 192, 192, 1)',
-//         backgroundColor: 'rgba(75, 192, 192, 0.2)',
-//         fill: true,
-//         tension:0,
-//       },
-//     ],
-//   };
+  const data = {
+    labels: dates,
+    datasets: [
+      {
+        label: 'Stock Price',
+        data: prices,
+        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        fill: true,
+        tension: 0,   // To make the line straight
+        pointRadius: 0,  // Hides the circles
+        pointHoverRadius: 6, // Shows larger circles on hover
+        hitRadius: 10
+      },
+    ],
+  };
 
   // Define the chart options
   const options = {

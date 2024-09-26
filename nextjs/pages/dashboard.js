@@ -64,7 +64,6 @@ const Dashboard = () => {
   const handleTrackedStock = async (e) => {
     e.preventDefault();
     try {
-      // Fetch the tracked stock data
       const response = await axios.get('http://localhost:8000/auth/track-stock', { params: { stockSearch } });
       const trackedStockInfo = response.data;
 
@@ -83,12 +82,14 @@ const Dashboard = () => {
   };
 
   if (!isAuthenticated) {
-    return <div>Loading...</div>; // Show a loading state while checking authentication
+    return <div>Loading...</div>;
   }
 
   return (
-    <Box>
+    <Box marginTop='8rem' marginRight='10vw' marginLeft='10vw'>
       <Typography variant="h4">Dashboard</Typography>
+      <h2>{selectedRow}</h2>
+      <StockGraph prices={stockData[0]} dates={stockData[1]} />
       <TextField
         label="Search stocks"
         variant="outlined"

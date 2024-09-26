@@ -249,6 +249,7 @@ const NavigationLayout = ({ children }) => {
                 <MenuItem onClick={() => router.push("/dashboard")}>Dashboard</MenuItem>
                 <MenuItem onClick={() => router.push("/settings")}>Settings</MenuItem>
                 <MenuItem onClick={() => setIsLoggedIn(false)}>Log out</MenuItem>
+                <MenuItem onClick={() => setIsLoggedIn(true)}>Log in test</MenuItem>
               </Menu>
             </Box>
           ) : (

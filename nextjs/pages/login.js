@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
-import { TextField, Button, Typography, Paper, Grid } from '@mui/material';
+import { TextField, Button, Typography, Paper, Grid, Link } from '@mui/material';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -62,6 +62,14 @@ const Login = () => {
               Login
             </Button>
           </form>
+          <Typography variant="body1" style={{ marginRight: '0.5rem' }}>
+            Don't have an account?
+          </Typography>
+          <Link href="/signup" passHref>
+            <Button variant="text" style={{ color: '#68BB59' }}>
+              Sign Up
+            </Button>
+          </Link>
         </Paper>
       </Grid>
     </Grid>
