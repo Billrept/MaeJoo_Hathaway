@@ -9,11 +9,11 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 const Signup = () => {
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState(""); // Ensure this state is for email
-  const [password, setPassword] = useState('');  
+  const [email, setEmail] = useState(""); 
+  const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // Toggle for password visibility
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Toggle for confirm password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [passwordValid, setPasswordValid] = useState(false);
@@ -22,7 +22,6 @@ const Signup = () => {
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
-
     return () => {
       document.body.style.overflow = "auto";
     };
@@ -46,132 +45,135 @@ const Signup = () => {
       return;
     }
 
-	try {
-	  const response = await axios.post('http://localhost:8000/auth/signup', {
-		email,
-		username,
-		password
-	  });
+    try {
+      const response = await axios.post('http://localhost:8000/auth/signup', {
+        email,
+        username,
+        password
+      });
 
-	  if (response.data.success && response.data['2fa_required']) {
-		localStorage.setItem('email', email);
-		router.push('/2fa');
-	  } else if (response.data.success) {
-		router.push('/dashboard');
-	  } else {
-		setError('Sign up failed. Please try again.');
-	  }
-	} catch (err) {
-	  setError('Sign up failed. Please try again.');
-	}
+      if (response.data.success && response.data['2fa_required']) {
+        localStorage.setItem('email', email);
+        router.push('/2fa');
+      } else if (response.data.success) {
+        router.push('/dashboard');
+      } else {
+        setError('Sign up failed. Please try again.');
+      }
+    } catch (err) {
+      setError('Sign up failed. Please try again.');
+    }
   };
 
   return (
-    <Paper elevation={3} style={{ padding: '20px', maxWidth: '400px', margin: 'auto' }}>
-      <Grid container direction="column" spacing={2}>
-        <Grid item>
-          <Typography variant="h5" align="center">
-            <AccountCircleIcon fontSize="large" />
-            Sign Up
-          </Typography>
-        </Grid>
-        <Grid item>
-          <TextField
-            label="Username"
-            variant="outlined"
-            fullWidth
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        </Grid>
-        <Grid item>
-          <TextField
-            label="Email"
-            variant="outlined"
-            fullWidth
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </Grid>
-        <Grid item>
-          <TextField
-            label="Password"
-            type={showPassword ? "text" : "password"} // Toggle between text and password
-            variant="outlined"
-            fullWidth
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              validatePassword(e.target.value);
-            }}
-            required
-            error={!!passwordError}
-            helperText={passwordError}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => setShowPassword(!showPassword)} // Toggle visibility
-                    edge="end"
-                  >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Grid>
-        <Grid item>
-          <TextField
-            label="Confirm Password"
-            type={showConfirmPassword ? "text" : "password"} // Toggle between text and password
-            variant="outlined"
-            fullWidth
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            error={!!confirmPasswordError}
-            helperText={confirmPasswordError}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)} // Toggle visibility
-                    edge="end"
-                  >
-                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Grid>
-        {error && (
-          <Grid item>
-            <Typography color="error">{error}</Typography>
+    <Grid container justifyContent="center" alignItems="center" style={{ minHeight: '100vh', padding: '0 20px' }}>
+      <Paper elevation={5} style={{ padding: '40px', maxWidth: '450px', borderRadius: '15px', width: '100%' }}>
+        <Grid container direction="column" spacing={3}>
+          <Grid item align="center">
+            <AccountCircleIcon fontSize="large" color="primary" />
+            <Typography variant="h4" gutterBottom>
+              Create an Account
+            </Typography>
           </Grid>
-        )}
-        <Grid item>
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            onClick={handleSignup}
-            disabled={!passwordValid}
-          >
-            Sign Up
-          </Button>
+          <Grid item>
+            <TextField
+              label="Username"
+              variant="outlined"
+              fullWidth
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </Grid>
+          <Grid item>
+            <TextField
+              label="Email"
+              variant="outlined"
+              fullWidth
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </Grid>
+          <Grid item>
+            <TextField
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              variant="outlined"
+              fullWidth
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                validatePassword(e.target.value);
+              }}
+              required
+              error={!!passwordError}
+              helperText={passwordError}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+          <Grid item>
+            <TextField
+              label="Confirm Password"
+              type={showConfirmPassword ? "text" : "password"}
+              variant="outlined"
+              fullWidth
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              error={!!confirmPasswordError}
+              helperText={confirmPasswordError}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      edge="end"
+                    >
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+          {error && (
+            <Grid item>
+              <Typography color="error">{error}</Typography>
+            </Grid>
+          )}
+          <Grid item>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              onClick={handleSignup}
+              disabled={!passwordValid}
+              style={{ padding: '10px 0', fontSize: '16px' }}
+            >
+              Sign Up
+            </Button>
+          </Grid>
+          <Grid item>
+            <Typography align="center">
+              Already have an account? <Link href="/login">Login</Link>
+            </Typography>
+          </Grid>
         </Grid>
-        <Grid item>
-          <Typography align="center">
-            Already have an account? <Link href="/login">Login</Link>
-          </Typography>
-        </Grid>
-      </Grid>
-    </Paper>
+      </Paper>
+    </Grid>
   );
 };
 

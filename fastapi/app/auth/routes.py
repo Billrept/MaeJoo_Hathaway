@@ -1,10 +1,9 @@
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from pydantic import BaseModel
-from .auth_handler import get_password_hash, verify_otp, create_access_token, generate_otp, send_otp_via_email, decode_token
+from .auth_handler import *
 from app.database import get_db_connection
 from app.crud.user import create_user, get_user_by_email
 from sqlalchemy.orm import Session
-
 
 router = APIRouter()
 
@@ -25,7 +24,7 @@ class VerifyOtpRequest(BaseModel):
 
 class resendOtpRequest(BaseModel):
     email: str
-    
+
 class TokenRequest(BaseModel):
     token: str
 
@@ -60,7 +59,10 @@ def verify_otp_endpoint(data: VerifyOtpRequest):
 async def resend_otp(data: resendOtpRequest):
     try:
         otp = generate_otp(data.email)
-        send_otp_via_email(data.email, otp)
+        reference_code = generate_reference_code()
+        store_reference_code(data.email, reference_code)  # Store the reference code
+        send_otp_via_email(data.email, otp, reference_code)
+        
         return {"message": "OTP sent successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to resend OTP: {str(e)}")
@@ -72,4 +74,12 @@ def verify_token(token_request: TokenRequest):
         payload = decode_token(token)
         return {"valid": True} 
     except:
-        raise HTTPException(status_code=401, detail="Invalid token")  # Return 401 if token is invalid
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+@router.get("/get-reference-code/{email}")
+async def get_reference_code_endpoint(email: str):
+    reference_code = get_reference_code(email)
+    if reference_code:
+        return {"reference_code": reference_code}
+    else:
+        raise HTTPException(status_code=404, detail="Reference code not found")

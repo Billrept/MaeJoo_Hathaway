@@ -2,13 +2,13 @@ import { useState, useEffect } from 'react';
 import { TextField, Button, Grid, Typography, Paper } from '@mui/material';
 import { useRouter } from 'next/router';
 import axios from 'axios';
-import Link from 'next/link';
 
 const TwoFactorAuth = () => {
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [email, setEmail] = useState('');
+  const [referenceCode, setReferenceCode] = useState(''); // New state for reference code
   const router = useRouter();
 
   useEffect(() => {
@@ -20,13 +20,27 @@ const TwoFactorAuth = () => {
       router.push('/login');  
     } else {
       setEmail(storedEmail);
+
+      // Fetch the reference code from the backend when the page loads
+      fetchReferenceCode(storedEmail);
     }
   }, [router]);
+
+  const fetchReferenceCode = async (email) => {
+    try {
+      const response = await axios.get(`http://localhost:8000/auth/get-reference-code/${email}`);
+      setReferenceCode(response.data.reference_code);
+    } catch (error) {
+      console.error('Error fetching reference code:', error);
+      setError('Could not retrieve reference code.');
+    }
+  };
 
   const resendCode = async () => {
     try {
       const response = await axios.post('http://localhost:8000/auth/resend-otp', { email });
       setSuccess('OTP has been resent successfully.');
+      fetchReferenceCode(email);  // Fetch the updated reference code
       setError('');
     } catch (error) {
       setError('Failed to resend code. Please try again.');
@@ -74,6 +88,13 @@ const TwoFactorAuth = () => {
           {/* Display error and success messages */}
           {error && <Typography color="error">{error}</Typography>}
           {success && <Typography color="success.main">{success}</Typography>}
+
+          {/* Display Reference Code */}
+          {referenceCode && (
+            <Typography variant="body1" gutterBottom color="primary">
+              Reference Code: {referenceCode}
+            </Typography>
+          )}
 
           {/* OTP Verification Form */}
           <form onSubmit={handleVerifyOtp}>

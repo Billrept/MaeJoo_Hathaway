@@ -97,8 +97,7 @@ const NavigationLayout = ({ children }) => {
       <AppBar
         position="sticky"
         sx={{
-          paddingRight: "60px",
-          paddingLeft: "60px",
+          padding: { xs: "10px", md: "0px" },  // Add padding on small screens only
           backgroundColor: isDarkMode ? "#333" : "#68BB59",
         }}
       >
@@ -109,7 +108,6 @@ const NavigationLayout = ({ children }) => {
               sx={{
                 color: "#ffffff",
                 textDecoration: "none",
-                color: "white",
                 transition: "color 0.3s ease",
                 "&:hover": {
                   color: isDarkMode ? "#68BB59" : "#0cab37",
@@ -149,7 +147,7 @@ const NavigationLayout = ({ children }) => {
           >
             {/* Cash Mode Switch */}
             <FormControlLabel
-              sx={{marginRight:'80px'}}
+              sx={{ marginRight: '80px' }}
               control={
                 <Switch
                   checked={isCashMode}
