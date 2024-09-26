@@ -244,7 +244,17 @@ const NavigationLayout = ({ children }) => {
                 <MenuItem onClick={() => router.push("/profile")}>Profile</MenuItem>
                 <MenuItem onClick={() => router.push("/dashboard")}>Dashboard</MenuItem>
                 <MenuItem onClick={() => router.push("/settings")}>Settings</MenuItem>
-                <MenuItem onClick={() => setIsLoggedIn(false)}>Log out</MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    // Clear the token from localStorage
+                    localStorage.removeItem('token');  // Remove the token
+                    localStorage.removeItem('email');  // (Optional) Remove the email or other related info if needed
+                    setIsLoggedIn(false);  // Update state to reflect that the user is logged out
+                    router.push('/login');  // Redirect to login page after logout
+                  }}
+                >
+                  Log out
+                </MenuItem>
               </Menu>
             </Box>
           ) : (
