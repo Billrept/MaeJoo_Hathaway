@@ -39,7 +39,7 @@ export default function Layout({ children }) {
         sx={{
           minHeight: "100vh",
           bgcolor: "background.default",
-          transition: "color 0.5s ease-in-out", // Smooth transition for background and text color
+          transition: "color 0.85s ease-in-out", // Smooth transition for background and text color
         }}
       >
         <NavigationLayout />

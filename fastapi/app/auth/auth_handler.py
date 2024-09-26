@@ -34,12 +34,13 @@ def generate_otp(user_identifier):
     totp = pyotp.TOTP(otp_secret)
     return totp.now()
 
-def verify_otp(user_identifier, otp):
+def verify_otp(user_identifier: str, otp: str) -> bool:
     otp_secret = otp_secrets.get(user_identifier)
     if not otp_secret:
         return False
     totp = pyotp.TOTP(otp_secret)
-    return totp.verify(otp)
+    return totp.verify(otp, valid_window=1)
+
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -69,12 +70,10 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
 
 def send_otp_via_email(email, otp):
     try:
-        # Email setup
         sender_email = "maejoohathaway@gmail.com"
-        sender_password = "ijzx anng ineu wzog"  # Ideally, this should be stored in environment variables for security.
+        sender_password = "ijzx anng ineu wzog"
         subject = "Your OTP Code"
-        
-        # Create the email content
+
         message = MIMEMultipart()
         message['From'] = sender_email
         message['To'] = email
@@ -83,14 +82,12 @@ def send_otp_via_email(email, otp):
         body = f"Your OTP code is: {otp}"
         message.attach(MIMEText(body, 'plain'))
 
-        server = smtplib.SMTP('smtp.gmail.com', 587)  # Use port 587 for TLS
-        server.starttls()  # Upgrade the connection to a secure encrypted TLS connection
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
         server.login(sender_email, sender_password)
 
-        # Send the email
         server.sendmail(sender_email, email, message.as_string())
 
-        # Close the connection
         server.quit()
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error sending OTP")

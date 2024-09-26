@@ -11,8 +11,8 @@ import {
   Typography,
   FormControlLabel
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu"; // Import MenuIcon
-import AccountCircle from "@mui/icons-material/AccountCircle"; // Import AccountCircle
+import MenuIcon from "@mui/icons-material/Menu";
+import AccountCircle from "@mui/icons-material/AccountCircle"; 
 import { useRouter } from "next/router";
 import Link from "next/link";
 import FunctionsIcon from "@mui/icons-material/Functions";
@@ -33,12 +33,11 @@ const NavigationLayout = ({ children }) => {
   const [username, setUsername] = useState("John Doe"); // Placeholder username
   const [isCashMode, setIsCashMode] = useState(false); // Toggle cash mode
 
-  // State to manage the dropdown menu
-  const [anchorEl, setAnchorEl] = useState(null); // Menu anchor
-  const menuOpen = Boolean(anchorEl); // Menu open state
+  const [anchorEl, setAnchorEl] = useState(null);
+  const menuOpen = Boolean(anchorEl);
 
   const handleMenuClick = (event) => {
-    setAnchorEl(event.currentTarget); // Set the anchor (target) for the dropdown menu
+    setAnchorEl(event.currentTarget);
   };
 
   const handleMenuClose = () => {
@@ -47,7 +46,7 @@ const NavigationLayout = ({ children }) => {
 
   // Handle cash splash
   const handleClick = (e) => {
-    if (!isCashMode) return; // Only trigger splash if cash mode is enabled
+    if (!isCashMode) return;
 
     const cashCount = 10;
     for (let i = 0; i < cashCount; i++) {
@@ -59,7 +58,6 @@ const NavigationLayout = ({ children }) => {
       cashSplash.style.setProperty("--y", Math.random() * 2 - 1);
       document.body.appendChild(cashSplash);
 
-      // Remove the cash splash element after animation
       setTimeout(() => {
         cashSplash.remove();
       }, 700);
@@ -69,14 +67,13 @@ const NavigationLayout = ({ children }) => {
   useEffect(() => {
     if (isDarkMode) {
       setShowSun(false);
-      setTimeout(() => setShowMoon(true), 400); // Delay moon visibility until the sun is hidden
+      setTimeout(() => setShowMoon(true), 400);
     } else {
       setShowMoon(false);
-      setTimeout(() => setShowSun(true), 400); // Delay sun visibility until the moon is hidden
+      setTimeout(() => setShowSun(true), 400);
     }
   }, [isDarkMode]);
 
-  // Apply the cash icon as cursor when cash mode is enabled
   useEffect(() => {
     if (isCashMode) {
       document.body.style.cursor = "url('/cashCursor.png'), auto";
@@ -86,7 +83,6 @@ const NavigationLayout = ({ children }) => {
       document.removeEventListener("click", handleClick);
     }
 
-    // Clean up event listener on unmount
     return () => {
       document.removeEventListener("click", handleClick);
     };
@@ -178,7 +174,7 @@ const NavigationLayout = ({ children }) => {
                 marginRight: "40px",
               }}
             >
-              <WbSunnyIcon fontSize="large" sx={{ color: "#FFD700" }} />
+              <WbSunnyIcon fontSize="small" sx={{ color: "#FFD700" }} />
             </IconButton>
 
             {/* Moon Icon */}
@@ -194,7 +190,7 @@ const NavigationLayout = ({ children }) => {
                 marginRight: "40px",
               }}
             >
-              <Brightness2Icon fontSize="large" sx={{ color: "#ffffff" }} />
+              <Brightness2Icon fontSize="small" sx={{ color: "#ffffff" }} />
             </IconButton>
 
             {/* Dark Mode Switch */}
@@ -300,7 +296,7 @@ const NavigationLink = ({ href, label }) => {
           fontSize: "14px",
           fontWeight: 500,
           color: "#fff",
-          padding: "0 10px", // Add padding on left and right
+          padding: "0 10px",
           textDecoration: "none",
           color: "white",
           transition: "color 0.3s ease",

@@ -22,7 +22,7 @@ class UserLogin(BaseModel):
 
 class VerifyOtpRequest(BaseModel):
     email: str
-    otp: int
+    otp: str
 
 class resendOtpRequest(BaseModel):
     email: str
@@ -53,18 +53,13 @@ def login(user: UserLogin, conn = Depends(get_db_connection)):
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post("/verify-otp")
-async def verify_otp_endpoint(data: VerifyOtpRequest):
-    # Convert OTP to an integer for comparison, assuming OTP is stored/generated as an integer
-    try:
-        user_otp = int(data.otp)  # Convert the user-provided OTP to an integer
-    except ValueError:
-        # Handle cases where the provided OTP is not a valid number
-        raise HTTPException(status_code=400, detail="Invalid OTP format.")
+def verify_otp_endpoint(data: VerifyOtpRequest):
 
-    if verify_otp(data.email, user_otp):  # Ensure OTPs are compared as integers
+    otp = data.otp.strip()
+    if verify_otp(data.email, otp):
         return {"success": True, "message": "OTP verified successfully"}
     else:
-        raise HTTPException(status_code=400, detail="Invalid OTP.")
+        raise HTTPException(status_code=400, detail="Invalid or expired OTP.")
 
 @router.post("/resend-otp")
 async def resend_otp(data: resendOtpRequest):

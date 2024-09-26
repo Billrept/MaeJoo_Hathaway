@@ -8,20 +8,21 @@ const TwoFactorAuth = () => {
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [email, setEmail] = useState('');  // State to store email
+  const [email, setEmail] = useState('');
   const router = useRouter();
 
-  // Fetch email from localStorage and display error if not found
   useEffect(() => {
+    // Check for both email and authentication token
     const storedEmail = localStorage.getItem('email');
-    if (storedEmail) {
-      setEmail(storedEmail);
+    const authToken = localStorage.getItem('token'); 
+    if (!storedEmail || !authToken) {
+      setError('Unauthorized access, redirecting to login...');
+      router.push('/login');  
     } else {
-      setError('No email found in local storage.');
+      setEmail(storedEmail);
     }
-  }, []);
+  }, [router]);
 
-  // Function to resend OTP code
   const resendCode = async () => {
     try {
       const response = await axios.post('http://localhost:8000/auth/resend-otp', { email });
@@ -34,11 +35,9 @@ const TwoFactorAuth = () => {
     }
   };
 
-  // Function to handle OTP verification
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
 
-    // Clear previous messages
     setError('');
     setSuccess('');
 
@@ -48,16 +47,15 @@ const TwoFactorAuth = () => {
         otp
       });
 
-      console.log(response.data);  // Log the response to inspect
-
+      console.log(response.data);
       if (response.data.success) {
         setSuccess('OTP verified successfully!');
-        router.push('/dashboard');  // Redirect to dashboard on success
+        router.push('/dashboard');  
       } else {
         setError('Invalid OTP. Please try again.');
       }
     } catch (err) {
-      console.error('Error verifying OTP:', err.response);  // Log error response for debugging
+      console.error('Error verifying OTP:', err.response);
       setError('Failed to verify OTP. Please try again.');
     }
   };
@@ -106,7 +104,7 @@ const TwoFactorAuth = () => {
                 variant="text"
                 onClick={resendCode}
                 style={{ color: '#68BB59' }}
-                disabled={!email}  // Disable resend if email is missing
+                disabled={!email}
               >
                 Resend code
               </Button>
