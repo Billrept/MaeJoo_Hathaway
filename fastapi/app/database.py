@@ -44,23 +44,25 @@ def get_all_stock_prices():
     connection = get_db_connection()
     cursor = connection.cursor()
 
-    # Query to get the most recent close_price for each ticker
+    # Query to get the latest close price for each ticker
     query = """
     SELECT ticker, close
-    FROM stock_history
-    WHERE (ticker, trade_date) IN (
-        SELECT ticker, MAX(trade_date)
-        FROM stock_history
-        GROUP BY ticker
+    FROM stock_history sh
+    WHERE trade_date = (
+        SELECT MAX(trade_date)
+        FROM stock_history sh2
+        WHERE sh2.ticker = sh.ticker
     )
+    ORDER BY ticker ASC;
     """
-    
+
     cursor.execute(query)
     stock_prices = cursor.fetchall()
     connection.close()
 
-    # Convert the data to a list of dictionaries
+    # Format the stock prices with 2 decimal places
     return [{"ticker": ticker, "current_price": f'{float(close_price):.2f}'} for ticker, close_price in stock_prices]
+
 
 def store_prediction(ticker, predicted_price, predicted_volatility, model_used="ARIMA-GARCH"):
     conn = get_db_connection()
@@ -121,12 +123,27 @@ def insert_stock_history(ticker, trade_date, close_price):
     cur = conn.cursor()
 
     cur.execute("""
-    INSERT INTO stock_history (ticker, trade_date, close)
-    VALUES (%s, %s, %s)
-    ON CONFLICT (ticker, trade_date) 
-    DO UPDATE SET close = EXCLUDED.close;
-    """, (ticker, trade_date, close_price))
-    conn.commit()
+    SELECT close
+    FROM stock_history
+    WHERE ticker = %s AND trade_date = %s
+    ORDER BY trade_date DESC;
+    """, (ticker, trade_date))
+    existing_data = cur.fetchone()
 
+    if existing_data:
+        # Update the existing record
+        cur.execute("""
+        UPDATE stock_history
+        SET close = %s
+        WHERE ticker = %s AND trade_date = %s;
+        """, (close_price, ticker, trade_date))
+    else:
+        # Insert a new record
+        cur.execute("""
+        INSERT INTO stock_history (ticker, trade_date, close)
+        VALUES (%s, %s, %s);
+        """, (ticker, trade_date, close_price))
+
+    conn.commit()
     cur.close()
     conn.close()

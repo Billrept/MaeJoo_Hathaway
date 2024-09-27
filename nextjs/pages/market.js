@@ -57,8 +57,8 @@ const Market = () => {
         const fetchStockPricesAndFavorites = async () => {
             try {
                 const [stockPricesResponse, favoritesResponse] = await Promise.all([
-                    axios.get('http://localhost:8000/stocks/prices'),
-                    axios.get(`http://localhost:8000/auth/${storedUserId}/favorites`)  // Fetch user favorites
+                    axios.post('http://localhost:8000/stocks/prices'),
+                    axios.get(`http://localhost:8000/stocks/${storedUserId}/favorites`)  // Fetch user favorites
                 ]);
 
                 const stockPrices = stockPricesResponse.data;
@@ -87,7 +87,7 @@ const Market = () => {
     // Function to add stock to favorites
     const handleAddFavorite = async (ticker) => {
         try {
-            await axios.post(`http://localhost:8000/auth/${ticker}/${userId}/add-favorite`);
+            await axios.post(`http://localhost:8000/stocks/${ticker}/${userId}/add-favorite`);
             console.log("Favorite added successfully");
         } catch (error) {
             console.error('Error adding stock to favorites:', error);
@@ -97,7 +97,7 @@ const Market = () => {
     // Function to remove stock from favorites
     const handleRemoveFavorite = async (ticker) => {
         try {
-            await axios.post(`http://localhost:8000/auth/${ticker}/${userId}/remove-favorite`);
+            await axios.post(`http://localhost:8000/stocks/${ticker}/${userId}/remove-favorite`);
             console.log("Favorite removed successfully");
         } catch (error) {
             console.error('Error removing stock from favorites:', error);
