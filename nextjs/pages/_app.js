@@ -8,6 +8,7 @@ import Layout from "@/components/layout";
 import useBearStore from "@/store/useBearStore";
 import Head from "next/head";
 import { Backdrop, CircularProgress } from "@mui/material";
+import { AuthProvider } from "@/context/auth";
 
 const roboto = Roboto({
   weight: ["300", "400", "500", "700"],
@@ -31,7 +32,7 @@ export default function App({ Component, pageProps, props }) {
   React.useEffect(() => {
     console.log("App load", pageName, router.query);
     setLoading(true);
-    setAppName("Maejoo Hathaway")
+    setAppName("Maejoo Hathaway");
     setLoading(false);
   }, [router, pageName]);
 
@@ -45,9 +46,13 @@ export default function App({ Component, pageProps, props }) {
       </Head>
 
       <AppCacheProvider {...props}>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
+        <ThemeProvider theme={theme}>
+          <AuthProvider>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </AuthProvider>
+        </ThemeProvider>
       </AppCacheProvider>
     </React.Fragment>
   );

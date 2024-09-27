@@ -9,7 +9,7 @@ import {
   Menu,
   MenuItem,
   Typography,
-  FormControlLabel
+  FormControlLabel,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle"; 
@@ -20,17 +20,17 @@ import WbSunnyIcon from "@mui/icons-material/WbSunny";
 import Brightness2Icon from "@mui/icons-material/Brightness2";
 import useBearStore from "@/store/useBearStore";
 import { useState, useEffect } from "react";
+import { useAuth } from "@/context/auth";  // Import useAuth hook from AuthProvider
 
 const NavigationLayout = ({ children }) => {
   const router = useRouter();
   const isDarkMode = useBearStore((state) => state.isDarkMode);
   const toggleDarkMode = useBearStore((state) => state.toggleDarkMode);
   const appName = useBearStore((state) => state.appName);
+  const { userId, isLoggedIn, logout } = useAuth();  // Destructure values from the useAuth hook
 
   const [showSun, setShowSun] = useState(!isDarkMode);
   const [showMoon, setShowMoon] = useState(isDarkMode);
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const [username, setUsername] = useState("John Doe"); // Placeholder username
   const [isCashMode, setIsCashMode] = useState(false); // Toggle cash mode
 
   const [anchorEl, setAnchorEl] = useState(null);
@@ -44,7 +44,6 @@ const NavigationLayout = ({ children }) => {
     setAnchorEl(null); // Close the menu
   };
 
-  // Handle cash splash
   const handleClick = (e) => {
     if (!isCashMode) return;
 
@@ -206,7 +205,7 @@ const NavigationLayout = ({ children }) => {
                   marginRight: "10px",
                 }}
               >
-                {username}
+                User ID: {userId}
               </Typography>
               <IconButton color="inherit">
                 <AccountCircle />
@@ -244,9 +243,7 @@ const NavigationLayout = ({ children }) => {
                 <MenuItem onClick={() => router.push("/settings")}>Settings</MenuItem>
                 <MenuItem
                   onClick={() => {
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('email');
-                    setIsLoggedIn(false); 
+                    logout();
                     router.push('/login');
                   }}
                 >
