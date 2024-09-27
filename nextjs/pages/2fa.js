@@ -2,14 +2,16 @@ import { useState, useEffect } from 'react';
 import { TextField, Button, Grid, Typography, Paper } from '@mui/material';
 import { useRouter } from 'next/router';
 import axios from 'axios';
+import { useAuth } from '@/context/auth';  // Import useAuth hook
 
 const TwoFactorAuth = () => {
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [email, setEmail] = useState('');
-  const [referenceCode, setReferenceCode] = useState(''); // New state for reference code
+  const [referenceCode, setReferenceCode] = useState('');
   const router = useRouter();
+  const { login } = useAuth();  // Destructure the login function from useAuth
 
   useEffect(() => {
     // Check for both email and authentication token
@@ -64,6 +66,12 @@ const TwoFactorAuth = () => {
       console.log(response.data);
       if (response.data.success) {
         setSuccess('OTP verified successfully!');
+        
+        // Call login to set isLoggedIn to true
+        const userId = localStorage.getItem('user_id');
+        const token = localStorage.getItem('token');
+        login(userId, token);  // Trigger login after successful OTP verification
+        
         router.push('/dashboard');  
       } else {
         setError('Invalid OTP. Please try again.');
@@ -106,7 +114,7 @@ const TwoFactorAuth = () => {
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
               required
-              disabled={!email}  // Disable if no email is available
+              disabled={!email}
             />
 
             <Button
@@ -114,7 +122,7 @@ const TwoFactorAuth = () => {
               variant="contained"
               fullWidth
               sx={{ marginTop: '2rem', marginBottom: '2rem', backgroundColor: '#68BB59', color:"#ffffff" }}
-              disabled={!email}  // Disable button if email is missing
+              disabled={!email}
             >
               Verify
             </Button>

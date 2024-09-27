@@ -120,27 +120,6 @@ const Dashboard = () => {
           </TableBody>
         </Table>
       </TableContainer>
-
-      {/* Form to add a new stock */}
-      <form onSubmit={handleTrackedStock}>
-        <TextField
-          label="Stock ticker"
-          variant="outlined"
-          margin="normal"
-          value={stockSearch}
-          onChange={(e) => setStockSearch(e.target.value)}
-          required
-          style={{ marginTop: '2rem', minWidth: '30vw' }}
-        />
-        {error && <Typography color="error">{error}</Typography>}
-        <Button
-          type="submit"
-          variant="contained"
-          style={{ marginTop: '40px', marginLeft: '20px', backgroundColor: '#68BB59', color: '#ffffff' }}
-        >
-          Add new stock
-        </Button>
-      </form>
     </Box>
   );
 };

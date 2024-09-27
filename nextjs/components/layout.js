@@ -43,7 +43,9 @@ export default function Layout({ children }) {
       <CssBaseline />
       <Box
         sx={{
-          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100vh", // Ensure it takes the full viewport height
           bgcolor: "background.default",
           transition: mounted
             ? "background-color 0.95s ease-in-out, color 0.85s ease-in-out, transform 0.85s ease-in-out"
@@ -53,7 +55,15 @@ export default function Layout({ children }) {
         }}
       >
         <NavigationLayout />
-        <main>{children}</main>
+        {/* Main content with flex-grow to fill available space */}
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1, // This will make the content stretch and push the footer to the bottom
+          }}
+        >
+          {children}
+        </Box>
         <FooterLayout />
       </Box>
     </ThemeProvider>
