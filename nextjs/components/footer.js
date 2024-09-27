@@ -12,7 +12,7 @@ const FooterLayout = () => {
         padding: '1.5rem 0',
         textAlign: 'center',
         color: 'white',
-        marginTop:'10vh'
+        marginTop: 'auto'  // Ensures footer sticks to bottom
       }}
     >
       <Grid container justifyContent="center" spacing={2}>

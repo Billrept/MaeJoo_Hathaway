@@ -31,7 +31,6 @@ const NavigationLayout = ({ children }) => {
 
   const [showSun, setShowSun] = useState(!isDarkMode);
   const [showMoon, setShowMoon] = useState(isDarkMode);
-  const [isCashMode, setIsCashMode] = useState(false); // Toggle cash mode
 
   const [anchorEl, setAnchorEl] = useState(null);
   const menuOpen = Boolean(anchorEl);
@@ -44,25 +43,6 @@ const NavigationLayout = ({ children }) => {
     setAnchorEl(null); // Close the menu
   };
 
-  const handleClick = (e) => {
-    if (!isCashMode) return;
-
-    const cashCount = 10;
-    for (let i = 0; i < cashCount; i++) {
-      const cashSplash = document.createElement("div");
-      cashSplash.classList.add("cash-splash");
-      cashSplash.style.left = `${e.clientX}px`;
-      cashSplash.style.top = `${e.clientY}px`;
-      cashSplash.style.setProperty("--x", Math.random() * 2 - 1);
-      cashSplash.style.setProperty("--y", Math.random() * 2 - 1);
-      document.body.appendChild(cashSplash);
-
-      setTimeout(() => {
-        cashSplash.remove();
-      }, 700);
-    }
-  };
-
   useEffect(() => {
     if (isDarkMode) {
       setShowSun(false);
@@ -72,20 +52,6 @@ const NavigationLayout = ({ children }) => {
       setTimeout(() => setShowSun(true), 400);
     }
   }, [isDarkMode]);
-
-  useEffect(() => {
-    if (isCashMode) {
-      document.body.style.cursor = "url('/cashCursor.png'), auto";
-      document.addEventListener("click", handleClick);
-    } else {
-      document.body.style.cursor = "auto";
-      document.removeEventListener("click", handleClick);
-    }
-
-    return () => {
-      document.removeEventListener("click", handleClick);
-    };
-  }, [isCashMode]);
 
   const handleToggle = () => {
     toggleDarkMode();
@@ -144,19 +110,6 @@ const NavigationLayout = ({ children }) => {
               marginRight: "20px",
             }}
           >
-            {/* Cash Mode Switch */}
-            <FormControlLabel
-              sx={{ marginRight: '80px' }}
-              control={
-                <Switch
-                  checked={isCashMode}
-                  onChange={() => setIsCashMode(!isCashMode)}
-                  color="primary"
-                  sx={{ marginRight: "10px" }}
-                />
-              }
-              label="Cash Mode"
-            />
 
             {/* Sun Icon */}
             <IconButton
