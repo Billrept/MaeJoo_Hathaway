@@ -15,7 +15,6 @@ def create_user(db, username: str, email: str, hashed_password: str):
         )
         new_user = cursor.fetchone()
 
-        # Insert a corresponding record into the favorites table
         cursor.execute(
             """
             INSERT INTO favorites (fav_user)

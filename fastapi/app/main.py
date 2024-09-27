@@ -6,7 +6,6 @@ from .daily_fetch.daily_fetch import router as daily_fetch
 
 app = FastAPI()
 
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],  
@@ -14,7 +13,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 app.include_router(auth_routes.router, prefix="/auth")
 app.include_router(daily_fetch, prefix="/fetch")

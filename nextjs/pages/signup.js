@@ -39,32 +39,30 @@ const Signup = () => {
 
   const handleSignup = async (e) => {
     e.preventDefault();
-
+  
     if (password !== confirmPassword) {
       setConfirmPasswordError("Passwords do not match");
       return;
     }
-
+  
     try {
       const response = await axios.post('http://localhost:8000/auth/signup', {
         email,
         username,
         password
       });
-
-      if (response.data.success && response.data['2fa_required']) {
-        localStorage.setItem('email', email);
-        router.push('/2fa');
-      } else if (response.data.success) {
-        router.push('/dashboard');
+        localStorage.setItem('fromSignup', true);
+        router.push('/redirecting');
+      }
+      catch (err) {
+      if (err.response && err.response.data && err.response.data.detail === 'User with this email already exists') {
+        setError('A user with this email already exists. Please use a different email or log in.');
       } else {
         setError('Sign up failed. Please try again.');
       }
-    } catch (err) {
-      setError('Sign up failed. Please try again.');
     }
   };
-
+  
   return (
     <Grid container justifyContent="center" alignItems="center" style={{ minHeight: '100vh', padding: '0 20px' }}>
       <Paper elevation={5} style={{ padding: '40px', maxWidth: '450px', borderRadius: '15px', width: '100%' }}>
