@@ -4,9 +4,12 @@ import StockGraph from '../components/stockData'; // Import the graph component 
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import { useAuth } from "@/context/auth";
+import useBearStore from "@/store/useBearStore";
 
 const Dashboard = () => {
   const router = useRouter(); 
+
+  const isDarkMode = useBearStore((state) => state.isDarkMode);
 
   const [rows, setRows] = useState([]);
   const [search, setSearch] = useState('');
@@ -16,7 +19,7 @@ const Dashboard = () => {
   const [selectedRange, setSelectedRange] = useState('all');
   const [currentStock, setCurrentStock] = useState('');
   const [stocksFetched, setStocksFetched] = useState(false);
-
+  
   const { userId, isLoggedIn, logout } = useAuth();
 
   const timeOptions = {
@@ -156,18 +159,49 @@ const Dashboard = () => {
         variant="outlined" 
         value={search} 
         onChange={(e) => setSearch(e.target.value)} // Update search value
-        sx={{ bgcolor: 'background.default', width: '300px', marginTop: '1rem', marginBottom: '1rem', transition: 'background-color 1.5s ease-in-out', }}
+        sx={{ bgcolor: 'background.default', width: '300px', marginTop: '1rem', marginBottom: '1rem', transition: 'background-color 1.0s ease-in-out', }}
       />
 
       {/* Table for displaying stocks */}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
-            <TableRow>
-              <TableCell>Your Stocks</TableCell>
-              <TableCell align="right">Current Pricing</TableCell>
-              <TableCell align="right">Predicted Price</TableCell>
-              <TableCell align="right">Predicted Volatility</TableCell>
+            <TableRow
+              sx={{
+                transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out',
+              }}
+            >
+              <TableCell
+                sx={{
+                  transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out',
+                }}
+              >
+                Your Stocks
+              </TableCell>
+              <TableCell
+                align="right"
+                sx={{
+                  transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out',
+                }}
+              >
+                Current Pricing
+              </TableCell>
+              <TableCell
+                align="right"
+                sx={{
+                  transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out',
+                }}
+              >
+                Predicted Price
+              </TableCell>
+              <TableCell
+                align="right"
+                sx={{
+                  transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out',
+                }}
+              >
+                Predicted Volatility
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -175,19 +209,53 @@ const Dashboard = () => {
               <TableRow
                 key={row.ticker}
                 onClick={() => handleRowClick(row.ticker)}
-                sx={{ cursor: 'pointer', '&:hover': { backgroundColor: '#f5f5f5' } }}
+                sx={{
+                  cursor: 'pointer',
+                  '&:hover': {
+                    backgroundColor: isDarkMode ? '#3E3E3E' : '#f5f5f5',
+                  },
+                  transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out',
+                }}
               >
-                <TableCell component="th" scope="row">
+                <TableCell
+                  component="th"
+                  scope="row"
+                  sx={{
+                    transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out',
+                  }}
+                >
                   {row.ticker}
                 </TableCell>
-                <TableCell align="right">{row.currentPricing}</TableCell>
-                <TableCell align="right">{row.predictedPrice}</TableCell>
-                <TableCell align="right">{row.predictedVolatility}</TableCell>
+                <TableCell
+                  align="right"
+                  sx={{
+                    transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out',
+                  }}
+                >
+                  {row.currentPricing}
+                </TableCell>
+                <TableCell
+                  align="right"
+                  sx={{
+                    transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out',
+                  }}
+                >
+                  {row.predictedPrice}
+                </TableCell>
+                <TableCell
+                  align="right"
+                  sx={{
+                    transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out',
+                  }}
+                >
+                  {row.predictedVolatility}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+
     </Box>
   );
 };

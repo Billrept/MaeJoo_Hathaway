@@ -323,7 +323,7 @@ import React, { useState, useEffect } from 'react';
                                         onClick={() => handleRowClick(row)} 
                                         sx={{ 
                                             cursor: 'pointer', 
-                                            '&:hover': { backgroundColor: isDarkMode ? '#3E3E3E' : '#f5f5f5' } 
+                                            '&:hover': { backgroundColor: isDarkMode ? '#3E3E3E' : '#f5f5f5' },
                                         }}
                                     >
                                         <TableCell 

@@ -9,7 +9,6 @@ export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    console.log(localStorage.getItem('user_id'));
     const storedUserId = localStorage.getItem('user_id');
     const token = localStorage.getItem('token');
     if (storedUserId && token) {
@@ -39,7 +38,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ userId, isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ userId, isLoggedIn, login, logout, setIsLoggedIn }}>
       {children}
     </AuthContext.Provider>
   );
