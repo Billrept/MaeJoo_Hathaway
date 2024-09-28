@@ -67,10 +67,14 @@ const Dashboard = () => {
           const stockPromises = favoriteStocks.map(async (stock) => {
             try {
               const predictionResponse = await axios.get(`http://localhost:8000/stocks/${stock.ticker}/prediction`);
+              const priceResponse = await axios.post(`http://localhost:8000/stocks/${stock.ticker}/price`);
+
               const trackedStockInfo = predictionResponse.data;
+              const currentPrice = priceResponse.data[0];
 
               return {
                 ticker: trackedStockInfo.ticker,
+                currentPricing: currentPrice.current_price,
                 predictedPrice: trackedStockInfo.predicted_price,
                 predictedVolatility: trackedStockInfo.predicted_volatility,
               };
@@ -176,7 +180,7 @@ const Dashboard = () => {
                 <TableCell component="th" scope="row">
                   {row.ticker}
                 </TableCell>
-                <TableCell align="right">{row.pricing}</TableCell>
+                <TableCell align="right">{row.currentPricing}</TableCell>
                 <TableCell align="right">{row.predictedPrice}</TableCell>
                 <TableCell align="right">{row.predictedVolatility}</TableCell>
               </TableRow>
