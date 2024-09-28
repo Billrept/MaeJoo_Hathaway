@@ -17,7 +17,6 @@ const Login = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      // Redirect to the dashboard or any other page if the user is logged in
       router.push('/dashboard'); // Replace with the page you want to redirect to
     }
   }, [router]);

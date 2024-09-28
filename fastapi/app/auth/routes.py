@@ -77,10 +77,7 @@ def login(user: UserLogin, background_tasks: BackgroundTasks, conn = Depends(get
         raise HTTPException(status_code=400, detail="Invalid username or password")
     otp = generate_otp(user.email)
     background_tasks.add_task(send_otp_via_email, user.email, otp)
-    access_token = create_access_token(data={"sub": user.email})
     return {
-        "access_token": access_token,
-        "token_type": "bearer",
         "user_id": db_user["id"]
     }
 
@@ -88,7 +85,13 @@ def login(user: UserLogin, background_tasks: BackgroundTasks, conn = Depends(get
 def verify_otp_endpoint(data: VerifyOtpRequest):
     otp = data.otp.strip()
     if verify_otp(data.email, otp):
-        return {"success": True, "message": "OTP verified successfully"}
+        access_token = create_access_token(data={"sub": data.email})
+        return {
+            "success": True,
+            "message": "OTP verified successfully",
+            "access_token": access_token,
+            "token_type": "bearer"
+        }
     else:
         raise HTTPException(status_code=400, detail="Invalid or expired OTP.")
 

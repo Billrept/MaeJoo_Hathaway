@@ -95,7 +95,7 @@ import React, { useState, useEffect } from 'react';
 
         const handleRemoveFavorite = async (ticker) => {
             try {
-                await axios.post(`http://localhost:8000/stocks/${ticker}/${userId}/remove-favorite`);
+                await axios.delete(`http://localhost:8000/stocks/${ticker}/${userId}/remove-favorite`);
                 console.log("Favorite removed successfully");
             } catch (error) {
                 console.error('Error removing stock from favorites:', error);
@@ -458,5 +458,3 @@ import React, { useState, useEffect } from 'react';
     };
 
     export default Market;
-
-
