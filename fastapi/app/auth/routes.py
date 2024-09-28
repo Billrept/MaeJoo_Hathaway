@@ -80,7 +80,7 @@ async def resend_otp(data: resendOtpRequest):
         otp = generate_otp(data.email)
         reference_code = generate_reference_code()
         store_reference_code(data.email, reference_code)
-        send_otp_via_email(data.email, otp, reference_code)
+        send_otp_via_email(data.email, otp)
         return {"message": "OTP sent successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to resend OTP: {str(e)}")

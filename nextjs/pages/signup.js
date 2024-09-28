@@ -62,7 +62,7 @@ const Signup = () => {
       }
     }
   };
-  
+
   return (
     <Grid container justifyContent="center" alignItems="center" style={{ minHeight: '100vh', padding: '0 20px' }}>
       <Paper elevation={5} style={{ padding: '40px', maxWidth: '450px', borderRadius: '15px', width: '100%' }}>

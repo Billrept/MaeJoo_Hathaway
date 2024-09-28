@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import { TextField, Button, Typography, Paper, Grid, Link } from '@mui/material';
@@ -13,9 +13,18 @@ const Login = () => {
   // Get the dark mode state from the global store
   const isDarkMode = useBearStore((state) => state.isDarkMode);
 
+  // Check if user is already logged in
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      // Redirect to the dashboard or any other page if the user is logged in
+      router.push('/dashboard'); // Replace with the page you want to redirect to
+    }
+  }, [router]);
+
   const handleLogin = async (e) => {
     e.preventDefault();
-    
+
     try {
       const response = await axios.post('http://localhost:8000/auth/login', {
         email,
@@ -37,7 +46,7 @@ const Login = () => {
       alignItems="center"
       sx={{ 
         minHeight: '100vh', 
-        backgroundColor: isDarkMode ? '#333' : '#f5f5f5', // Dark mode background
+        backgroundColor: isDarkMode ? '#333' : '#f5f5f5', 
       }}
     >
       <Grid item xs={12} sm={8} md={4}>
@@ -47,8 +56,8 @@ const Login = () => {
             padding: '2rem',
             textAlign: 'center',
             borderRadius: '12px',
-            backgroundColor: isDarkMode ? '#424242' : '#fff', // Dark mode background for Paper
-            color: isDarkMode ? '#ffffff' : '#000000', // Text color in dark mode
+            backgroundColor: isDarkMode ? '#424242' : '#fff', 
+            color: isDarkMode ? '#ffffff' : '#000000', 
           }}
         >
           <Typography variant="h4" gutterBottom>
@@ -65,12 +74,12 @@ const Login = () => {
               required
               InputProps={{
                 style: {
-                  color: isDarkMode ? '#ffffff' : '#000000', // Dark mode input text color
+                  color: isDarkMode ? '#ffffff' : '#000000', 
                 },
               }}
               InputLabelProps={{
                 style: {
-                  color: isDarkMode ? '#cccccc' : '#000000', // Dark mode label color
+                  color: isDarkMode ? '#cccccc' : '#000000', 
                 },
               }}
             />
