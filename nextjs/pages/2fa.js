@@ -65,6 +65,7 @@ const TwoFactorAuth = () => {
 
       console.log(response.data);
       if (response.data.success) {
+        localStorage.setItem('token', response.data.access_token);
         setSuccess('OTP verified successfully!');
         
         // Call login to set isLoggedIn to true
