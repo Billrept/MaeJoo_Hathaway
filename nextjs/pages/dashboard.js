@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Box } from '@mui/material';
+import { TextField, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Box, ButtonGroup, Button } from '@mui/material';
 import StockGraph from '../components/stockData'; // Import the graph component to display stock data
 import axios from 'axios';
 import { useRouter } from 'next/router';
@@ -8,7 +8,6 @@ import useBearStore from "@/store/useBearStore";
 
 const Dashboard = () => {
   const router = useRouter(); 
-
   const isDarkMode = useBearStore((state) => state.isDarkMode);
 
   const [rows, setRows] = useState([]);
@@ -153,6 +152,66 @@ const Dashboard = () => {
   return (
     <Box marginY="5rem" marginX='10vw'>
       <Typography variant="h4">Dashboard</Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between',marginTop:'2rem', marginBottom: '1rem', alignItems: 'center'}} >
+                    <Typography variant="subtitle1" color="textSecondary" sx={{transition: 'color 1.0s ease-in-out'}}>
+                        {currentStock ?`Current Stock: ${currentStock}` : 'No stock selected'}
+                    </Typography>
+
+                    <ButtonGroup
+                        variant="contained"
+                        aria-label="outlined primary button group"
+                        sx={{
+                        '& .MuiButton-root': {
+                            color: '#ffffff',
+                            backgroundColor: '#2da14c',
+                            borderColor: '#000000', // Black border between buttons
+                            '&:hover': {
+                            backgroundColor: '#1e7d36', // Color on hover
+                            },
+                        },
+                        '& .MuiButton-root.Mui-selected': {
+                            backgroundColor: '#145524', // Change color for selected buttons
+                        },
+                        }}
+                    >
+                        <Button
+                        onClick={() => setSelectedRange('week')}
+                        className={selectedRange === 'week' ? 'Mui-selected' : ''}
+                        >
+                        7 D
+                        </Button>
+                        <Button
+                        onClick={() => setSelectedRange('month')}
+                        className={selectedRange === 'month' ? 'Mui-selected' : ''}
+                        >
+                        1 M
+                        </Button>
+                        <Button
+                        onClick={() => setSelectedRange('threeMonths')}
+                        className={selectedRange === 'threeMonths' ? 'Mui-selected' : ''}
+                        >
+                        3 M
+                        </Button>
+                        <Button
+                        onClick={() => setSelectedRange('sixMonths')}
+                        className={selectedRange === 'sixMonths' ? 'Mui-selected' : ''}
+                        >
+                        6 M
+                        </Button>
+                        <Button
+                        onClick={() => setSelectedRange('year')}
+                        className={selectedRange === 'year' ? 'Mui-selected' : ''}
+                        >
+                        1 Y
+                        </Button>
+                        <Button
+                        onClick={() => setSelectedRange('all')}
+                        className={selectedRange === 'all' ? 'Mui-selected' : ''}
+                        >
+                        All
+                        </Button>
+                    </ButtonGroup>
+                    </Box>
       <StockGraph prices={filteredGraphData.prices} dates={filteredGraphData.dates}/>
       <TextField 
         label="Search" 
@@ -163,99 +222,110 @@ const Dashboard = () => {
       />
 
       {/* Table for displaying stocks */}
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow
-              sx={{
-                transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out',
-              }}
-            >
-              <TableCell
-                sx={{
-                  transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out',
-                }}
-              >
-                Your Stocks
-              </TableCell>
-              <TableCell
-                align="right"
-                sx={{
-                  transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out',
-                }}
-              >
-                Current Pricing
-              </TableCell>
-              <TableCell
-                align="right"
-                sx={{
-                  transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out',
-                }}
-              >
-                Predicted Price
-              </TableCell>
-              <TableCell
-                align="right"
-                sx={{
-                  transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out',
-                }}
-              >
-                Predicted Volatility
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredRows.map((row) => (
+      <Box 
+        component={Paper} 
+        sx={{ 
+          transition: 'background-color 1.0s ease-in-out', // Apply transition globally for mode changes
+        }}
+      >
+        <TableContainer>
+          <Table stickyHeader>
+            <TableHead>
               <TableRow
-                key={row.ticker}
-                onClick={() => handleRowClick(row.ticker)}
                 sx={{
-                  cursor: 'pointer',
-                  '&:hover': {
-                    backgroundColor: isDarkMode ? '#3E3E3E' : '#f5f5f5',
-                  },
-                  transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out',
+                  transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out', // Apply transition for dark/light mode
                 }}
               >
                 <TableCell
-                  component="th"
-                  scope="row"
                   sx={{
-                    transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out',
+                    color: isDarkMode ? '#ffffff' : '#000000', // Text color change for dark mode
+                    transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out', // Apply transition for dark/light mode
                   }}
                 >
-                  {row.ticker}
+                  Your Stocks
                 </TableCell>
                 <TableCell
                   align="right"
                   sx={{
-                    transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out',
+                    color: isDarkMode ? '#ffffff' : '#000000',
+                    transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out', // Apply transition for dark/light mode
                   }}
                 >
-                  {row.currentPricing}
+                  Current Pricing
                 </TableCell>
                 <TableCell
                   align="right"
                   sx={{
-                    transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out',
+                    color: isDarkMode ? '#ffffff' : '#000000',
+                    transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out', // Apply transition for dark/light mode
                   }}
                 >
-                  {row.predictedPrice}
+                  Predicted Price
                 </TableCell>
                 <TableCell
                   align="right"
                   sx={{
-                    transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out',
+                    color: isDarkMode ? '#ffffff' : '#000000',
+                    transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out', // Apply transition for dark/light mode
                   }}
                 >
-                  {row.predictedVolatility}
+                  Predicted Volatility
                 </TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
+            </TableHead>
+            <TableBody>
+              {filteredRows.map((row) => (
+                <TableRow
+                  key={row.ticker}
+                  onClick={() => handleRowClick(row.ticker)}
+                  sx={{
+                    cursor: 'pointer',
+                    '&:hover': {
+                      backgroundColor: isDarkMode ? '#3E3E3E' : '#f5f5f5', // Apply hover effect without transition
+                      transition: 'none', // Disable transition during hover
+                    }
+                  }}
+                >
+                  <TableCell
+                    component="th"
+                    scope="row"
+                    sx={{
+                      transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out', // Apply transition for mode changes
+                    }}
+                  >
+                    {row.ticker}
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out', // Apply transition for mode changes
+                    }}
+                  >
+                    {row.currentPricing}
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out', // Apply transition for mode changes
+                    }}
+                  >
+                    {row.predictedPrice}
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out', // Apply transition for mode changes
+                    }}
+                  >
+                    {row.predictedVolatility}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        
+      </Box>
     </Box>
   );
 };
