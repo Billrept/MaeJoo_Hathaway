@@ -1,5 +1,47 @@
 from psycopg2 import sql
 from psycopg2.extras import RealDictCursor
+from passlib.context import CryptContext
+from psycopg2.extras import RealDictCursor
+from sqlalchemy.orm import Session
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def update_user(db, user_id: int, username: str, email: str, password: str = None):
+    cursor = db.cursor(cursor_factory=RealDictCursor)
+    try:
+        if password:
+            # Hash the new password if provided
+            password_hash = pwd_context.hash(password)
+            cursor.execute(
+                """
+                UPDATE users
+                SET username = %s, email = %s, password_hash = %s
+                WHERE id = %s
+                RETURNING id, username, email;
+                """,
+                (username, email, password_hash, user_id)
+            )
+        else:
+            cursor.execute(
+                """
+                UPDATE users
+                SET username = %s, email = %s
+                WHERE id = %s
+                RETURNING id, username, email;
+                """,
+                (username, email, user_id)
+            )
+        updated_user = cursor.fetchone()
+        db.commit()
+        return updated_user
+    except Exception as e:
+        db.rollback()
+        raise e
+    finally:
+        cursor.close()
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
 
 def create_user(db, username: str, email: str, hashed_password: str):
     cursor = db.cursor(cursor_factory=RealDictCursor)
@@ -65,11 +107,8 @@ def add_stock_to_favorites(db, user_id: int, stock_id: int):
     finally:
         cursor.close()
 
-from psycopg2 import sql
-
 def get_user_by_email(conn, email: str):
     with conn.cursor() as cur:
-        # Raw SQL query to fetch user by email
         query = sql.SQL("""
             SELECT id, username, email, password_hash
             FROM users
@@ -79,35 +118,36 @@ def get_user_by_email(conn, email: str):
         cur.execute(query, (email,))
         result = cur.fetchone()
 
-        # Return None if no user found
         if result is None:
             return None
 
-        # Return the result as a dictionary
+        # Return the result as a dictionary including password hash
         return {
             "id": result[0],          # user_id
             "username": result[1],     # username
             "email": result[2],        # email
+            "password_hash": result[3] # password hash for update
         }
 
+def get_user_by_id(conn, user_id: int):
+    try:
+        print(f"Querying for user with id: {user_id}")  # Log the ID being queried
+        
+        # Query the database for the user using raw SQL
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT id, username, email FROM users WHERE id = %d;", (user_id,))
+            user = cursor.fetchone()
 
-def update_user(db, username: str, email: str):
-	cursor = db.cursor(cursor_factory=RealDictCursor)
-	try:
-		cursor.execute(
-			"""
-			UPDATE users
-			SET username = %s, email = %s
-			WHERE id = %s
-			RETURNING id, username, email;
-			""",
-			(username, email)
-		)
-		updated_user = cursor.fetchone()
-		db.commit()
-		return updated_user
-	except Exception as e:
-		db.rollback()
-		raise e
-	finally:
-		cursor.close()
+        if user:
+            print(f"User found: {user}")
+            return {
+                "id": user[0],
+                "username": user[1],
+                "email": user[2]
+            }
+        else:
+            print(f"No user found with id: {user_id}")  # Log if no user found
+            return None
+    except Exception as e:
+        print(f"Error fetching user by ID: {e}")
+        raise e

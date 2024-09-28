@@ -111,10 +111,8 @@ def send_otp_via_email(email: str, otp: str) -> str:
         subject = "Your OTP Code"
         reference_code = generate_reference_code()
 
-        # Store the reference code associated with the email
         store_reference_code(email, reference_code)
 
-        # Construct the email
         message = MIMEMultipart()
         message['From'] = sender_email
         message['To'] = email
@@ -130,12 +128,11 @@ def send_otp_via_email(email: str, otp: str) -> str:
         server.sendmail(sender_email, email, message.as_string())
         server.quit()
 
-        return reference_code  # Return the reference code for debugging purposes
-
+        return reference_code
+    
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error sending OTP")
 
-# Decode a JWT token
 def decode_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])

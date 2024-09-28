@@ -44,7 +44,6 @@ def get_all_stock_prices():
     connection = get_db_connection()
     cursor = connection.cursor()
 
-    # Query to get the latest close price for each ticker
     query = """
     SELECT ticker, close
     FROM stock_history sh
@@ -60,9 +59,7 @@ def get_all_stock_prices():
     stock_prices = cursor.fetchall()
     connection.close()
 
-    # Format the stock prices with 2 decimal places
     return [{"ticker": ticker, "current_price": f'{float(close_price):.2f}'} for ticker, close_price in stock_prices]
-
 
 def store_prediction(ticker, predicted_price, predicted_volatility, model_used="ARIMA-GARCH"):
     conn = get_db_connection()

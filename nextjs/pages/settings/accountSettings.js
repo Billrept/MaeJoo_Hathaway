@@ -1,141 +1,130 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Typography, TextField, Button, IconButton, Avatar } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
+import React, { useState, useEffect } from 'react';
 
 const AccountSettings = () => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [confirmPasswordError, setConfirmPasswordError] = useState('');
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [isEditing, setIsEditing] = useState({ username: false, email: false, password: false });
 
-  useEffect(() => {
-    setUsername(localStorage.getItem('username'));
-    setEmail(localStorage.getItem('email'));
-  }, []);
+    // Fetch current user data from API on mount
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await fetch('/auth/user/me', { // Assuming this endpoint exists to fetch user data
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    setUsername(data.username);
+                    setEmail(data.email);
+                } else {
+                    alert('Failed to fetch user data');
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
 
-  const handleAvatarChange = () => {
-    // Add API call here
-    console.log('Change avatar');
-  };
+        fetchUserData();
+    }, []);
 
-  const handleUserChange = () => {
-    // Validate password and confirm password
-    if (password.length < 8) {
-      setPasswordError('Password must be at least 8 characters long');
-      return;
-    }
-    if (password !== confirmPassword) {
-      setConfirmPasswordError('Passwords do not match');
-      return;
-    }
+    // Update the user profile data
+    const handleUpdate = async (field, value) => {
+        try {
+            const response = await fetch('/auth/user/update', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ [field]: value })
+            });
 
-    //Add API call here
-    console.log('handleUserChange');
-  };
+            const data = await response.json();
+            if (response.ok) {
+                alert(`${field} updated successfully!`);
+            } else {
+                alert(`Failed to update ${field}: ${data.detail}`);
+            }
+        } catch (error) {
+            console.error(`Error updating ${field}:`, error);
+            alert(`Error updating ${field}. Please try again.`);
+        }
+    };
 
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-    if (e.target.value.length >= 8) {
-      setPasswordError('');
-    }
-  };
+    return (
+        <div className="account-settings">
+            <h2>Security</h2>
 
-  const handleConfirmPasswordChange = (e) => {
-    setConfirmPassword(e.target.value);
-    if (password === e.target.value) {
-      setConfirmPasswordError('');
-    }
-  };
+            {/* Username Section */}
+            <div>
+                <label>Username:</label>
+                {!isEditing.username ? (
+                    <span>{username} <button onClick={() => setIsEditing({ ...isEditing, username: true })}>Edit</button></span>
+                ) : (
+                    <input
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        onBlur={() => {
+                            if (username) {
+                                handleUpdate('username', username);
+                                setIsEditing({ ...isEditing, username: false });
+                            } else {
+                                alert('Username cannot be empty');
+                            }
+                        }}
+                    />
+                )}
+            </div>
+            
+            {/* Email Section */}
+            <div>
+                <label>Email:</label>
+                {!isEditing.email ? (
+                    <span>{email} <button onClick={() => setIsEditing({ ...isEditing, email: true })}>Edit</button></span>
+                ) : (
+                    <input
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        onBlur={() => {
+                            if (email) {
+                                handleUpdate('email', email);
+                                setIsEditing({ ...isEditing, email: false });
+                            } else {
+                                alert('Email cannot be empty');
+                            }
+                        }}
+                    />
+                )}
+            </div>
 
-  return (
-    <Box sx={{ maxWidth: '500px', padding: '16px' }}>
-      <Typography variant="h5" gutterBottom>
-        Account Settings
-      </Typography>
+            {/* Password Section */}
+            <div>
+                <label>Password:</label>
+                {!isEditing.password ? (
+                    <span>•••••• <button onClick={() => setIsEditing({ ...isEditing, password: true })}>Edit</button></span>
+                ) : (
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        onBlur={() => {
+                            if (password) {
+                                handleUpdate('password', password);
+                                setIsEditing({ ...isEditing, password: false });
+                            } else {
+                                alert('Password cannot be empty');
+                            }
+                        }}
+                    />
+                )}
+            </div>
 
-      {/* Account Circle with Edit Button */}
-      <Box sx={{ display: 'flex', marginBottom: '16px' }}>
-        <Avatar
-          sx={{
-            width: 40,
-            height: 40,
-            backgroundColor: '#68BB59',
-          }}
-        />
-        <IconButton onClick={handleAvatarChange} sx={{ marginLeft: '20px' }}>
-          <EditIcon />
-        </IconButton>
-      </Box>
-
-      {/* Username Field */}
-      <Box sx={{ marginBottom: '16px' }}>
-        <TextField
-          fullWidth
-          label="Username"
-          variant="outlined"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-      </Box>
-
-      {/* Email Field */}
-      <Box sx={{ marginBottom: '16px' }}>
-        <TextField
-          fullWidth
-          label="Email"
-          variant="outlined"
-          placeholder="Email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </Box>
-
-      {/* New Password Field */}
-      <Box sx={{ marginBottom: '16px' }}>
-        <TextField
-          fullWidth
-          label="New Password"
-          variant="outlined"
-          placeholder="New Password"
-          type="password"
-          value={password}
-          onChange={handlePasswordChange}
-          error={!!passwordError}
-          helperText={passwordError}
-        />
-      </Box>
-
-      {/* Confirm Password Field */}
-      <Box sx={{ marginBottom: '16px' }}>
-        <TextField
-          fullWidth
-          label="Confirm Password"
-          variant="outlined"
-          placeholder="Confirm Password"
-          type="password"
-          value={confirmPassword}
-          onChange={handleConfirmPasswordChange}
-          error={!!confirmPasswordError}
-          helperText={confirmPasswordError}
-        />
-      </Box>
-
-      {/* Save Button */}
-      <Button
-        variant="contained"
-        color="primary"
-        fullWidth
-        sx={{ marginTop: '16px' }}
-        onClick={handleUserChange}
-      >
-        Save
-      </Button>
-    </Box>
-  );
+            {/* Add other sections like 2FA, SMS OTP, etc. */}
+        </div>
+    );
 };
 
 export default AccountSettings;
