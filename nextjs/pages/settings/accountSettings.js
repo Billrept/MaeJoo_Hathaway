@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, TextField, Button, IconButton, Avatar } from '@mui/material';
+import { Box, Typography, TextField, IconButton, Avatar } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';
+import axios from 'axios'; // Import axios to make API calls
 
 const AccountSettings = () => {
   const [username, setUsername] = useState('');
@@ -10,29 +12,20 @@ const AccountSettings = () => {
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
 
+  // Track edit mode for each field
+  const [isUsernameEditable, setIsUsernameEditable] = useState(false);
+  const [isEmailEditable, setIsEmailEditable] = useState(false);
+  const [isPasswordEditable, setIsPasswordEditable] = useState(false);
+
   useEffect(() => {
+    // Assuming username and email are stored in localStorage
     setUsername(localStorage.getItem('username'));
     setEmail(localStorage.getItem('email'));
   }, []);
 
   const handleAvatarChange = () => {
-    // Add API call here
+    // Add API call for changing avatar here
     console.log('Change avatar');
-  };
-
-  const handleUserChange = () => {
-    // Validate password and confirm password
-    if (password.length < 8) {
-      setPasswordError('Password must be at least 8 characters long');
-      return;
-    }
-    if (password !== confirmPassword) {
-      setConfirmPasswordError('Passwords do not match');
-      return;
-    }
-
-    //Add API call here
-    console.log('handleUserChange');
   };
 
   const handlePasswordChange = (e) => {
@@ -46,6 +39,46 @@ const AccountSettings = () => {
     setConfirmPassword(e.target.value);
     if (password === e.target.value) {
       setConfirmPasswordError('');
+    }
+  };
+
+  // Function to update username
+  const updateUsername = async () => {
+    try {
+      const response = await axios.put('/api/update-username', { username });
+      console.log('Username updated successfully:', response.data);
+    } catch (error) {
+      console.error('Error updating username:', error);
+    }
+  };
+
+  // Function to update email
+  const updateEmail = async () => {
+    try {
+      const response = await axios.put('/api/update-email', { email });
+      console.log('Email updated successfully:', response.data);
+    } catch (error) {
+      console.error('Error updating email:', error);
+    }
+  };
+
+  // Function to update password
+  const updatePassword = async () => {
+    // Validate password before calling the API
+    if (password.length < 8) {
+      setPasswordError('Password must be at least 8 characters long');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setConfirmPasswordError('Passwords do not match');
+      return;
+    }
+
+    try {
+      const response = await axios.put('/api/update-password', { password });
+      console.log('Password updated successfully:', response.data);
+    } catch (error) {
+      console.error('Error updating password:', error);
     }
   };
 
@@ -70,70 +103,84 @@ const AccountSettings = () => {
       </Box>
 
       {/* Username Field */}
-      <Box sx={{ marginBottom: '16px' }}>
+      <Box sx={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
         <TextField
           fullWidth
           label="Username"
           variant="outlined"
-          placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          disabled={!isUsernameEditable} // Disable unless editable
         />
+        <IconButton
+          onClick={() => {
+            if (isUsernameEditable) updateUsername();
+            setIsUsernameEditable(!isUsernameEditable);
+          }}
+        >
+          {isUsernameEditable ? <SaveIcon /> : <EditIcon />}
+        </IconButton>
       </Box>
 
       {/* Email Field */}
-      <Box sx={{ marginBottom: '16px' }}>
+      <Box sx={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
         <TextField
           fullWidth
           label="Email"
           variant="outlined"
-          placeholder="Email"
-          type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          disabled={!isEmailEditable} // Disable unless editable
         />
+        <IconButton
+          onClick={() => {
+            if (isEmailEditable) updateEmail();
+            setIsEmailEditable(!isEmailEditable);
+          }}
+        >
+          {isEmailEditable ? <SaveIcon /> : <EditIcon />}
+        </IconButton>
       </Box>
 
       {/* New Password Field */}
-      <Box sx={{ marginBottom: '16px' }}>
+      <Box sx={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
         <TextField
           fullWidth
           label="New Password"
           variant="outlined"
-          placeholder="New Password"
           type="password"
           value={password}
           onChange={handlePasswordChange}
+          disabled={!isPasswordEditable} // Disable unless editable
           error={!!passwordError}
           helperText={passwordError}
         />
+        <IconButton
+          onClick={() => {
+            if (isPasswordEditable) updatePassword();
+            setIsPasswordEditable(!isPasswordEditable);
+          }}
+        >
+          {isPasswordEditable ? <SaveIcon /> : <EditIcon />}
+        </IconButton>
       </Box>
 
       {/* Confirm Password Field */}
-      <Box sx={{ marginBottom: '16px' }}>
+      <Box sx={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
         <TextField
           fullWidth
           label="Confirm Password"
           variant="outlined"
-          placeholder="Confirm Password"
           type="password"
           value={confirmPassword}
           onChange={handleConfirmPasswordChange}
+          disabled={!isPasswordEditable} // Disable unless editable
           error={!!confirmPasswordError}
           helperText={confirmPasswordError}
+          sx={{ width: 'calc(100% - 40px)' }}
         />
       </Box>
 
-      {/* Save Button */}
-      <Button
-        variant="contained"
-        color="primary"
-        fullWidth
-        sx={{ marginTop: '16px' }}
-        onClick={handleUserChange}
-      >
-        Save
-      </Button>
     </Box>
   );
 };
