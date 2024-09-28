@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import List
-from ..database import get_stock_history, get_prediction, get_all_stock_prices, get_db_connection
+from ..database import *
 from sqlalchemy.orm import Session
 
 router = APIRouter()
@@ -52,6 +52,10 @@ def stock_prediction(ticker: str):
 @router.post("/prices")
 def fetch_current_stock_prices():
     return get_all_stock_prices()
+
+@router.post("/{ticker}/price")
+def fetch_single_stock_price(ticker: str):
+    return get_stock_price(ticker)
 
 @router.post("/{ticker}/{userId}/add-favorite")
 async def add_favorite_stock(ticker: str, userId: int, db: Session = Depends(get_db_connection)):
@@ -124,3 +128,4 @@ async def remove_favorite_stock(ticker: str, userId: int, db: Session = Depends(
         return {"message": f"Stock {ticker} removed from favorites."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error removing stock from favorites: {str(e)}")
+    

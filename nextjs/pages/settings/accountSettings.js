@@ -11,6 +11,7 @@ const AccountSettings = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
 
   // Track edit mode for each field
   const [isUsernameEditable, setIsUsernameEditable] = useState(false);
@@ -18,7 +19,6 @@ const AccountSettings = () => {
   const [isPasswordEditable, setIsPasswordEditable] = useState(false);
 
   useEffect(() => {
-    // Assuming username and email are stored in localStorage
     setUsername(localStorage.getItem('username'));
     setEmail(localStorage.getItem('email'));
   }, []);
@@ -45,26 +45,38 @@ const AccountSettings = () => {
   // Function to update username
   const updateUsername = async () => {
     try {
-      const response = await axios.put('/api/update-username', { username });
+      const user_id = localStorage.getItem('user_id');
+      const token = localStorage.getItem('token');
+
+      const response = await axios.put(
+        'http://localhost:8000/auth/update-username',
+        { user_id, username },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       console.log('Username updated successfully:', response.data);
     } catch (error) {
-      console.error('Error updating username:', error);
+      console.error('Error updating username:', error.response ? error.response.data : error.message);
     }
   };
 
   // Function to update email
   const updateEmail = async () => {
     try {
-      const response = await axios.put('/api/update-email', { email });
+      const user_id = localStorage.getItem('user_id');
+      const token = localStorage.getItem('token');
+
+      const response = await axios.put(
+        'http://localhost:8000/auth/update-email',
+        { user_id, email },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       console.log('Email updated successfully:', response.data);
     } catch (error) {
-      console.error('Error updating email:', error);
+      console.error('Error updating email:', error.response ? error.response.data : error.message);
     }
   };
 
-  // Function to update password
   const updatePassword = async () => {
-    // Validate password before calling the API
     if (password.length < 8) {
       setPasswordError('Password must be at least 8 characters long');
       return;
@@ -73,14 +85,35 @@ const AccountSettings = () => {
       setConfirmPasswordError('Passwords do not match');
       return;
     }
-
+  
     try {
-      const response = await axios.put('/api/update-password', { password });
+      const user_id = localStorage.getItem('user_id');
+      const email = localStorage.getItem('email'); // Retrieve email from localStorage or other source
+      const token = localStorage.getItem('token');
+  
+      const payload = {
+        user_id,
+        email,  // Add email to the payload
+        current_password: currentPassword,
+        new_password: password,
+      };
+      
+      const response = await axios.put(
+        'http://localhost:8000/auth/update-password',
+        payload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       console.log('Password updated successfully:', response.data);
     } catch (error) {
-      console.error('Error updating password:', error);
+      if (error.response && error.response.data) {
+        console.error('Error updating password:', error.response.data);
+      } else {
+        console.error('Error updating password:', error.message);
+      }
     }
   };
+  
+  
 
   return (
     <Box sx={{ maxWidth: '500px', padding: '16px' }}>
@@ -111,6 +144,7 @@ const AccountSettings = () => {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           disabled={!isUsernameEditable} // Disable unless editable
+          onBlur={() => { if (isUsernameEditable) updateUsername(); }} // Auto-save onBlur
         />
         <IconButton
           onClick={() => {
@@ -131,6 +165,7 @@ const AccountSettings = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled={!isEmailEditable} // Disable unless editable
+          onBlur={() => { if (isEmailEditable) updateEmail(); }} // Auto-save onBlur
         />
         <IconButton
           onClick={() => {
@@ -140,6 +175,19 @@ const AccountSettings = () => {
         >
           {isEmailEditable ? <SaveIcon /> : <EditIcon />}
         </IconButton>
+      </Box>
+
+      {/* Current Password Field */}
+      <Box sx={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
+        <TextField
+          fullWidth
+          label="Current Password"
+          variant="outlined"
+          type="password"
+          value={currentPassword}
+          onChange={(e) => setCurrentPassword(e.target.value)}
+          disabled={!isPasswordEditable} // Disable unless editable
+        />
       </Box>
 
       {/* New Password Field */}
@@ -178,6 +226,7 @@ const AccountSettings = () => {
           error={!!confirmPasswordError}
           helperText={confirmPasswordError}
           sx={{ width: 'calc(100% - 40px)' }}
+          onBlur={() => { if (isPasswordEditable) updatePassword(); }} // Auto-save onBlur
         />
       </Box>
 

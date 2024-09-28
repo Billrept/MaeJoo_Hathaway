@@ -72,15 +72,12 @@ def verify_otp(user_identifier: str, otp: str) -> bool:
     totp = pyotp.TOTP(otp_secret)
     return totp.verify(otp, valid_window=1)
 
-# Verify the password against its hash
-def verify_password(plain_password, hashed_password):
+def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
-# Hash the password
 def get_password_hash(password):
     return pwd_context.hash(password)
 
-# Get current user based on token
 def get_current_user(token: str = Depends(oauth2_scheme)) -> Dict[str, str]:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -91,7 +88,6 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> Dict[str, str]:
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-# Create an access token
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
     if expires_delta:
@@ -102,7 +98,6 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-# Send OTP via email with a reference code
 def send_otp_via_email(email: str, otp: str) -> str:
     email = email.lower()  # Ensure lowercase email
     try:
@@ -111,10 +106,8 @@ def send_otp_via_email(email: str, otp: str) -> str:
         subject = "Your OTP Code"
         reference_code = generate_reference_code()
 
-        # Store the reference code associated with the email
         store_reference_code(email, reference_code)
 
-        # Construct the email
         message = MIMEMultipart()
         message['From'] = sender_email
         message['To'] = email
@@ -130,12 +123,11 @@ def send_otp_via_email(email: str, otp: str) -> str:
         server.sendmail(sender_email, email, message.as_string())
         server.quit()
 
-        return reference_code  # Return the reference code for debugging purposes
-
+        return reference_code
+    
     except Exception as e:
         raise HTTPException(status_code=500, detail="Error sending OTP")
 
-# Decode a JWT token
 def decode_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])

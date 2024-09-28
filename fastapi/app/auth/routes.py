@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, constr
 from .auth_handler import *
 from app.database import get_db_connection
-from app.crud.user import create_user, get_user_by_email
+from app.crud.user import create_user, get_user_by_email, update_user, get_user_by_id
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 
 router = APIRouter()
 
@@ -29,6 +29,25 @@ class resendOtpRequest(BaseModel):
 class TokenRequest(BaseModel):
     token: str
 
+class UserResponse(BaseModel):
+    id: int
+    username: str
+    email: str
+    
+class UpdateUsernameRequest(BaseModel):
+    user_id: int
+    username: str
+
+class UpdateEmailRequest(BaseModel):
+    user_id: int
+    email: EmailStr
+
+class UpdatePasswordRequest(BaseModel):
+    email: str
+    user_id : int
+    current_password: str
+    new_password: constr(min_length=8)
+
 @router.post("/signup")
 def signup(user: UserSignup, db: Session = Depends(get_db_connection)):
     try:
@@ -50,7 +69,6 @@ def signup(user: UserSignup, db: Session = Depends(get_db_connection)):
         # Log the error and return a generic error message
         print(f"Signup error: {str(e)}")  # This will print the error to the FastAPI logs
         raise HTTPException(status_code=500, detail="Internal Server Error")
-
 
 @router.post("/login")
 def login(user: UserLogin, background_tasks: BackgroundTasks, conn = Depends(get_db_connection)):
@@ -99,3 +117,68 @@ async def get_reference_code_endpoint(email: str):
     reference_code = get_reference_code(email)
     if reference_code:
         return {"reference_code": reference_code}
+    
+@router.put("/update-username")
+def update_username(data: UpdateUsernameRequest, conn = Depends(get_db_connection)):
+    user = get_user_by_id(conn, data.user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("UPDATE users SET username = %s WHERE id = %s;", (data.username, data.user_id))
+            conn.commit()
+
+        user['username'] = data.username
+        
+        return {"message": "Username updated successfully", "user": user}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating username: {str(e)}")
+
+
+@router.put("/update-email")
+def update_email(data: UpdateEmailRequest, conn = Depends(get_db_connection)):
+    # Retrieve user by user_id
+    user = get_user_by_id(conn, data.user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Retrieve user by email
+    existing_user = get_user_by_email(conn, data.email)
+    if existing_user and existing_user['id'] != data.user_id:  # Access 'id' as a dict key
+        raise HTTPException(status_code=400, detail="Email is already in use")
+    
+    try:
+        # Update email in the database
+        with conn.cursor() as cursor:
+            cursor.execute("UPDATE users SET email = %s WHERE id = %s;", (data.email, data.user_id))
+            conn.commit()
+
+        # Return the updated user information
+        user['email'] = data.email
+        return {"message": "Email updated successfully", "user": user}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating email: {str(e)}")
+
+
+# Route to update password
+@router.put("/update-password")
+def update_password(data: UpdatePasswordRequest, conn = Depends(get_db_connection)):
+    # Retrieve the user by email
+    db_user = get_user_by_id(conn, data.user_id)  # Assuming data includes email
+    if not db_user:
+        raise HTTPException(status_code=400, detail="Invalid username or password")
+
+    if not verify_password(data.current_password, db_user['password_hash']):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+
+    try:
+        hashed_new_password = get_password_hash(data.new_password)
+
+        with conn.cursor() as cursor:
+            cursor.execute("UPDATE users SET password_hash = %s WHERE id = %s;", (hashed_new_password, db_user['id']))
+            conn.commit()
+
+        return {"message": "Password updated successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating password: {str(e)}")
