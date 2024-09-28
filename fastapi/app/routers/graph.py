@@ -110,7 +110,7 @@ def get_favorite_stocks(user_id: int, db: Session = Depends(get_db_connection)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching favorites: {str(e)}")
 
-@router.post("/{ticker}/{userId}/remove-favorite")
+@router.delete("/{ticker}/{userId}/remove-favorite")
 async def remove_favorite_stock(ticker: str, userId: int, db: Session = Depends(get_db_connection)):
     try:
         cursor = db.cursor()
