@@ -18,8 +18,16 @@ const SettingsPage = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', paddingTop: '4vw', paddingX:'10vw' }}>
-      <Paper elevation={3} sx={{ display: 'flex', width: '100%', padding: 3 }}>
+    <Box sx={{ display: 'flex', justifyContent: 'center', paddingTop: '4vw', paddingX: '10vw' }}>
+      <Paper 
+        elevation={3} 
+        sx={{ 
+          display: 'flex', 
+          width: '100%', 
+          padding: 3, 
+          transition: 'background-color 1.0s ease-in-out', // Smooth transition for background color
+        }}
+      >
         {/* Left Sidebar */}
         <Box sx={{ width: '20%', padding: 2, borderRight: '1px solid #e0e0e0' }}>
           <List component="nav">

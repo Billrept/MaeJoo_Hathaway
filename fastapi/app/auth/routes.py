@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, constr
 from .auth_handler import *
 from app.database import get_db_connection
 from app.crud.user import create_user, get_user_by_email, update_user, get_user_by_id
@@ -33,13 +33,20 @@ class UserResponse(BaseModel):
     id: int
     username: str
     email: str
-
-    class Config:
-        orm_mode = True
-        
-class UserUpdateRequest(BaseModel):
+    
+class UpdateUsernameRequest(BaseModel):
     user_id: int
-    username: Optional[str]
+    username: str
+
+class UpdateEmailRequest(BaseModel):
+    user_id: int
+    email: EmailStr
+
+class UpdatePasswordRequest(BaseModel):
+    email: str
+    user_id : int
+    current_password: str
+    new_password: constr(min_length=8)
 
 @router.post("/signup")
 def signup(user: UserSignup, db: Session = Depends(get_db_connection)):
@@ -111,57 +118,60 @@ async def get_reference_code_endpoint(email: str):
     if reference_code:
         return {"reference_code": reference_code}
     
-@router.patch("/user/update")
-def update_user_profile(
-    user_id: Optional[int] = None,
-    username: Optional[str] = None,
-    conn = Depends(get_db_connection)  # Assuming conn is a raw psycopg2 connection
-):
+@router.put("/update-username")
+def update_username(data: UpdateUsernameRequest, conn = Depends(get_db_connection)):
+    user = get_user_by_id(conn, data.user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
     try:
-        # Log the received input for debugging
-        print(f"Received user_id: {user_id}, username: {username}")
-
-        # Fetch the user by user_id using raw SQL and the psycopg2 connection
         with conn.cursor() as cursor:
-            cursor.execute("SELECT id, username FROM users WHERE id = %s;", (user_id,))
-            user = cursor.fetchone()
+            cursor.execute("UPDATE users SET username = %s WHERE id = %s;", (data.username, data.user_id))
+            conn.commit()
 
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
+        user['username'] = data.username
         
-        print(f"User found: {user}")
-
-        # Update the username only if it is provided
-        if username:
-            with conn.cursor() as cursor:
-                # Correct parameterized query
-                cursor.execute(
-                    "UPDATE users SET username = %s WHERE id = %s;",  # No Python string formatting here
-                    (username, user_id)  # Pass parameters as a tuple
-                )
-            print(f"Username updated to: {username}")
-
-        # Commit the changes to the database
-        conn.commit()
-
-        return {"message": "User updated successfully"}
-
+        return {"message": "Username updated successfully", "user": user}
     except Exception as e:
-        # Log the error and rollback the transaction
-        print(f"Error occurred: {str(e)}")
-        conn.rollback()
-        raise HTTPException(status_code=500, detail=f"An error occurred while updating user profile: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error updating username: {str(e)}")
 
-@router.get("/user/me")
-def get_current_user_data(db: Session = Depends(get_db_connection), current_user: dict = Depends(get_current_user)):
+
+@router.put("/update-email")
+def update_email(data: UpdateEmailRequest, db: Session = Depends(get_db_connection)):
+    user = get_user_by_id(db, data.user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    existing_user = get_user_by_email(db, data.email)
+    if existing_user and existing_user.id != data.user_id:
+        raise HTTPException(status_code=400, detail="Email is already in use")
+    
     try:
-        user = get_user_by_email(db, current_user['username'])
-
-        if user is None:
-            raise HTTPException(status_code=404, detail="User not found")
-        return {
-            "username": user['username'],
-            "email": user['email']
-        }
+        user.email = data.email
+        db.commit()
+        db.refresh(user)
+        return {"message": "Email updated successfully", "user": user}
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Error retrieving user information")
+        raise HTTPException(status_code=500, detail=f"Error updating email: {str(e)}")
+
+# Route to update password
+@router.put("/update-password")
+def update_password(data: UpdatePasswordRequest, conn = Depends(get_db_connection)):
+    # Retrieve the user by email
+    db_user = get_user_by_id(conn, data.user_id)  # Assuming data includes email
+    if not db_user:
+        raise HTTPException(status_code=400, detail="Invalid username or password")
+
+    if not verify_password(data.current_password, db_user['password_hash']):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+
+    try:
+        hashed_new_password = get_password_hash(data.new_password)
+
+        with conn.cursor() as cursor:
+            cursor.execute("UPDATE users SET password_hash = %s WHERE id = %s;", (hashed_new_password, db_user['id']))
+            conn.commit()
+
+        return {"message": "Password updated successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating password: {str(e)}")

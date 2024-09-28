@@ -135,7 +135,7 @@ def get_user_by_id(conn, user_id: int):
         
         # Query the database for the user using raw SQL
         with conn.cursor() as cursor:
-            cursor.execute("SELECT id, username, email FROM users WHERE id = %d;", (user_id,))
+            cursor.execute("SELECT id, username, email, password_hash FROM users WHERE id = %s;", (user_id,))
             user = cursor.fetchone()
 
         if user:
@@ -143,7 +143,8 @@ def get_user_by_id(conn, user_id: int):
             return {
                 "id": user[0],
                 "username": user[1],
-                "email": user[2]
+                "email": user[2],
+                "password_hash" : user[3]
             }
         else:
             print(f"No user found with id: {user_id}")  # Log if no user found
