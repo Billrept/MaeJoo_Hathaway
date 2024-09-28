@@ -1,27 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Box } from '@mui/material';
-import StockGraph from './stockData/stockData'; // Import the graph component to display stock data
+import StockGraph from '../components/stockData'; // Import the graph component to display stock data
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import { useAuth } from "@/context/auth";
 
 const Dashboard = () => {
   const router = useRouter(); 
+
   const [rows, setRows] = useState([]);
   const [search, setSearch] = useState('');
-  const [selectedRow, setSelectedRow] = useState('');
-  const [stockData, setStockData] = useState([]);
-  const [error, setError] = useState('');
+  const [stockData, setStockData] = useState({ prices: [], dates: [] });
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // Loading state to track authentication
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedRange, setSelectedRange] = useState('all');
+  const [currentStock, setCurrentStock] = useState('');
+  const [stocksFetched, setStocksFetched] = useState(false);
+
   const { userId, isLoggedIn, logout } = useAuth();
+
+  const timeOptions = {
+    week: 7,
+    month: 30,
+    threeMonths: 90,
+    sixMonths: 180,
+    year: 365,
+    all: Infinity
+  };
 
   // Check authentication when the component mounts
   useEffect(() => {
     const token = localStorage.getItem('token');
 
     if (!token) {
-      // No token, redirect to login
       router.push('/login');
     } else {
       axios
@@ -30,80 +41,118 @@ const Dashboard = () => {
           if (response.data.valid) {
             setIsAuthenticated(true);
           } else {
-            // Invalid token, clear it and redirect to login
             logout();
             router.push('/login');
           }
         })
         .catch(() => {
-          // Catch any other errors and log out the user
           logout();
           router.push('/login');
         })
         .finally(() => {
-          setIsLoading(false); // Stop the loading state
+          setIsLoading(false);
         });
     }
   }, [router]);
 
   // Fetch the user's favorite stocks and their predictions
   useEffect(() => {
-    if (isAuthenticated && userId) {
+    if (isAuthenticated && userId && !stocksFetched) {
       const fetchData = async () => {
         try {
           const response = await axios.get(`http://localhost:8000/stocks/${userId}/favorites`);
           const favoriteStocks = response.data;
 
           // Fetch predictions for each stock concurrently
-          const stockPromises = favoriteStocks.map((stock) => handleTrackedStock(stock.ticker));
-          await Promise.all(stockPromises);
+          const stockPromises = favoriteStocks.map(async (stock) => {
+            try {
+              const predictionResponse = await axios.get(`http://localhost:8000/stocks/${stock.ticker}/prediction`);
+              const trackedStockInfo = predictionResponse.data;
+
+              return {
+                ticker: trackedStockInfo.ticker,
+                predictedPrice: trackedStockInfo.predicted_price,
+                predictedVolatility: trackedStockInfo.predicted_volatility,
+              };
+            } catch (error) {
+              console.error(`Error fetching prediction for ${stock.ticker}:`, error);
+              return null;
+            }
+          });
+
+          const resolvedStocks = await Promise.all(stockPromises);
+
+          const validStocks = resolvedStocks.filter(stock => stock !== null);
+          setRows(validStocks);
+          setStocksFetched(true);
         } catch (error) {
           console.error('Error fetching data: ', error);
         }
       };
       fetchData();
     }
-  }, [userId, isAuthenticated]);
+  }, [userId, isAuthenticated, stocksFetched]);
 
-  const handleTrackedStock = async (ticker) => {
-    try {
-      const response = await axios.get(`http://localhost:8000/stocks/${ticker}/prediction`);
-      const trackedStockInfo = response.data;
+  // Filter rows based on search input
+  const filteredRows = rows.filter((row) =>
+    row.ticker.toLowerCase().includes(search.toLowerCase())
+  );
 
-      const newStock = [
-        trackedStockInfo.ticker,
-        trackedStockInfo.pricing,
-        trackedStockInfo.pred_price,
-        trackedStockInfo.pred_vola,
-      ];
-
-      setRows((prevRows) => [...prevRows, newStock]); // Append the new stock data to the previous rows
-    } catch (err) {
-      setError('Error tracking stock');
-    }
-  };
-
-  // Show loading screen while authentication is in progress
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  // If not authenticated, show nothing (or you can redirect or show an error message)
   if (!isAuthenticated) {
     return null;
   }
 
+  const changeGraph = async (ticker) => {
+    try {
+      const response = await axios.get(`http://localhost:8000/stocks/${ticker}/history`);
+      const historyData = response.data;
+
+      const dates = historyData.map(item => item.date);
+      const prices = historyData.map(item => item.close_price);
+
+      setStockData({ dates, prices });
+    } catch (error) {
+      console.error('Error fetching stock history data:', error);
+    }
+  };
+
+  const handleRowClick = async (ticker) => {
+    try {
+      changeGraph(ticker);
+      setCurrentStock(ticker);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  const getFilteredGraphData = () => {
+    const { dates, prices } = stockData;
+    const daysToShow = timeOptions[selectedRange];
+
+    if (dates.length <= daysToShow) return stockData;
+
+    const filteredDates = dates.slice(-daysToShow);
+    const filteredPrices = prices.slice(-daysToShow);
+
+    return { dates: filteredDates, prices: filteredPrices };
+  };
+
+  const filteredGraphData = getFilteredGraphData();
+
   return (
-    <Box marginTop="8rem" marginRight="10vw" marginLeft="10vw">
+    <Box marginY="5rem" marginX='10vw'>
       <Typography variant="h4">Dashboard</Typography>
-      <h2>{selectedRow}</h2>
-      <StockGraph prices={stockData[0]} dates={stockData[1]} />
-      <TextField
-        label="Search stocks"
-        variant="outlined"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        sx={{ bgcolor: 'background.default', width: '300px', marginTop: '1rem', marginBottom: '1rem' }}
+      <StockGraph prices={filteredGraphData.prices} dates={filteredGraphData.dates}/>
+      <TextField 
+        label="Search" 
+        variant="outlined" 
+        value={search} 
+        onChange={(e) => setSearch(e.target.value)} // Update search value
+        sx={{ bgcolor: 'background.default', width: '300px', marginTop: '1rem', marginBottom: '1rem', transition: 'background-color 1.5s ease-in-out', }}
       />
 
       {/* Table for displaying stocks */}
@@ -118,18 +167,18 @@ const Dashboard = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
+            {filteredRows.map((row) => (
               <TableRow
-                key={row[0]}
-                onClick={() => setSelectedRow(row)}
+                key={row.ticker}
+                onClick={() => handleRowClick(row.ticker)}
                 sx={{ cursor: 'pointer', '&:hover': { backgroundColor: '#f5f5f5' } }}
               >
                 <TableCell component="th" scope="row">
-                  {row[0]}
+                  {row.ticker}
                 </TableCell>
-                <TableCell align="right">{row[1]}</TableCell>
-                <TableCell align="right">{row[2]}</TableCell>
-                <TableCell align="right">{row[3]}</TableCell>
+                <TableCell align="right">{row.pricing}</TableCell>
+                <TableCell align="right">{row.predictedPrice}</TableCell>
+                <TableCell align="right">{row.predictedVolatility}</TableCell>
               </TableRow>
             ))}
           </TableBody>

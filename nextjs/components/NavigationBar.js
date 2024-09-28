@@ -216,15 +216,12 @@ const NavigationLayout = ({ children }) => {
                   "aria-labelledby": "basic-button",
                 }}
               >
-                <MenuItem onClick={() => router.push("/profile")}>Profile</MenuItem>
                 <MenuItem onClick={() => router.push("/dashboard")}>Dashboard</MenuItem>
                 <MenuItem onClick={() => router.push("/settings")}>Settings</MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    logout();
-                    router.push('/login');
-                  }}
-                >
+                <MenuItem onClick={() => { 
+                  logout(); 
+                  router.push('/login'); 
+                  }} >
                   Log out
                 </MenuItem>
               </Menu>

@@ -1,9 +1,9 @@
-    import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
     import axios from 'axios';
     import { Typography, Box, TextField, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, ButtonGroup, Button,Snackbar,CircularProgress } from '@mui/material';
     import StarIcon from '@mui/icons-material/Star';
     import useBearStore from "@/store/useBearStore";
-    import StockGraph from './stockData/stockData';
+    import StockGraph from '../components/stockData';
 
     const tickers = [
         "AAPL", "ABNB", "ADBE", "ADI", "ADP", "ADSK", "AEP", "AMAT", "AMD", "AMGN", 
@@ -30,9 +30,7 @@
     const Market = () => {
         const isDarkMode = useBearStore((state) => state.isDarkMode);
         
-        // Fetch user_id from localStorage
         const [userId, setUserId] = useState(null);
-        
         const [stockData, setStockData] = useState({ prices: [], dates: [] });
         const [search, setSearch] = useState('');
         const [selectedRange, setSelectedRange] = useState('all');
@@ -44,24 +42,23 @@
         const [rows, setRows] = useState(
             tickers.map(ticker => ({
                 ticker: ticker,
-                pricing: 0,  // Initial placeholder for pricing
-                favorited: false,  // Initial favorite state
+                pricing: 0,
+                favorited: false,
                 isLoading: false
             }))
         );
 
         useEffect(() => {
-            // Fetch user_id from localStorage when component mounts
             const storedUserId = localStorage.getItem('user_id');
             if (storedUserId) {
-                setUserId(storedUserId);  // Set userId from localStorage
+                setUserId(storedUserId);
             }
 
             const fetchStockPricesAndFavorites = async () => {
                 try {
                     const [stockPricesResponse, favoritesResponse] = await Promise.all([
                         axios.post('http://localhost:8000/stocks/prices'),
-                        axios.get(`http://localhost:8000/stocks/${storedUserId}/favorites`)  // Fetch user favorites
+                        axios.get(`http://localhost:8000/stocks/${storedUserId}/favorites`)
                     ]);
 
                     const stockPrices = stockPricesResponse.data;
@@ -69,11 +66,11 @@
 
                     const updatedRows = rows.map(row => {
                         const stock = stockPrices.find(stock => stock.ticker === row.ticker);
-                        const isFavorited = favoriteStocks.some(favorite => favorite.ticker === row.ticker); // Check if stock is favorited
+                        const isFavorited = favoriteStocks.some(favorite => favorite.ticker === row.ticker);
                         return {
                             ...row,
-                            pricing: stock ? stock.current_price : row.pricing,  // Update price if found
-                            favorited: isFavorited  // Mark as favorited if it exists in the user's favorites
+                            pricing: stock ? stock.current_price : row.pricing,
+                            favorited: isFavorited
                         };
                     });
                     setRows(updatedRows);
@@ -85,9 +82,8 @@
             if (storedUserId) {
                 fetchStockPricesAndFavorites();
             }
-        }, []); // Empty dependency array to run once on mount
+        }, []);
 
-        // Function to add stock to favorites
         const handleAddFavorite = async (ticker) => {
             try {
                 await axios.post(`http://localhost:8000/stocks/${ticker}/${userId}/add-favorite`);
@@ -97,7 +93,6 @@
             }
         };
 
-        // Function to remove stock from favorites
         const handleRemoveFavorite = async (ticker) => {
             try {
                 await axios.post(`http://localhost:8000/stocks/${ticker}/${userId}/remove-favorite`);
@@ -107,7 +102,6 @@
             }
         };
 
-        // Toggle favorite icon and API call
         const handleToggleFavorite = (ticker, isFavorited) => {
             setRows(prevRows => prevRows.map(row => {
                 if (row.ticker === ticker) {
@@ -155,7 +149,6 @@
                 const response = await axios.get(`http://localhost:8000/stocks/${row.ticker}/history`);
                 const historyData = response.data;
 
-                // Extract dates and prices
                 const dates = historyData.map(item => item.date);
                 const prices = historyData.map(item => item.close_price);
 
@@ -170,7 +163,6 @@
                 const response = await axios.get(`http://localhost:8000/stocks/${row.ticker}/prediction`);
                 const { predicted_price, predicted_volatility } = response.data;
 
-                // Store the predicted price and volatility in state
                 setPredictedPrice(predicted_price);
                 setPredictedVolatility(predicted_volatility);
             } catch (error) {
@@ -178,23 +170,24 @@
             }
         };
 
-        const getFilteredGraphData = () => {
-            const { dates, prices } = stockData;
-            const daysToShow = timeOptions[selectedRange];
-
-            if (dates.length <= daysToShow) return stockData;
-
-            const filteredDates = dates.slice(-daysToShow);
-            const filteredPrices = prices.slice(-daysToShow);
-
-            return { dates: filteredDates, prices: filteredPrices };
-        };
-
-        const filteredGraphData = getFilteredGraphData();
+				const getFilteredGraphData = () => {
+					const { dates, prices } = stockData;
+					const daysToShow = timeOptions[selectedRange];
+			
+					if (dates.length <= daysToShow) return stockData;
+			
+					const filteredDates = dates.slice(-daysToShow);
+					const filteredPrices = prices.slice(-daysToShow);
+			
+					return { dates: filteredDates, prices: filteredPrices };
+				};
+			
+				const filteredGraphData = getFilteredGraphData();
 
         const handleCloseSnackbar = () => {
             setSnackbarMessage('');
         };
+        
 
         return (
             <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out' }}>
@@ -202,30 +195,15 @@
                     <Typography variant='h3' gutterBottom>
                         Market
                     </Typography>
-                    <TextField
-                        label="Search"
-                        variant="outlined"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
+                    <TextField label="Search" variant="outlined" value={search} onChange={(e) => setSearch(e.target.value)}
                         sx={{ bgcolor: 'background.default', width: '300px', marginTop: '1rem', marginBottom: '1rem', transition: 'background-color 1.5s ease-in-out', }}
                     />
                 </Box>
-                <Box
-                    sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        marginBottom: '1rem',
-                        marginLeft: '10vw',
-                        marginRight: '34.8vw',
-                        alignItems: 'center',
-                    }}
-                    >
-                    {/* Current Stock Typography aligned to the left */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', marginLeft: '10vw', marginRight: '34.8vw', alignItems: 'center'}} >
                     <Typography variant="subtitle1" color="textSecondary">
-                        {currentStock ? `Current Stock: ${currentStock.ticker}` : 'No stock selected'}
+                        {currentStock ?`Current Stock: ${currentStock.ticker}` : 'No stock selected'}
                     </Typography>
 
-                    {/* Button Group aligned to the right */}
                     <ButtonGroup
                         variant="contained"
                         aria-label="outlined primary button group"
@@ -297,7 +275,7 @@
                         sx={{ 
                             width: '65vw', 
                             padding: '1rem', 
-                            height: '500px',
+                            height:'56vh',
                             transition: 'background-color 1.5s ease-in-out',
                         }}
                     >
@@ -307,7 +285,7 @@
                         component={Paper} 
                         sx={{ 
                             width: '30vw', 
-                            height: '500px', 
+                            height: '56vh', 
                             overflowY: 'auto',
                             transition: 'background-color 1.5s ease-in-out',
                         }}
@@ -480,3 +458,5 @@
     };
 
     export default Market;
+
+
