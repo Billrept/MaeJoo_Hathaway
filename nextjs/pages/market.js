@@ -154,7 +154,6 @@ const Market = () => {
             const response = await axios.get(`http://localhost:8000/stocks/${row.ticker}/prediction`);
             const { predicted_price, predicted_volatility } = response.data;
 
-            // Store the predicted price and volatility in state
             setPredictedPrice(predicted_price);
             setPredictedVolatility(predicted_volatility);
         } catch (error) {
@@ -199,10 +198,10 @@ const Market = () => {
                         '& .MuiButton-root': {
                             color: '#ffffff',
                             backgroundColor: '#2da14c',
-                            borderColor: '#000000', // Black border between buttons
+                            borderColor: '#000000',
                         },
                         '& .MuiButton-root:not(:last-of-type)': {
-                            borderRight: '1px solid #000000', // Black line between buttons
+                            borderRight: '1px solid #000000',
                         },
                     }}
                 >
