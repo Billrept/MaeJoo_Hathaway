@@ -20,6 +20,7 @@ class UserLogin(BaseModel):
     password: str
 
 class VerifyOtpRequest(BaseModel):
+    user_id: int
     email: str
     otp: str
 
@@ -78,19 +79,23 @@ def login(user: UserLogin, background_tasks: BackgroundTasks, conn = Depends(get
     otp = generate_otp(user.email)
     background_tasks.add_task(send_otp_via_email, user.email, otp)
     return {
-        "user_id": db_user["id"]
+        "message": "OTP sent to your email",
     }
 
 @router.post("/verify-otp")
-def verify_otp_endpoint(data: VerifyOtpRequest):
+def verify_otp_endpoint(data: VerifyOtpRequest, db: Session = Depends(get_db_connection)):
     otp = data.otp.strip()
+    db_user = get_user_by_id(db, data.user_id)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
     if verify_otp(data.email, otp):
         access_token = create_access_token(data={"sub": data.email})
         return {
             "success": True,
             "message": "OTP verified successfully",
             "access_token": access_token,
-            "token_type": "bearer"
+            "token_type": "bearer",
+            "user_id": db_user["id"]
         }
     else:
         raise HTTPException(status_code=400, detail="Invalid or expired OTP.")

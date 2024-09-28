@@ -16,8 +16,7 @@ const TwoFactorAuth = () => {
   useEffect(() => {
     // Check for both email and authentication token
     const storedEmail = localStorage.getItem('email');
-    const authToken = localStorage.getItem('token'); 
-    if (!storedEmail || !authToken) {
+    if (!storedEmail) {
       setError('Unauthorized access, redirecting to login...');
       router.push('/login');  
     } else {
@@ -66,6 +65,7 @@ const TwoFactorAuth = () => {
       console.log(response.data);
       if (response.data.success) {
         localStorage.setItem('token', response.data.access_token);
+        localStorage,setItem('user_id', response.data.user_id);
         setSuccess('OTP verified successfully!');
         
         // Call login to set isLoggedIn to true
