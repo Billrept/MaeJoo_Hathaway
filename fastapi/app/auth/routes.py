@@ -137,22 +137,29 @@ def update_username(data: UpdateUsernameRequest, conn = Depends(get_db_connectio
 
 
 @router.put("/update-email")
-def update_email(data: UpdateEmailRequest, db: Session = Depends(get_db_connection)):
-    user = get_user_by_id(db, data.user_id)
+def update_email(data: UpdateEmailRequest, conn = Depends(get_db_connection)):
+    # Retrieve user by user_id
+    user = get_user_by_id(conn, data.user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
-    existing_user = get_user_by_email(db, data.email)
-    if existing_user and existing_user.id != data.user_id:
+    # Retrieve user by email
+    existing_user = get_user_by_email(conn, data.email)
+    if existing_user and existing_user['id'] != data.user_id:  # Access 'id' as a dict key
         raise HTTPException(status_code=400, detail="Email is already in use")
     
     try:
-        user.email = data.email
-        db.commit()
-        db.refresh(user)
+        # Update email in the database
+        with conn.cursor() as cursor:
+            cursor.execute("UPDATE users SET email = %s WHERE id = %s;", (data.email, data.user_id))
+            conn.commit()
+
+        # Return the updated user information
+        user['email'] = data.email
         return {"message": "Email updated successfully", "user": user}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error updating email: {str(e)}")
+
 
 # Route to update password
 @router.put("/update-password")
