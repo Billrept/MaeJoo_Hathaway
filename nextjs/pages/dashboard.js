@@ -3,37 +3,45 @@ import { TextField, Paper, Table, TableBody, TableCell, TableContainer, TableHea
 import StockGraph from './stockData/stockData'; // Import the graph component to display stock data
 import axios from 'axios';
 import { useRouter } from 'next/router';
+import { useAuth } from "@/context/auth";
 
 const Dashboard = () => {
-  const router = useRouter(); // Extract userId from the URL
-  const [userId, setUserId] = useState(null);
+  const router = useRouter(); 
   const [rows, setRows] = useState([]);
   const [search, setSearch] = useState('');
   const [selectedRow, setSelectedRow] = useState('');
   const [stockData, setStockData] = useState([]);
   const [error, setError] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Loading state to track authentication
+  const { userId, isLoggedIn, logout } = useAuth();
 
   // Check authentication when the component mounts
   useEffect(() => {
-    const storedUserId = localStorage.getItem('user_id');
-    setUserId(storedUserId);
     const token = localStorage.getItem('token');
 
     if (!token) {
-      router.push('/login'); // Redirect to login if no token
+      // No token, redirect to login
+      router.push('/login');
     } else {
       axios
         .post('http://localhost:8000/auth/verify-token', { token })
         .then((response) => {
           if (response.data.valid) {
-            setIsAuthenticated(true); // Token is valid, allow access
+            setIsAuthenticated(true);
           } else {
-            router.push('/login'); // Redirect if token is invalid
+            // Invalid token, clear it and redirect to login
+            logout();
+            router.push('/login');
           }
         })
         .catch(() => {
-          router.push('/login'); // Redirect on error
+          // Catch any other errors and log out the user
+          logout();
+          router.push('/login');
+        })
+        .finally(() => {
+          setIsLoading(false); // Stop the loading state
         });
     }
   }, [router]);
@@ -43,16 +51,12 @@ const Dashboard = () => {
     if (isAuthenticated && userId) {
       const fetchData = async () => {
         try {
-          console.log('User Id: ', userId);
-          // Fetch user-tracked stocks using the userId
           const response = await axios.get(`http://localhost:8000/stocks/${userId}/favorites`);
-          const favoriteStocks = response.data; // Assuming this is an array of stocks with tickers
+          const favoriteStocks = response.data;
 
           // Fetch predictions for each stock concurrently
           const stockPromises = favoriteStocks.map((stock) => handleTrackedStock(stock.ticker));
-          await Promise.all(stockPromises); // Wait for all stock predictions to be fetched
-
-          console.log('Data fetched: ', favoriteStocks);
+          await Promise.all(stockPromises);
         } catch (error) {
           console.error('Error fetching data: ', error);
         }
@@ -74,14 +78,19 @@ const Dashboard = () => {
       ];
 
       setRows((prevRows) => [...prevRows, newStock]); // Append the new stock data to the previous rows
-      setError('');
     } catch (err) {
       setError('Error tracking stock');
     }
   };
 
-  if (!isAuthenticated) {
+  // Show loading screen while authentication is in progress
+  if (isLoading) {
     return <div>Loading...</div>;
+  }
+
+  // If not authenticated, show nothing (or you can redirect or show an error message)
+  if (!isAuthenticated) {
+    return null;
   }
 
   return (

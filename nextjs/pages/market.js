@@ -39,6 +39,7 @@
         const [predictedPrice, setPredictedPrice] = useState(null);
         const [predictedVolatility, setPredictedVolatility] = useState(null);
         const [snackbarMessage, setSnackbarMessage] = useState('');
+        const [currentStock, setCurrentStock] = useState('');
 
         const [rows, setRows] = useState(
             tickers.map(ticker => ({
@@ -143,6 +144,7 @@
             try {
                 changeGraph(row);
                 changePrediction(row);
+                setCurrentStock(row);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -195,44 +197,90 @@
         };
 
         return (
-            <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+            <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingRight: '10vw', paddingLeft: '10vw', paddingTop:'50px',paddingBottom:'20px' }}>
                     <Typography variant='h3' gutterBottom>
                         Market
                     </Typography>
-
                     <TextField
                         label="Search"
                         variant="outlined"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        sx={{ bgcolor: 'background.default', width: '300px', marginTop: '1rem', marginBottom: '1rem' }}
+                        sx={{ bgcolor: 'background.default', width: '300px', marginTop: '1rem', marginBottom: '1rem', transition: 'background-color 1.5s ease-in-out', }}
                     />
                 </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'Left', marginBottom: '1rem', marginLeft:'10vw' }}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        marginBottom: '1rem',
+                        marginLeft: '10vw',
+                        marginRight: '34.8vw',
+                        alignItems: 'center',
+                    }}
+                    >
+                    {/* Current Stock Typography aligned to the left */}
+                    <Typography variant="subtitle1" color="textSecondary">
+                        {currentStock ? `Current Stock: ${currentStock.ticker}` : 'No stock selected'}
+                    </Typography>
+
+                    {/* Button Group aligned to the right */}
                     <ButtonGroup
                         variant="contained"
                         aria-label="outlined primary button group"
                         sx={{
-                            '& .MuiButton-root': {
-                                color: '#ffffff',
-                                backgroundColor: '#2da14c',
-                                borderColor: '#000000', // Black border between buttons
+                        '& .MuiButton-root': {
+                            color: '#ffffff',
+                            backgroundColor: '#2da14c',
+                            borderColor: '#000000', // Black border between buttons
+                            '&:hover': {
+                            backgroundColor: '#1e7d36', // Color on hover
                             },
-                            '& .MuiButton-root:not(:last-of-type)': {
-                                borderRight: '1px solid #000000', // Black line between buttons
-                            },
+                        },
+                        '& .MuiButton-root.Mui-selected': {
+                            backgroundColor: '#145524', // Change color for selected buttons
+                        },
                         }}
                     >
-                        <Button onClick={() => setSelectedRange('week')}>7 D</Button>
-                        <Button onClick={() => setSelectedRange('month')}>1 M</Button>
-                        <Button onClick={() => setSelectedRange('threeMonths')}>3 M</Button>
-                        <Button onClick={() => setSelectedRange('sixMonths')}>6 M</Button>
-                        <Button onClick={() => setSelectedRange('year')}>1 Y</Button>
-                        <Button onClick={() => setSelectedRange('all')}>All</Button>
+                        <Button
+                        onClick={() => setSelectedRange('week')}
+                        className={selectedRange === 'week' ? 'Mui-selected' : ''}
+                        >
+                        7 D
+                        </Button>
+                        <Button
+                        onClick={() => setSelectedRange('month')}
+                        className={selectedRange === 'month' ? 'Mui-selected' : ''}
+                        >
+                        1 M
+                        </Button>
+                        <Button
+                        onClick={() => setSelectedRange('threeMonths')}
+                        className={selectedRange === 'threeMonths' ? 'Mui-selected' : ''}
+                        >
+                        3 M
+                        </Button>
+                        <Button
+                        onClick={() => setSelectedRange('sixMonths')}
+                        className={selectedRange === 'sixMonths' ? 'Mui-selected' : ''}
+                        >
+                        6 M
+                        </Button>
+                        <Button
+                        onClick={() => setSelectedRange('year')}
+                        className={selectedRange === 'year' ? 'Mui-selected' : ''}
+                        >
+                        1 Y
+                        </Button>
+                        <Button
+                        onClick={() => setSelectedRange('all')}
+                        className={selectedRange === 'all' ? 'Mui-selected' : ''}
+                        >
+                        All
+                        </Button>
                     </ButtonGroup>
-                </Box>
-
+                    </Box>
                 <Box 
                     sx={{ 
                         display: 'flex', 
@@ -249,10 +297,11 @@
                         sx={{ 
                             width: '65vw', 
                             padding: '1rem', 
-                            height: '500px'
+                            height: '500px',
+                            transition: 'background-color 1.5s ease-in-out',
                         }}
                     >
-                        <StockGraph prices={filteredGraphData.prices} dates={filteredGraphData.dates} />
+                        <StockGraph prices={filteredGraphData.prices} dates={filteredGraphData.dates}/>
                     </Box>
                     <Box 
                         component={Paper} 
@@ -260,84 +309,166 @@
                             width: '30vw', 
                             height: '500px', 
                             overflowY: 'auto',
+                            transition: 'background-color 1.5s ease-in-out',
                         }}
                     >
-                        <TableContainer>
-                            <Table stickyHeader>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell align="center">Stocks</TableCell>
-                                        <TableCell align="center">Current Pricing</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {filteredRows.map((row) => (
-                                        <TableRow 
+                    <TableContainer>
+                        <Table stickyHeader>
+                            <TableHead>
+                                <TableRow
+                                    sx={{
+                                        transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out', // Smooth transition for header row background and color
+                                    }}
+                                >
+                                    <TableCell
+                                        align="center"
+                                        sx={{
+                                            transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out', // Smooth transition for header cell background and color
+                                        }}
+                                    >
+                                        Stocks
+                                    </TableCell>
+                                    <TableCell
+                                        align="center"
+                                        sx={{
+                                            transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out', // Smooth transition for header cell background and color
+                                        }}
+                                    >
+                                        Current Pricing
+                                    </TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {filteredRows.map((row) => (
+                                    <TableRow 
                                         key={row.ticker} 
                                         onClick={() => handleRowClick(row)} 
                                         sx={{ 
                                             cursor: 'pointer', 
                                             '&:hover': { backgroundColor: isDarkMode ? '#3E3E3E' : '#f5f5f5' } 
                                         }}
+                                    >
+                                        <TableCell 
+                                            component="th" 
+                                            scope="row" 
+                                            sx={{ 
+                                                display: 'flex', 
+                                                alignItems: 'center', 
+                                                transition: 'color 1.5s ease-in-out', // Transition for color
+                                            }}
                                         >
-                                            <TableCell component="th" scope="row" sx={{ display: 'flex', alignItems: 'center' }}>
-                                                <IconButton
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleToggleFavorite(row.ticker, row.favorited);
-                                                    }}
-                                                    size="small"
-                                                    disabled={row.isLoading}
-                                                >
-                                                    {row.isLoading ? (
-                                                        <CircularProgress size={20} />
-                                                    ) : (
-                                                        <StarIcon sx={{ color: row.favorited ? '#FFCE2E' : 'gray' }} />
-                                                    )}
-                                                </IconButton>
-                                                <Typography sx={{ marginLeft: 1 }}>{row.ticker}</Typography>
-                                            </TableCell>
-                                            <TableCell align="center">{row.pricing}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </Box>
-                </Box>
-                <Box sx={{ 
-                    display: 'block', 
-                    paddingTop:'40px',
-                    paddingRight: '10vw', 
-                    paddingLeft: '10vw', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'flex-start', 
-                    gap: 2,
-                    transition: "background-color 1.5s ease-in-out",
-                }}>
-                <Box component={Paper}>
-                    <TableContainer>
-                        <Table stickyHeader>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell align="center" sx={{ width: '50%' }}>Estimated Price</TableCell>
-                                    <TableCell align="center" sx={{ width: '50%' }}>Estimated Volatility</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                <TableRow>
-                                    <TableCell align="center" sx={{ width: '50%' }}>
-                                        {predictedPrice !== null ? predictedPrice : 'N/A'}
-                                    </TableCell>
-                                    <TableCell align="center" sx={{ width: '50%' }}>
-                                        {predictedVolatility !== null ? predictedVolatility : 'N/A'}
-                                    </TableCell>
-                                </TableRow>
+                                            <IconButton
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleToggleFavorite(row.ticker, row.favorited);
+                                                }}
+                                                size="small"
+                                                disabled={row.isLoading}
+                                            >
+                                                {row.isLoading ? (
+                                                    <CircularProgress size={20} />
+                                                ) : (
+                                                    <StarIcon sx={{ color: row.favorited ? '#FFCE2E' : 'gray' }} />
+                                                )}
+                                            </IconButton>
+                                            <Typography sx={{ marginLeft: 1 }}>{row.ticker}</Typography>
+                                        </TableCell>
+                                        <TableCell 
+                                            align="center"
+                                            sx={{ 
+                                                transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out', // Smooth transition for color and background
+                                            }}
+                                        >
+                                            {row.pricing}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
                             </TableBody>
                         </Table>
                     </TableContainer>
+                    </Box>
                 </Box>
-            </Box>
+                <Box
+                    sx={{
+                        display: 'block',
+                        paddingTop: '40px',
+                        paddingRight: '10vw',
+                        paddingLeft: '10vw',
+                        justifyContent: 'space-between',
+                        alignItems: 'flex-start',
+                        gap: 2,
+                        transition: 'background-color 1.5s ease-in-out',
+                    }}
+                    >
+                    <Box component={Paper}>
+                        <TableContainer>
+                        <Table stickyHeader>
+                            {/* Table Head with Transition */}
+                            <TableHead>
+                            <TableRow
+                                sx={{
+                                transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out',
+                                }}
+                            >
+                                <TableCell
+                                align="center"
+                                sx={{
+                                    width: '50%',
+                                    color: isDarkMode ? '#ffffff' : '#000000', // Adjust text color
+                                    transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out',
+                                }}
+                                >
+                                Estimated Price
+                                </TableCell>
+                                <TableCell
+                                align="center"
+                                sx={{
+                                    width: '50%',
+                                    color: isDarkMode ? '#ffffff' : '#000000',
+                                    transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out',
+                                }}
+                                >
+                                Estimated Volatility
+                                </TableCell>
+                            </TableRow>
+                            </TableHead>
+
+                            {/* Table Body with Transition */}
+                            <TableBody>
+                            <TableRow
+                                sx={{
+                                transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out',
+                                backgroundColor: isDarkMode ? '#2B2B2B' : '#ffffff', // Adjust based on dark mode
+                                }}
+                            >
+                                <TableCell
+                                align="center"
+                                sx={{
+                                    width: '50%',
+                                    transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out',
+                                }}
+                                >
+                                <Typography>
+                                    {predictedPrice !== null ? predictedPrice : 'N/A'}
+                                </Typography>
+                                </TableCell>
+                                <TableCell
+                                align="center"
+                                sx={{
+                                    width: '50%',
+                                    transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out',
+                                }}
+                                >
+                                <Typography>
+                                    {predictedVolatility !== null ? predictedVolatility : 'N/A'}
+                                </Typography>
+                                </TableCell>
+                            </TableRow>
+                            </TableBody>
+                        </Table>
+                        </TableContainer>
+                    </Box>
+                    </Box>
                 <Snackbar
                     open={!!snackbarMessage}
                     autoHideDuration={3000}

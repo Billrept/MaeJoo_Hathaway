@@ -21,26 +21,51 @@ import Brightness2Icon from "@mui/icons-material/Brightness2";
 import useBearStore from "@/store/useBearStore";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/auth";  // Import useAuth hook from AuthProvider
+import axios from 'axios';
 
 const NavigationLayout = ({ children }) => {
   const router = useRouter();
   const isDarkMode = useBearStore((state) => state.isDarkMode);
   const toggleDarkMode = useBearStore((state) => state.toggleDarkMode);
   const appName = useBearStore((state) => state.appName);
-  const { userId, isLoggedIn, logout } = useAuth();  // Destructure values from the useAuth hook
+  const { userId, isLoggedIn, logout, setIsLoggedIn } = useAuth();  // Destructure values from the useAuth hook
 
   const [showSun, setShowSun] = useState(!isDarkMode);
   const [showMoon, setShowMoon] = useState(isDarkMode);
-
   const [anchorEl, setAnchorEl] = useState(null);
   const menuOpen = Boolean(anchorEl);
+
+  // Check token validity periodically
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const interval = setInterval(() => {
+      if (token) {
+        axios
+          .post('http://localhost:8000/auth/verify-token', { token })
+          .then((response) => {
+            if (!response.data.valid) {
+              logout();
+              setIsLoggedIn(false);  // Update isLoggedIn when token is invalid
+              router.push('/login');
+            }
+          })
+          .catch(() => {
+            logout();
+            setIsLoggedIn(false);  // Update isLoggedIn on error
+            router.push('/login');
+          });
+      }
+    }, 5 * 60 * 1000); // Check every 5 minutes
+
+    return () => clearInterval(interval);  // Cleanup the interval on component unmount
+  }, [logout, router, setIsLoggedIn]);
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
   const handleMenuClose = () => {
-    setAnchorEl(null); // Close the menu
+    setAnchorEl(null);
   };
 
   useEffect(() => {
