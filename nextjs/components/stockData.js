@@ -26,6 +26,8 @@ const StockGraph = ({ prices, dates }) => {
   // Define the chart options
   const options = {
     responsive: true,
+    maintainAspectRatio: true, // Ensure the graph scales proportionally
+    aspectRatio: 2,
     plugins: {
       legend: {
         position: 'top',
@@ -39,6 +41,10 @@ const StockGraph = ({ prices, dates }) => {
       x: {
         grid: {
           display: false,  // Hide grid lines on the x-axis
+        },
+        ticks: {
+          autoSkip: true,  // Automatically skip labels to avoid clutter
+          maxTicksLimit: 10,  // Maximum number of labels to show on the x-axis
         },
       },
       y: {
