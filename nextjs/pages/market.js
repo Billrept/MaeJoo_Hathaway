@@ -1,6 +1,6 @@
     import React, { useState, useEffect } from 'react';
     import axios from 'axios';
-    import { Typography, Box, TextField, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, ButtonGroup, Button } from '@mui/material';
+    import { Typography, Box, TextField, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, ButtonGroup, Button,Snackbar,CircularProgress } from '@mui/material';
     import StarIcon from '@mui/icons-material/Star';
     import useBearStore from "@/store/useBearStore";
     import StockGraph from './stockData/stockData';
@@ -38,12 +38,14 @@
         const [selectedRange, setSelectedRange] = useState('all');
         const [predictedPrice, setPredictedPrice] = useState(null);
         const [predictedVolatility, setPredictedVolatility] = useState(null);
+        const [snackbarMessage, setSnackbarMessage] = useState('');
 
         const [rows, setRows] = useState(
             tickers.map(ticker => ({
                 ticker: ticker,
                 pricing: 0,  // Initial placeholder for pricing
-                favorited: false  // Initial favorite state
+                favorited: false,  // Initial favorite state
+                isLoading: false
             }))
         );
 
@@ -106,20 +108,32 @@
 
         // Toggle favorite icon and API call
         const handleToggleFavorite = (ticker, isFavorited) => {
-            setRows(prevRows => {
-                return prevRows.map(row => {
+            setRows(prevRows => prevRows.map(row => {
+                if (row.ticker === ticker) {
+                    row.isLoading = true;
+                }
+                return row;
+            }));
+        
+            setTimeout(async () => {
+                if (isFavorited) {
+                    await handleRemoveFavorite(ticker);
+                    setSnackbarMessage(`${ticker} removed from favorites`);
+                } else {
+                    await handleAddFavorite(ticker);
+                    setSnackbarMessage(`${ticker} added to favorites`);
+                }
+        
+                setRows(prevRows => prevRows.map(row => {
                     if (row.ticker === ticker) {
-                        if (!row.favorited) {
-                            handleAddFavorite(ticker);  // Add to favorites if not favorited
-                        } else {
-                            handleRemoveFavorite(ticker);  // Remove from favorites if favorited
-                        }
-                        return { ...row, favorited: !row.favorited };  // Toggle favorite
+                        row.favorited = !isFavorited;
+                        row.isLoading = false;
                     }
                     return row;
-                });
-            });
+                }));
+            }, 500);
         };
+        
 
         const filteredRows = rows.filter(row =>
             row.ticker.toLowerCase().includes(search.toLowerCase())
@@ -175,6 +189,10 @@
         };
 
         const filteredGraphData = getFilteredGraphData();
+
+        const handleCloseSnackbar = () => {
+            setSnackbarMessage('');
+        };
 
         return (
             <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
@@ -263,14 +281,19 @@
                                         }}
                                         >
                                             <TableCell component="th" scope="row" sx={{ display: 'flex', alignItems: 'center' }}>
-                                                <IconButton 
+                                                <IconButton
                                                     onClick={(e) => {
-                                                        e.stopPropagation(); // Prevent row click when star is clicked
-                                                        handleToggleFavorite(row.ticker, row.favorited);  // Toggle favorite
+                                                        e.stopPropagation();
+                                                        handleToggleFavorite(row.ticker, row.favorited);
                                                     }}
                                                     size="small"
+                                                    disabled={row.isLoading}
                                                 >
-                                                    <StarIcon sx={{ color: row.favorited ? '#FFCE2E' : 'gray' }} />
+                                                    {row.isLoading ? (
+                                                        <CircularProgress size={20} />
+                                                    ) : (
+                                                        <StarIcon sx={{ color: row.favorited ? '#FFCE2E' : 'gray' }} />
+                                                    )}
                                                 </IconButton>
                                                 <Typography sx={{ marginLeft: 1 }}>{row.ticker}</Typography>
                                             </TableCell>
@@ -315,6 +338,12 @@
                     </TableContainer>
                 </Box>
             </Box>
+                <Snackbar
+                    open={!!snackbarMessage}
+                    autoHideDuration={3000}
+                    onClose={handleCloseSnackbar}
+                    message={snackbarMessage}
+                />
             </Box>
         );
     };
