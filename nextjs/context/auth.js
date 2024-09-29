@@ -26,10 +26,10 @@ export const AuthProvider = ({ children }) => {
 
   const login = (id, token) => {
     localStorage.setItem('user_id', id);
-    localStorage.setItem('token', token);
+    localStorage.setItem('access_token', token);
     setUserId(id);
     setIsLoggedIn(true);  // Set logged in state to true after login
-  };
+  };  
 
   const logout = () => {
     clearLocalStorage();

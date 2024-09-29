@@ -10,7 +10,6 @@ const Login = () => {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  // Get the dark mode state from the global store
   const isDarkMode = useBearStore((state) => state.isDarkMode);
 
   // Check if user is already logged in

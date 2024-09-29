@@ -21,7 +21,6 @@ const TwoFactorAuth = () => {
       router.push('/login');  
     } else {
       setEmail(storedEmail);
-
       // Fetch the reference code from the backend when the page loads
       fetchReferenceCode(storedEmail);
     }
@@ -61,27 +60,27 @@ const TwoFactorAuth = () => {
         email,
         otp
       });
-
-      console.log(response.data);
-      if (response.data.success) {
         localStorage.setItem('token', response.data.access_token);
-        localStorage,setItem('user_id', response.data.user_id);
+        localStorage.setItem('user_id', response.data.user_id);
         setSuccess('OTP verified successfully!');
+        const token = response.data.access_token;
+        const user_id = response.data.user_id;
+        login(user_id, token);
+        router.push('/dashboard');
+      } catch (err) {
+      console.error('Full Error Object:', err);
+      
+      // Check if err.response.data is an object with a 'detail' key
+      const errorMessage = err.response && err.response.data && typeof err.response.data === 'object' 
+        ? err.response.data.detail 
+        : err.message || 'An error occurred during OTP verification.';
         
-        // Call login to set isLoggedIn to true
-        const userId = localStorage.getItem('user_id');
-        const token = localStorage.getItem('token');
-        login(userId, token);  // Trigger login after successful OTP verification
-        
-        router.push('/dashboard');  
-      } else {
-        setError('Invalid OTP. Please try again.');
-      }
-    } catch (err) {
-      console.error('Error verifying OTP:', err.response);
-      setError('Failed to verify OTP. Please try again.');
+      console.error('Error verifying OTP:', errorMessage);
+      
+      setError(errorMessage);  
     }
   };
+
 
   return (
     <Grid container justifyContent="center" alignItems="center" style={{ minHeight: '100vh' }}>

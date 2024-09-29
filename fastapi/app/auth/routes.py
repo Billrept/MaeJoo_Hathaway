@@ -20,7 +20,6 @@ class UserLogin(BaseModel):
     password: str
 
 class VerifyOtpRequest(BaseModel):
-    user_id: int
     email: str
     otp: str
 
@@ -76,29 +75,32 @@ def login(user: UserLogin, background_tasks: BackgroundTasks, conn = Depends(get
     db_user = get_user_by_email(conn, user.email)
     if not db_user:
         raise HTTPException(status_code=400, detail="Invalid username or password")
+
     otp = generate_otp(user.email)
     background_tasks.add_task(send_otp_via_email, user.email, otp)
+
     return {
-        "message": "OTP sent to your email",
+        "message": "OTP sent to your email. Please verify OTP to complete login."
     }
 
+
 @router.post("/verify-otp")
-def verify_otp_endpoint(data: VerifyOtpRequest, db: Session = Depends(get_db_connection)):
+def verify_otp_endpoint(data: VerifyOtpRequest, conn = Depends(get_db_connection)):
     otp = data.otp.strip()
-    db_user = get_user_by_id(db, data.user_id)
+    if not verify_otp(data.email, otp):
+        raise HTTPException(status_code=400, detail="Invalid or expired OTP.")
+    db_user = get_user_by_email(conn, data.email)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
-    if verify_otp(data.email, otp):
-        access_token = create_access_token(data={"sub": data.email})
-        return {
-            "success": True,
-            "message": "OTP verified successfully",
-            "access_token": access_token,
-            "token_type": "bearer",
-            "user_id": db_user["id"]
-        }
-    else:
-        raise HTTPException(status_code=400, detail="Invalid or expired OTP.")
+    access_token = create_access_token(data={"sub": data.email})
+
+    return {
+        "message": "OTP verified successfully",
+        "user_id": db_user["id"],
+        "access_token": access_token,
+        "token_type": "bearer",
+        "success": True
+    }
 
 @router.post("/resend-otp")
 async def resend_otp(data: resendOtpRequest):
@@ -143,7 +145,6 @@ def update_username(data: UpdateUsernameRequest, conn = Depends(get_db_connectio
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error updating username: {str(e)}")
 
-
 @router.put("/update-email")
 def update_email(data: UpdateEmailRequest, conn = Depends(get_db_connection)):
     # Retrieve user by user_id
@@ -173,7 +174,7 @@ def update_email(data: UpdateEmailRequest, conn = Depends(get_db_connection)):
 @router.put("/update-password")
 def update_password(data: UpdatePasswordRequest, conn = Depends(get_db_connection)):
     # Retrieve the user by email
-    db_user = get_user_by_id(conn, data.user_id)  # Assuming data includes email
+    db_user = get_user_by_id(conn, data.user_id)
     if not db_user:
         raise HTTPException(status_code=400, detail="Invalid username or password")
 
