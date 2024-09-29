@@ -16,17 +16,12 @@ const FooterLayout = () => {
       }}
     >
       <Grid container justifyContent="center" spacing={2}>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={6}>
           <Typography variant="body1">© 2024 Maejoo Hathaway</Typography>
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={6}>
           <Link href="/about" underline="hover" sx={{ color: 'white' }}>
             About Us
-          </Link>
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <Link href="/contact" underline="hover" sx={{ color: 'white' }}>
-            Contact
           </Link>
         </Grid>
       </Grid>

@@ -4,7 +4,7 @@ import { Box, Typography, Button } from "@mui/material";
 function Home() {
   return (
     <>
-      <Box sx={{ minHeight: '100vh', paddingLeft: '15vw', paddingRight: '15vw', bgcolor: 'background.default', paddingTop:'10vh'}}>
+      <Box sx={{ minHeight: '100vh', paddingLeft: '15vw', paddingRight: '15vw', bgcolor: 'background.default', paddingTop:'10vh', transition: "background-color 1.5s ease-in-out, color 1.5s ease-in-out"}}>
         <main>
           <Grid container wrap="nowrap" direction="row" alignItems="center" justifyContent="space-around">
             
