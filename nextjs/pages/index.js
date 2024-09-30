@@ -1,26 +1,29 @@
 import Grid from "@mui/material/Grid";
 import { Box, Typography, Button } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 
-function Home() {
+const Home = () =>  {
+  const { t } = useTranslation(['index']);
+
   return (
     <>
       <Box sx={{ minHeight: '100vh', paddingLeft: '15vw', paddingRight: '15vw', bgcolor: 'background.default', paddingTop:'10vh', transition: "background-color 1.5s ease-in-out, color 1.5s ease-in-out"}}>
         <main>
           <Grid container wrap="nowrap" direction="row" alignItems="center" justifyContent="space-around">
             
-            <Grid item size={{xs:12, md:6}}>
+            <Grid item size={{xs:12, md:4}}>
               <Typography text variant="h2" gutterBottom>
-                Something here
+                {t('welcome')}
               </Typography>
               <Typography text variant="body1">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
               </Typography>
               <Button href='/login' variant="contained" sx={{ color:'#ffffff', backgroundColor:'#2da14c', marginTop: '1rem' }}>
-                Get Started
+                {t('button')}
               </Button>
             </Grid>
 
-            <Grid item size={{xs:12, md:6}}>
+            <Grid item size={{xs:12, md:8}}>
               <Box sx={{ justifyContent: 'center', padding: '2rem' }}>
                 <img
                   src="/images/placeholder.jpg"

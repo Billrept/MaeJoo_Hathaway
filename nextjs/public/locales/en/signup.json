@@ -1,0 +1,10 @@
+{
+    "title": "Create an Account",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "signupButton": "sign up",
+    "ctaText": "Already have an account?",
+    "link": "Login"
+}

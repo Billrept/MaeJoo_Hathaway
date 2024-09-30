@@ -9,6 +9,8 @@ import useBearStore from "@/store/useBearStore";
 import Head from "next/head";
 import { Backdrop, CircularProgress } from "@mui/material";
 import { AuthProvider } from "@/context/auth";
+import { I18nextProvider } from "react-i18next";
+import i18n from "../i18n"; // Import your i18n configuration
 
 const roboto = Roboto({
   weight: ["300", "400", "500", "700"],
@@ -48,9 +50,11 @@ export default function App({ Component, pageProps, props }) {
       <AppCacheProvider {...props}>
         <ThemeProvider theme={theme}>
           <AuthProvider>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
+            <I18nextProvider i18n={i18n}> {/* Wrap with I18nextProvider */}
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </I18nextProvider>
           </AuthProvider>
         </ThemeProvider>
       </AppCacheProvider>

@@ -54,7 +54,7 @@ const Market = () => {
   const [currentStock, setCurrentStock] = useState("");
   const [predictedPrice, setPredictedPrice] = useState(null);
   const [predictedVolatility, setPredictedVolatility] = useState(null);
-  const token = localStorage.getItem('token');
+  const [token, setToken] = useState(null);
 
   // State for sorting
   const [sortBy, setSortBy] = useState('ticker');
@@ -70,6 +70,7 @@ const Market = () => {
   );
 
   useEffect(() => {
+    setToken(localStorage.getItem('token'));
     const storedUserId = localStorage.getItem("user_id");
     if (storedUserId) {
       setUserId(storedUserId);

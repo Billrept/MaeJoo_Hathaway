@@ -22,6 +22,8 @@ import useBearStore from "@/store/useBearStore";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/auth";  // Import useAuth hook from AuthProvider
 import axios from 'axios';
+import LanguageSwitcher from "./languageSwitcher";
+import { useTranslation } from 'react-i18next';
 
 const NavigationLayout = ({ children }) => {
   const router = useRouter();
@@ -36,6 +38,8 @@ const NavigationLayout = ({ children }) => {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const menuOpen = Boolean(anchorEl);
+
+  const { t } = useTranslation(['navbar']);
 
   // Check token validity periodically
   useEffect(() => {
@@ -129,10 +133,12 @@ const NavigationLayout = ({ children }) => {
             {appName}
           </Typography>
 
-          <NavigationLink href="/dashboard" label="Dashboard" />
-          <NavigationLink href="/market" label="Market" />
+          <NavigationLink href="/dashboard" label={t('dashboard')} />
+          <NavigationLink href="/market" label={t('market')} />
 
           <Box sx={{ flexGrow: 1 }} />
+
+          <LanguageSwitcher></LanguageSwitcher>
 
           {/* Cash Mode Switch and Dark Mode Switch */}
           <Box
@@ -248,11 +254,11 @@ const NavigationLayout = ({ children }) => {
                 sx={{
                   backgroundColor: "#2da14c",
                   color: "#ffffff",
-                  width: "100px",
+                  width: "150px",
                   marginRight: "20px",
                 }}
               >
-                Sign In
+                {t('signIn')}
               </Button>
               <Button
                 variant="contained"
@@ -262,10 +268,10 @@ const NavigationLayout = ({ children }) => {
                 sx={{
                   backgroundColor: "#ffffff",
                   color: "#68BB59",
-                  width: "100px",
+                  width: "150px",
                 }}
               >
-                Sign Up
+                {t('signUp')}
               </Button>
             </>
           )}
