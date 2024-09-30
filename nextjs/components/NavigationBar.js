@@ -32,6 +32,8 @@ const NavigationLayout = ({ children }) => {
 
   const [showSun, setShowSun] = useState(!isDarkMode);
   const [showMoon, setShowMoon] = useState(isDarkMode);
+  const [isSwitchDisabled, setIsSwitchDisabled] = useState(false);
+
   const [anchorEl, setAnchorEl] = useState(null);
   const menuOpen = Boolean(anchorEl);
 
@@ -69,13 +71,20 @@ const NavigationLayout = ({ children }) => {
   };
 
   useEffect(() => {
+    setIsSwitchDisabled(true); // Disable switch when toggling
+
     if (isDarkMode) {
-      setShowSun(false);
-      setTimeout(() => setShowMoon(true), 400);
+      setShowSun(false); // Hide the sun first
+      setTimeout(() => setShowMoon(true), 300); // Delay showing the moon
     } else {
-      setShowMoon(false);
-      setTimeout(() => setShowSun(true), 400);
+      setShowMoon(false); // Hide the moon first
+      setTimeout(() => setShowSun(true), 300); // Delay showing the sun
     }
+
+    // Re-enable the switch after the animation completes
+    setTimeout(() => {
+      setIsSwitchDisabled(false); // Enable switch after 600ms
+    }, 600);
   }, [isDarkMode]);
 
   const handleToggle = () => {
@@ -128,48 +137,51 @@ const NavigationLayout = ({ children }) => {
           {/* Cash Mode Switch and Dark Mode Switch */}
           <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
-              position: "relative",
-              height: "48px",
-              marginRight: "20px",
+              display: 'flex',
+              alignItems: 'center',
+              position: 'relative',
+              height: '48px',
+              marginRight: '20px',
             }}
           >
-
             {/* Sun Icon */}
             <IconButton
               disableRipple
               sx={{
-                position: "absolute",
-                right: "10px",
+                position: 'absolute',
+                right: '10px',
                 opacity: showSun ? 1 : 0,
-                visibility: showSun ? "visible" : "hidden", // Hide sun completely when invisible
-                transform: showSun ? "translateY(0)" : "translateY(20px)",
-                transition: "opacity 0.55s, transform 0.55s ease, visibility 0.55s",
-                marginRight: "40px",
+                visibility: showSun ? 'visible' : 'hidden',
+                transform: showSun ? 'translateY(0)' : 'translateY(20px)',
+                transition: 'opacity 0.3s, transform 0.3s ease, visibility 0.3s',
+                marginRight: '40px',
               }}
             >
-              <WbSunnyIcon fontSize="small" sx={{ color: "#FFD700" }} />
+              <WbSunnyIcon fontSize="small" sx={{ color: '#FFD700' }} />
             </IconButton>
 
             {/* Moon Icon */}
             <IconButton
               disableRipple
               sx={{
-                position: "absolute",
-                right: "10px",
+                position: 'absolute',
+                right: '10px',
                 opacity: showMoon ? 1 : 0,
-                visibility: showMoon ? "visible" : "hidden", // Hide moon completely when invisible
-                transform: showMoon ? "translateY(0)" : "translateY(20px)",
-                transition: "opacity 0.55s, transform 0.55s ease, visibility 0.55s",
-                marginRight: "40px",
+                visibility: showMoon ? 'visible' : 'hidden',
+                transform: showMoon ? 'translateY(0)' : 'translateY(20px)',
+                transition: 'opacity 0.3s, transform 0.3s ease, visibility 0.3s',
+                marginRight: '40px',
               }}
             >
-              <Brightness2Icon fontSize="small" sx={{ color: "#ffffff" }} />
+              <Brightness2Icon fontSize="small" sx={{ color: '#ffffff' }} />
             </IconButton>
 
             {/* Dark Mode Switch */}
-            <Switch checked={isDarkMode} onChange={handleToggle} />
+            <Switch
+              checked={isDarkMode}
+              onChange={handleToggle}
+              disabled={isSwitchDisabled} // Disable switch while animation is in progress
+            />
           </Box>
 
           {/* Account Circle and Username */}

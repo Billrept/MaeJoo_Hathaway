@@ -232,6 +232,13 @@ const Market = () => {
     return { dates: filteredDates, prices: filteredPrices };
   };
 
+  const handleMouseLeave = () => {
+    setTransitionEnabled(false);
+    setTimeout(() => {
+      setTransitionEnabled(true);
+    }, 1000);
+  };
+
   const filteredGraphData = getFilteredGraphData();
 
   const handleCloseSnackbar = () => {
@@ -380,7 +387,7 @@ const Market = () => {
             transition: "background-color 1.5s ease-in-out",
           }}
         >
-          <StockGraph prices={filteredGraphData.prices} dates={filteredGraphData.dates} />
+          <StockGraph prices={filteredGraphData.prices} dates={filteredGraphData.dates} ratio={2}/>
         </Box>
         <Box
           component={Paper}

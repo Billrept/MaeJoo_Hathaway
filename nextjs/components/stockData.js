@@ -4,7 +4,7 @@ import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Title, Tooltip, Legend);
 
-const StockGraph = ({ prices, dates }) => {
+const StockGraph = ({ prices, dates, ratio}) => {
 
   const data = {
     labels: dates,
@@ -26,8 +26,8 @@ const StockGraph = ({ prices, dates }) => {
   // Define the chart options
   const options = {
     responsive: true,
-    maintainAspectRatio: true, // Ensure the graph scales proportionally
-    aspectRatio: 2,
+    maintainAspectRatio: true,
+    aspectRatio: ratio,
     plugins: {
       legend: {
         position: 'top',
