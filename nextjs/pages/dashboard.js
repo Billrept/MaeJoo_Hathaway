@@ -240,15 +240,19 @@ const Dashboard = () => {
                   sx={{
                     color: isDarkMode ? '#ffffff' : '#000000', // Text color change for dark mode
                     transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out', // Apply transition for dark/light mode
+                    width: '20%', // Adjust the width to leave space for the last 4 columns
                   }}
                 >
                   Your Stocks
                 </TableCell>
+
+                {/* Evenly Spaced Columns */}
                 <TableCell
                   align="right"
                   sx={{
                     color: isDarkMode ? '#ffffff' : '#000000',
                     transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out', // Apply transition for dark/light mode
+                    width: '20%', // Ensure even spacing
                   }}
                 >
                   Current Pricing
@@ -258,6 +262,7 @@ const Dashboard = () => {
                   sx={{
                     color: isDarkMode ? '#ffffff' : '#000000',
                     transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out', // Apply transition for dark/light mode
+                    width: '20%', // Ensure even spacing
                   }}
                 >
                   Predicted Price
@@ -267,6 +272,17 @@ const Dashboard = () => {
                   sx={{
                     color: isDarkMode ? '#ffffff' : '#000000',
                     transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out', // Apply transition for dark/light mode
+                    width: '20%', // Ensure even spacing
+                  }}
+                >
+                  Change
+                </TableCell>
+                <TableCell
+                  align="right"
+                  sx={{
+                    color: isDarkMode ? '#ffffff' : '#000000',
+                    transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out', // Apply transition for dark/light mode
+                    width: '20%', // Ensure even spacing
                   }}
                 >
                   Predicted Volatility
@@ -283,7 +299,7 @@ const Dashboard = () => {
                     '&:hover': {
                       backgroundColor: isDarkMode ? '#3E3E3E' : '#f5f5f5', // Apply hover effect without transition
                       transition: 'none', // Disable transition during hover
-                    }
+                    },
                   }}
                 >
                   <TableCell
@@ -291,6 +307,7 @@ const Dashboard = () => {
                     scope="row"
                     sx={{
                       transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out', // Apply transition for mode changes
+                      width: '20%',
                     }}
                   >
                     {row.ticker}
@@ -299,6 +316,7 @@ const Dashboard = () => {
                     align="right"
                     sx={{
                       transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out', // Apply transition for mode changes
+                      width: '20%',
                     }}
                   >
                     {row.currentPricing}
@@ -307,6 +325,7 @@ const Dashboard = () => {
                     align="right"
                     sx={{
                       transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out', // Apply transition for mode changes
+                      width: '20%',
                     }}
                   >
                     {row.predictedPrice}
@@ -315,6 +334,23 @@ const Dashboard = () => {
                     align="right"
                     sx={{
                       transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out', // Apply transition for mode changes
+                      color: row.currentPricing && row.predictedPrice
+                        ? ((Number(row.predictedPrice) - Number(row.currentPricing)) / Number(row.currentPricing)) > 0
+                          ? 'green'  // Green for positive change
+                          : 'red'    // Red for negative change
+                        : 'inherit',   // Default color if data is missing
+                      width: '20%',
+                    }}
+                  >
+                    {row.currentPricing && row.predictedPrice
+                      ? ((Number(row.predictedPrice) - Number(row.currentPricing)) / Number(row.currentPricing) * 100).toFixed(2) + '%'
+                      : 'N/A'}
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      transition: 'background-color 1.0s ease-in-out, color 1.0s ease-in-out', // Apply transition for mode changes
+                      width: '20%',
                     }}
                   >
                     {row.predictedVolatility}
@@ -324,7 +360,6 @@ const Dashboard = () => {
             </TableBody>
           </Table>
         </TableContainer>
-        
       </Box>
     </Box>
   );

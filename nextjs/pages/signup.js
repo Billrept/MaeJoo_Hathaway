@@ -18,6 +18,7 @@ const Signup = () => {
   const [passwordError, setPasswordError] = useState('');
   const [passwordValid, setPasswordValid] = useState(false);
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const [emailError, setEmailError] = useState('');
   const router = useRouter();
 
   useEffect(() => {
@@ -39,7 +40,12 @@ const Signup = () => {
 
   const handleSignup = async (e) => {
     e.preventDefault();
-  
+    
+    if (!emailRegex.test(email)){
+      setEmailError("Please enter a valid email address");
+      return;
+    }
+
     if (password !== confirmPassword) {
       setConfirmPasswordError("Passwords do not match");
       return;
@@ -62,6 +68,9 @@ const Signup = () => {
       }
     }
   };
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 
   return (
     <Grid container justifyContent="center" alignItems="center" style={{ minHeight: '100vh', padding: '0 20px' }}>
@@ -90,6 +99,8 @@ const Signup = () => {
               fullWidth
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              error={!!emailError}
+              helperText={emailError}
               required
             />
           </Grid>

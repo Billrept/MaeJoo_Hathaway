@@ -15,7 +15,7 @@ const StockGraph = ({ prices, dates }) => {
         borderColor: 'rgba(75, 192, 192, 1)',
         backgroundColor: 'rgba(75, 192, 192, 0.2)',
         fill: true,
-        tension: 0.2,  // Increased tension to smooth out the line
+        tension: 0.1,  // Increased tension to smooth out the line
         pointRadius: 0,  // Hides the circles
         pointHoverRadius: 6, // Shows larger circles on hover
         hitRadius: 10

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, TextField, IconButton, Avatar } from '@mui/material';
+import { Box, Typography, TextField, IconButton, Avatar, InputAdornment } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
-import axios from 'axios'; // Import axios to make API calls
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import axios from 'axios';
 
 const AccountSettings = () => {
   const [username, setUsername] = useState('');
@@ -17,6 +19,10 @@ const AccountSettings = () => {
   const [isUsernameEditable, setIsUsernameEditable] = useState(false);
   const [isEmailEditable, setIsEmailEditable] = useState(false);
   const [isPasswordEditable, setIsPasswordEditable] = useState(false);
+
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     setUsername(localStorage.getItem('username'));
@@ -113,7 +119,15 @@ const AccountSettings = () => {
     }
   };
   
-  
+  const togglePasswordVisibility = (type) => {
+    if (type === 'current') {
+      setShowCurrentPassword(!showCurrentPassword);
+    } else if (type === 'new') {
+      setShowNewPassword(!showNewPassword);
+    } else if (type === 'confirm') {
+      setShowConfirmPassword(!showConfirmPassword);
+    }
+  };
 
   return (
     <Box sx={{ maxWidth: '500px', padding: '16px' }}>
@@ -179,29 +193,24 @@ const AccountSettings = () => {
 
       {/* Current Password Field */}
       <Box sx={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
-        <TextField
+      <TextField
           fullWidth
           label="Current Password"
           variant="outlined"
-          type="password"
+          type={showCurrentPassword ? 'text' : 'password'}
           value={currentPassword}
           onChange={(e) => setCurrentPassword(e.target.value)}
-          disabled={!isPasswordEditable} // Disable unless editable
-        />
-      </Box>
-
-      {/* New Password Field */}
-      <Box sx={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
-        <TextField
-          fullWidth
-          label="New Password"
-          variant="outlined"
-          type="password"
-          value={password}
-          onChange={handlePasswordChange}
-          disabled={!isPasswordEditable} // Disable unless editable
-          error={!!passwordError}
-          helperText={passwordError}
+          disabled={!isPasswordEditable}
+          sx={{ width: 'calc(100% - 40px)' }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={() => togglePasswordVisibility('current')}>
+                  {showCurrentPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
         <IconButton
           onClick={() => {
@@ -213,20 +222,53 @@ const AccountSettings = () => {
         </IconButton>
       </Box>
 
+      {/* New Password Field */}
+      <Box sx={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
+      <TextField
+          fullWidth
+          label="New Password"
+          variant="outlined"
+          type={showNewPassword ? 'text' : 'password'}
+          value={password}
+          onChange={handlePasswordChange}
+          disabled={!isPasswordEditable}
+          error={!!passwordError}
+          helperText={passwordError}
+          sx={{ width: 'calc(100% - 40px)' }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={() => togglePasswordVisibility('new')}>
+                  {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Box>
+
       {/* Confirm Password Field */}
       <Box sx={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
-        <TextField
+      <TextField
           fullWidth
           label="Confirm Password"
           variant="outlined"
-          type="password"
+          type={showConfirmPassword ? 'text' : 'password'}
           value={confirmPassword}
           onChange={handleConfirmPasswordChange}
-          disabled={!isPasswordEditable} // Disable unless editable
+          disabled={!isPasswordEditable}
           error={!!confirmPasswordError}
           helperText={confirmPasswordError}
           sx={{ width: 'calc(100% - 40px)' }}
-          onBlur={() => { if (isPasswordEditable) updatePassword(); }} // Auto-save onBlur
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={() => togglePasswordVisibility('confirm')}>
+                  {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
       </Box>
 
