@@ -16,7 +16,7 @@ const Login = () => {
 
   const isDarkMode = useBearStore((state) => state.isDarkMode);
 
-  const { t } = useTranslation(['login']);
+  const { t } = useTranslation(['login', 'common']);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -83,7 +83,7 @@ const Login = () => {
           </Typography>
           <form onSubmit={handleLogin}>
             <TextField
-              label={t('email')}
+              label={t('common:email')}
               variant="outlined"
               fullWidth
               margin="normal"
@@ -104,7 +104,7 @@ const Login = () => {
 
             {/* Password Field with visibility toggle */}
             <TextField
-              label={t('password')}
+              label={t('common:password')}
               variant="outlined"
               fullWidth
               margin="normal"

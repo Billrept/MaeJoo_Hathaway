@@ -1,7 +1,5 @@
 {
     "title": "Login",
-    "email": "Email",
-    "password": "Password",
     "loginButton": "login",
     "ctaText": "Don't have an account?",
     "link": "sign up"

@@ -5,6 +5,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const AccountSettings = () => {
   const [username, setUsername] = useState('');
@@ -23,6 +24,8 @@ const AccountSettings = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const { t } = useTranslation(['settings', 'common']);
+  
   useEffect(() => {
     setUsername(localStorage.getItem('username'));
     setEmail(localStorage.getItem('email'));
@@ -82,11 +85,11 @@ const AccountSettings = () => {
 
   const updatePassword = async () => {
     if (password.length < 8) {
-      setPasswordError('Password must be at least 8 characters long');
+      setPasswordError(t('common:passwordError'));
       return;
     }
     if (password !== confirmPassword) {
-      setConfirmPasswordError('Passwords do not match');
+      setConfirmPasswordError(t('common:confirmPasswordError'));
       return;
     }
   
@@ -130,7 +133,7 @@ const AccountSettings = () => {
   return (
     <Box sx={{ maxWidth: '500px', padding: '16px' }}>
       <Typography variant="h5" gutterBottom>
-        Account Settings
+        {t('settings:accountSettings')}
       </Typography>
 
       {/* Account Circle with Edit Button */}
@@ -151,7 +154,7 @@ const AccountSettings = () => {
       <Box sx={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
         <TextField
           fullWidth
-          label="Username"
+          label={t('common:username')}
           variant="outlined"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
@@ -172,7 +175,7 @@ const AccountSettings = () => {
       <Box sx={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
         <TextField
           fullWidth
-          label="Email"
+          label={t('common:email')}
           variant="outlined"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -193,7 +196,7 @@ const AccountSettings = () => {
       <Box sx={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
       <TextField
           fullWidth
-          label="Current Password"
+          label={t('settings:currentPassword')}
           variant="outlined"
           type={showCurrentPassword ? 'text' : 'password'}
           value={currentPassword}
@@ -224,7 +227,7 @@ const AccountSettings = () => {
       <Box sx={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
       <TextField
           fullWidth
-          label="New Password"
+          label={t('settings:newPassword')}
           variant="outlined"
           type={showNewPassword ? 'text' : 'password'}
           value={password}
@@ -249,7 +252,7 @@ const AccountSettings = () => {
       <Box sx={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
       <TextField
           fullWidth
-          label="Confirm Password"
+          label={t('common:confirmPassword')}
           variant="outlined"
           type={showConfirmPassword ? 'text' : 'password'}
           value={confirmPassword}

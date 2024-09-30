@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useRouter } from 'next/router';
 import { useAuth } from "@/context/auth";
 import useBearStore from "@/store/useBearStore";
+import { useTranslation } from 'react-i18next';
 
 const Dashboard = () => {
   const router = useRouter(); 
@@ -20,6 +21,8 @@ const Dashboard = () => {
   const [stocksFetched, setStocksFetched] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: '', direction: 'asc' });
   const [transitionEnabled, setTransitionEnabled] = useState(true);
+
+  const { t } = useTranslation(['common']);
 
   const { userId, isLoggedIn, logout } = useAuth();
 
@@ -178,10 +181,10 @@ const Dashboard = () => {
 
   return (
     <Box marginY="5rem" marginX='10vw'>
-      <Typography variant="h4">Dashboard</Typography>
+      <Typography variant="h4">{t('dashboardTitle')}</Typography>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop:'2rem', marginBottom: '1rem', alignItems: 'center'}} >
         <Typography variant="subtitle1" color="textSecondary" sx={{transition: 'color 1.0s ease-in-out'}}>
-          {currentStock ? `Current Stock: ${currentStock}` : 'No stock selected'}
+          {currentStock ? `${t('displayedStock')} ${currentStock}` : t('missingStock')}
         </Typography>
 
         <ButtonGroup
@@ -201,17 +204,17 @@ const Dashboard = () => {
             },
           }}
         >
-          <Button onClick={() => setSelectedRange('week')} className={selectedRange === 'week' ? 'Mui-selected' : ''}>7 D</Button>
-          <Button onClick={() => setSelectedRange('month')} className={selectedRange === 'month' ? 'Mui-selected' : ''}>1 M</Button>
-          <Button onClick={() => setSelectedRange('threeMonths')} className={selectedRange === 'threeMonths' ? 'Mui-selected' : ''}>3 M</Button>
-          <Button onClick={() => setSelectedRange('sixMonths')} className={selectedRange === 'sixMonths' ? 'Mui-selected' : ''}>6 M</Button>
-          <Button onClick={() => setSelectedRange('year')} className={selectedRange === 'year' ? 'Mui-selected' : ''}>1 Y</Button>
-          <Button onClick={() => setSelectedRange('all')} className={selectedRange === 'all' ? 'Mui-selected' : ''}>All</Button>
+          <Button onClick={() => setSelectedRange('week')} className={selectedRange === 'week' ? 'Mui-selected' : ''}>{t('7dButton')}</Button>
+          <Button onClick={() => setSelectedRange('month')} className={selectedRange === 'month' ? 'Mui-selected' : ''}>{t('1mButton')}</Button>
+          <Button onClick={() => setSelectedRange('threeMonths')} className={selectedRange === 'threeMonths' ? 'Mui-selected' : ''}>{t('3mButton')}</Button>
+          <Button onClick={() => setSelectedRange('sixMonths')} className={selectedRange === 'sixMonths' ? 'Mui-selected' : ''}>{t('6mButton')}</Button>
+          <Button onClick={() => setSelectedRange('year')} className={selectedRange === 'year' ? 'Mui-selected' : ''}>{t('1yButton')}</Button>
+          <Button onClick={() => setSelectedRange('all')} className={selectedRange === 'all' ? 'Mui-selected' : ''}>{t('allButton')}</Button>
         </ButtonGroup>
       </Box>
       <StockGraph prices={filteredGraphData.prices} dates={filteredGraphData.dates} ratio={3.5}/>
       <TextField 
-        label="Search" 
+        label={t('search')}
         variant="outlined" 
         value={search} 
         onChange={(e) => setSearch(e.target.value)} 
@@ -235,7 +238,7 @@ const Dashboard = () => {
                   }}
                   onClick={() => handleSort('ticker')}
                 >
-                  Your Stocks {sortConfig.key === "ticker" && (sortConfig.direction === "asc" ? "▲" : "▼")}
+                  {t('stock')} {sortConfig.key === "ticker" && (sortConfig.direction === "asc" ? "▲" : "▼")}
                 </TableCell>
 
                 <TableCell
@@ -250,7 +253,7 @@ const Dashboard = () => {
                   }}
                   onClick={() => handleSort('currentPricing')}
                 >
-                  Current Pricing {sortConfig.key === "currentPricing" && (sortConfig.direction === "asc" ? "▲" : "▼")}
+                  {t('currentPricing')} {sortConfig.key === "currentPricing" && (sortConfig.direction === "asc" ? "▲" : "▼")}
                 </TableCell>
 
                 <TableCell
@@ -265,7 +268,7 @@ const Dashboard = () => {
                   }}
                   onClick={() => handleSort('predictedPrice')}
                 >
-                  Predicted Price {sortConfig.key === "predictedPrice" && (sortConfig.direction === "asc" ? "▲" : "▼")}
+                  {t('predictedPrice')} {sortConfig.key === "predictedPrice" && (sortConfig.direction === "asc" ? "▲" : "▼")}
                 </TableCell>
 
                 <TableCell
@@ -280,7 +283,7 @@ const Dashboard = () => {
                   }}
                   onClick={() => handleSort('change')}
                 >
-                  Change {sortConfig.key === "change" && (sortConfig.direction === "asc" ? "▲" : "▼")}
+                  {t('change')} {sortConfig.key === "change" && (sortConfig.direction === "asc" ? "▲" : "▼")}
                 </TableCell>
 
                 <TableCell
@@ -295,7 +298,7 @@ const Dashboard = () => {
                   }}
                   onClick={() => handleSort('predictedVolatility')}
                 >
-                  Predicted Volatility {sortConfig.key === "predictedVolatility" && (sortConfig.direction === "asc" ? "▲" : "▼")}
+                  {t('predictedVolatility')} {sortConfig.key === "predictedVolatility" && (sortConfig.direction === "asc" ? "▲" : "▼")}
                 </TableCell>
               </TableRow>
             </TableHead>

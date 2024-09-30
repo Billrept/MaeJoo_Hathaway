@@ -21,6 +21,7 @@ import {
 import StarIcon from "@mui/icons-material/Star";
 import useBearStore from "@/store/useBearStore";
 import StockGraph from "../components/stockData";
+import { useTranslation } from 'react-i18next';
 
 const tickers = [
   "AAPL", "ABNB", "ADBE", "ADI", "ADP", "ADSK", "AEP", "AMAT", "AMD", "AMGN",
@@ -59,6 +60,8 @@ const Market = () => {
   // State for sorting
   const [sortBy, setSortBy] = useState('ticker');
   const [sortDirection, setSortDirection] = useState('asc');
+
+  const { t } = useTranslation(['common']);
 
   const [rows, setRows] = useState(
     tickers.map((ticker) => ({
@@ -111,7 +114,7 @@ const Market = () => {
   const handleAddFavorite = async (ticker) => {
     try {
       await axios.post(`http://localhost:8000/stocks/${ticker}/${userId}/add-favorite`);
-      setSnackbarMessage(`${ticker} added to favorites`);
+      setSnackbarMessage(`${ticker} ${t('snackbarAddMessage')}`);
     } catch (error) {
       console.error("Error adding stock to favorites:", error);
     }
@@ -120,7 +123,7 @@ const Market = () => {
   const handleRemoveFavorite = async (ticker) => {
     try {
       await axios.delete(`http://localhost:8000/stocks/${ticker}/${userId}/remove-favorite`);
-      setSnackbarMessage(`${ticker} removed from favorites`);
+      setSnackbarMessage(`${ticker} ${t('snackbarRemoveMessage')}`);
     } catch (error) {
       console.error("Error removing stock from favorites:", error);
     }
@@ -281,10 +284,10 @@ const Market = () => {
         }}
       >
         <Typography variant="h3" gutterBottom>
-          Market
+          {t('marketTitle')}
         </Typography>
         <TextField
-          label="Search"
+          label={t('search')}
           variant="outlined"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -309,7 +312,7 @@ const Market = () => {
         }}
       >
         <Typography variant="subtitle1" color="textSecondary">
-          {currentStock ? `Current Stock: ${currentStock.ticker}` : "No stock selected"}
+        {currentStock ? `${t('displayedStock')} ${currentStock.ticker}` : t('missingStock')}
         </Typography>
 
         <ButtonGroup
@@ -333,37 +336,37 @@ const Market = () => {
             onClick={() => setSelectedRange("week")}
             className={selectedRange === "week" ? "Mui-selected" : ""}
           >
-            7 D
+            {t('7dButton')}
           </Button>
           <Button
             onClick={() => setSelectedRange("month")}
             className={selectedRange === "month" ? "Mui-selected" : ""}
           >
-            1 M
+            {t('1mButton')}
           </Button>
           <Button
             onClick={() => setSelectedRange("threeMonths")}
             className={selectedRange === "threeMonths" ? "Mui-selected" : ""}
           >
-            3 M
+            {t('3mButton')}
           </Button>
           <Button
             onClick={() => setSelectedRange("sixMonths")}
             className={selectedRange === "sixMonths" ? "Mui-selected" : ""}
           >
-            6 M
+            {t('6mButton')}
           </Button>
           <Button
             onClick={() => setSelectedRange("year")}
             className={selectedRange === "year" ? "Mui-selected" : ""}
           >
-            1 Y
+            {t('1yButton')}
           </Button>
           <Button
             onClick={() => setSelectedRange("all")}
             className={selectedRange === "all" ? "Mui-selected" : ""}
           >
-            All
+            {t('allButton')}
           </Button>
         </ButtonGroup>
       </Box>
@@ -415,7 +418,7 @@ const Market = () => {
                       transition: "background-color 1.5s ease-in-out, color 1.5s ease-in-out", // Smooth transition for header cell background and color
                     }}
                   >
-                    Stocks {sortBy === "ticker" && (sortDirection === "asc" ? "▲" : "▼")}
+                    {t('stock')} {sortBy === "ticker" && (sortDirection === "asc" ? "▲" : "▼")}
                   </TableCell>
                   <TableCell
                     align="center"
@@ -425,7 +428,7 @@ const Market = () => {
                       transition: "background-color 1.5s ease-in-out, color 1.5s ease-in-out", // Smooth transition for header cell background and color
                     }}
                   >
-                    Current Pricing {sortBy === "pricing" && (sortDirection === "asc" ? "▲" : "▼")}
+                    {t('currentPricing')} {sortBy === "pricing" && (sortDirection === "asc" ? "▲" : "▼")}
                   </TableCell>
                 </TableRow>
               </TableHead>
@@ -448,7 +451,7 @@ const Market = () => {
                         transition: "color 1.5s ease-in-out", // Transition for color
                       }}
                     >
-                      <Tooltip title={!token ? "Please log in to add stock to watchlist" : ""} disableInteractive>
+                      <Tooltip title={!token ? t('tooltip') : ""} disableInteractive>
                         <span>
                           <IconButton
                             onClick={(e) => {
@@ -513,7 +516,7 @@ const Market = () => {
                                     transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out',
                                 }}
                                 >
-                                Estimated Price
+                                {t('predictedPrice')}
                                 </TableCell>
                                 <TableCell
                                 align="center"
@@ -523,7 +526,7 @@ const Market = () => {
                                     transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out',
                                 }}
                                 >
-                                Estimated Volatility
+                                {t('predictedVolatility')}
                                 </TableCell>
                             </TableRow>
                             </TableHead>

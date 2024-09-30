@@ -1,9 +1,12 @@
 import React from 'react';
 import { Box, Typography, FormControlLabel, Switch } from '@mui/material';
 import { useState, useEffect } from "react";
+import { useTranslation } from 'react-i18next';
 
 const OtherSettings = () => {
     const [isCashMode, setIsCashMode] = useState(false);
+
+    const { t } = useTranslation(['settings']);
 
     useEffect(() => {
         if (isCashMode) {
@@ -40,7 +43,7 @@ const OtherSettings = () => {
 
     return(
         <Box>
-        <Typography variant="h5" gutterBottom>Other settings</Typography>
+        <Typography variant="h5" gutterBottom>{t('otherSettings')}</Typography>
         <FormControlLabel
                 sx={{ marginRight: '80px' }}
                 control={
@@ -51,7 +54,7 @@ const OtherSettings = () => {
                     sx={{ marginRight: "10px" }}
                     />
                 }
-                label="Cash Mode"
+                label={t('cashMode')}
             />
         </Box>
     )

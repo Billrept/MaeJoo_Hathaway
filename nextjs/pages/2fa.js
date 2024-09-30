@@ -3,6 +3,7 @@ import { TextField, Button, Grid, Typography, Paper } from '@mui/material';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import { useAuth } from '@/context/auth';  // Import useAuth hook
+import { useTranslation } from 'react-i18next';
 
 const TwoFactorAuth = () => {
   const [otp, setOtp] = useState('');
@@ -12,6 +13,8 @@ const TwoFactorAuth = () => {
   const [referenceCode, setReferenceCode] = useState('');
   const router = useRouter();
   const { login } = useAuth();  // Destructure the login function from useAuth
+
+  const { t } = useTranslation(['2fa']);
 
   useEffect(() => {
     // Check for both email and authentication token
@@ -32,18 +35,18 @@ const TwoFactorAuth = () => {
       setReferenceCode(response.data.reference_code);
     } catch (error) {
       console.error('Error fetching reference code:', error);
-      setError('Could not retrieve reference code.');
+      setError(t('fetchErrorText'));
     }
   };
 
   const resendCode = async () => {
     try {
       const response = await axios.post('http://localhost:8000/auth/resend-otp', { email });
-      setSuccess('OTP has been resent successfully.');
+      setSuccess(t('resendSuccessText'));
       fetchReferenceCode(email);  // Fetch the updated reference code
       setError('');
     } catch (error) {
-      setError('Failed to resend code. Please try again.');
+      setError(t('resendErrorText'));
       setSuccess('');
       console.error('Error resending code:', error);
     }
@@ -62,7 +65,7 @@ const TwoFactorAuth = () => {
       });
         localStorage.setItem('token', response.data.access_token);
         localStorage.setItem('user_id', response.data.user_id);
-        setSuccess('OTP verified successfully!');
+        setSuccess(t('successVerifyText'));
         const token = response.data.access_token;
         const user_id = response.data.user_id;
         login(user_id, token);
@@ -87,10 +90,10 @@ const TwoFactorAuth = () => {
       <Grid item xs={12} sm={8} md={4}>
         <Paper elevation={3} style={{ padding: '2rem', textAlign: 'center' }}>
           <Typography variant="h4" gutterBottom>
-            Two-Factor Authentication
+            {t('title')}
           </Typography>
           <Typography variant="body1" gutterBottom>
-            Please enter the OTP sent to your email
+            {t('body')}
           </Typography>
 
           {/* Display error and success messages */}
@@ -100,14 +103,14 @@ const TwoFactorAuth = () => {
           {/* Display Reference Code */}
           {referenceCode && (
             <Typography variant="body1" gutterBottom color="primary">
-              Reference Code: {referenceCode}
+              {t('refCode')} {referenceCode}
             </Typography>
           )}
 
           {/* OTP Verification Form */}
           <form onSubmit={handleVerifyOtp}>
             <TextField
-              label="Enter OTP"
+              label={t('otpTextField')}
               variant="outlined"
               fullWidth
               margin="normal"
@@ -124,18 +127,18 @@ const TwoFactorAuth = () => {
               sx={{ marginTop: '2rem', marginBottom: '2rem', backgroundColor: '#68BB59', color:"#ffffff" }}
               disabled={!email}
             >
-              Verify
+              {t('verifyButton')}
             </Button>
 
             <Typography variant="body1" gutterBottom>
-              Need a new code? 
+              {t('ctaText')}
               <Button
                 variant="text"
                 onClick={resendCode}
                 style={{ color: '#68BB59' }}
                 disabled={!email}
               >
-                Resend code
+                {t('link')}
               </Button>
             </Typography>
           </form>

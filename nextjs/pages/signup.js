@@ -22,7 +22,7 @@ const Signup = () => {
   const [emailError, setEmailError] = useState('');
   const router = useRouter();
 
-  const { t } = useTranslation(['signup']);
+  const { t } = useTranslation(['signup', 'common']);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -87,7 +87,7 @@ const Signup = () => {
           </Grid>
           <Grid item>
             <TextField
-              label={t('username')}
+              label={t('common:username')}
               variant="outlined"
               fullWidth
               value={username}
@@ -97,7 +97,7 @@ const Signup = () => {
           </Grid>
           <Grid item>
             <TextField
-              label={t('email')}
+              label={t('common:email')}
               variant="outlined"
               fullWidth
               value={email}
@@ -109,7 +109,7 @@ const Signup = () => {
           </Grid>
           <Grid item>
             <TextField
-              label={t('password')}
+              label={t('common:password')}
               type={showPassword ? "text" : "password"}
               variant="outlined"
               fullWidth
@@ -137,7 +137,7 @@ const Signup = () => {
           </Grid>
           <Grid item>
             <TextField
-              label={t('confirmPassword')}
+              label={t('common:confirmPassword')}
               type={showConfirmPassword ? "text" : "password"}
               variant="outlined"
               fullWidth
