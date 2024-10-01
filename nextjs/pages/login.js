@@ -5,6 +5,7 @@ import { TextField, Button, Typography, Paper, Grid, Link, IconButton, InputAdor
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import useBearStore from '@/store/useBearStore'; // Assuming you're using Zustand
+import { useTranslation } from 'react-i18next';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -14,6 +15,8 @@ const Login = () => {
   const router = useRouter();
 
   const isDarkMode = useBearStore((state) => state.isDarkMode);
+
+  const { t } = useTranslation(['login', 'common']);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -75,11 +78,11 @@ const Login = () => {
           }}
         >
           <Typography variant="h4" gutterBottom>
-            Login
+            {t('title')}
           </Typography>
           <form onSubmit={handleLogin}>
             <TextField
-              label="Email"
+              label={t('common:email')}
               variant="outlined"
               fullWidth
               margin="normal"
@@ -100,7 +103,7 @@ const Login = () => {
 
             {/* Password Field with visibility toggle */}
             <TextField
-              label="Password"
+              label={t('common:password')}
               variant="outlined"
               fullWidth
               margin="normal"
@@ -146,16 +149,16 @@ const Login = () => {
                 fontSize: '1rem',
               }}
             >
-              Login
+              {t('loginButton')}
             </Button>
           </form>
 
           {/* Link to Signup */}
           <Typography sx={{ marginTop: '1rem' }}>
-            Don't have an account?{' '}
+            {t('ctaText')}{' '}
             <Link href="/signup" passHref>
               <Button variant="text" color="primary">
-                Sign Up
+                {t('link')}
               </Button>
             </Link>
           </Typography>

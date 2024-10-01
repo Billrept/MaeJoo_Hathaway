@@ -6,6 +6,7 @@ import Link from "next/link";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { useTranslation } from 'react-i18next';
 
 const Signup = () => {
   const [username, setUsername] = useState('');
@@ -20,6 +21,8 @@ const Signup = () => {
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [emailError, setEmailError] = useState('');
   const router = useRouter();
+
+  const { t } = useTranslation(['signup', 'common']);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -79,12 +82,12 @@ const Signup = () => {
           <Grid item align="center">
             <AccountCircleIcon fontSize="large" color="primary" />
             <Typography variant="h4" gutterBottom>
-              Create an Account
+              {t('title')}
             </Typography>
           </Grid>
           <Grid item>
             <TextField
-              label="Username"
+              label={t('common:username')}
               variant="outlined"
               fullWidth
               value={username}
@@ -94,7 +97,7 @@ const Signup = () => {
           </Grid>
           <Grid item>
             <TextField
-              label="Email"
+              label={t('common:email')}
               variant="outlined"
               fullWidth
               value={email}
@@ -106,7 +109,7 @@ const Signup = () => {
           </Grid>
           <Grid item>
             <TextField
-              label="Password"
+              label={t('common:password')}
               type={showPassword ? "text" : "password"}
               variant="outlined"
               fullWidth
@@ -134,7 +137,7 @@ const Signup = () => {
           </Grid>
           <Grid item>
             <TextField
-              label="Confirm Password"
+              label={t('common:confirmPassword')}
               type={showConfirmPassword ? "text" : "password"}
               variant="outlined"
               fullWidth
@@ -172,12 +175,12 @@ const Signup = () => {
               disabled={!passwordValid}
               style={{ padding: '10px 0', fontSize: '16px' }}
             >
-              Sign Up
+              {t('signupButton')}
             </Button>
           </Grid>
           <Grid item>
             <Typography align="center">
-              Already have an account? <Link href="/login">Login</Link>
+              {t('ctaText')} <Link href="/login">{t('link')}</Link>
             </Typography>
           </Grid>
         </Grid>

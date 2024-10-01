@@ -1,16 +1,19 @@
 import React from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement, Title, Tooltip, Legend } from 'chart.js';
+import { useTranslation } from 'react-i18next';
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Title, Tooltip, Legend);
 
-const StockGraph = ({ prices, dates }) => {
+const StockGraph = ({ prices, dates, ratio}) => {
+
+  const { t } = useTranslation(['stockGraph']);
 
   const data = {
     labels: dates,
     datasets: [
       {
-        label: 'Stock Price',
+        label: t('labelText'),
         data: prices,
         borderColor: 'rgba(75, 192, 192, 1)',
         backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -26,15 +29,15 @@ const StockGraph = ({ prices, dates }) => {
   // Define the chart options
   const options = {
     responsive: true,
-    maintainAspectRatio: true, // Ensure the graph scales proportionally
-    aspectRatio: 2,
+    maintainAspectRatio: true,
+    aspectRatio: ratio,
     plugins: {
       legend: {
         position: 'top',
       },
       title: {
         display: true,
-        text: 'Stock Price over Time',
+        text: t('titleText'),
       },
     },
     scales: {
