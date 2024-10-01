@@ -15,7 +15,6 @@ const AccountSettings = () => {
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
 
-  // Track edit mode for each field
   const [isUsernameEditable, setIsUsernameEditable] = useState(false);
   const [isEmailEditable, setIsEmailEditable] = useState(false);
   const [isPasswordEditable, setIsPasswordEditable] = useState(false);

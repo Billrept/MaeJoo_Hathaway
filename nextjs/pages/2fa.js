@@ -21,7 +21,6 @@ const TwoFactorAuth = () => {
       router.push('/login');  
     } else {
       setEmail(storedEmail);
-      // Fetch the reference code from the backend when the page loads
       fetchReferenceCode(storedEmail);
     }
   }, [router]);
@@ -60,17 +59,21 @@ const TwoFactorAuth = () => {
         email,
         otp
       });
-        localStorage.setItem('token', response.data.access_token);
-        localStorage.setItem('user_id', response.data.user_id);
-        setSuccess('OTP verified successfully!');
-        const token = response.data.access_token;
-        const user_id = response.data.user_id;
-        login(user_id, token);
+      const { access_token, user_id, username } = response.data;
+
+      // Ensure username is properly set or fallback to a default value
+      localStorage.setItem('token', access_token);
+      localStorage.setItem('user_id', user_id);
+      localStorage.setItem('username', username || 'Unknown User');
+  
+      setSuccess('OTP verified successfully!');
+  
+      // Call the login function with user details
+      login(user_id, access_token, username || 'Unknown User');
         router.push('/dashboard');
       } catch (err) {
       console.error('Full Error Object:', err);
-      
-      // Check if err.response.data is an object with a 'detail' key
+
       const errorMessage = err.response && err.response.data && typeof err.response.data === 'object' 
         ? err.response.data.detail 
         : err.message || 'An error occurred during OTP verification.';

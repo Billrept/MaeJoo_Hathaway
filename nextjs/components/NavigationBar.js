@@ -28,7 +28,7 @@ const NavigationLayout = ({ children }) => {
   const isDarkMode = useBearStore((state) => state.isDarkMode);
   const toggleDarkMode = useBearStore((state) => state.toggleDarkMode);
   const appName = useBearStore((state) => state.appName);
-  const { userId, isLoggedIn, logout, setIsLoggedIn } = useAuth();  // Destructure values from the useAuth hook
+  const { userId, isLoggedIn, logout, setIsLoggedIn, username } = useAuth();  // Destructure values from the useAuth hook
 
   const [showSun, setShowSun] = useState(!isDarkMode);
   const [showMoon, setShowMoon] = useState(isDarkMode);
@@ -183,7 +183,7 @@ const NavigationLayout = ({ children }) => {
                   marginRight: "10px",
                 }}
               >
-                User ID: {userId}
+                User ID: {username}
               </Typography>
               <IconButton color="inherit">
                 <AccountCircle />
