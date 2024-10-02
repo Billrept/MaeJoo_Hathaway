@@ -1,10 +1,10 @@
 import NavigationLayout from "./NavigationBar";
 import FooterLayout from "./footer";
-import { ThemeProvider, createTheme, CssBaseline, Box, Snackbar } from "@mui/material";
+import { ThemeProvider, createTheme, CssBaseline, Box } from "@mui/material";
 import useBearStore from "@/store/useBearStore";
 import { useEffect, useState } from "react";
 
-export default function Layout({ children, snackbarMessage, handleCloseSnackbar }) {
+export default function Layout({ children }) {
   const isDarkMode = useBearStore((state) => state.isDarkMode);
   const [mounted, setMounted] = useState(false);
 
@@ -23,6 +23,9 @@ export default function Layout({ children, snackbarMessage, handleCloseSnackbar 
         primary: "#ffffff",
       },
     },
+    typography: {
+      fontFamily: "'Prompt', sans-serif",
+    }
   });
 
   const lightTheme = createTheme({
@@ -36,6 +39,9 @@ export default function Layout({ children, snackbarMessage, handleCloseSnackbar 
         primary: "#000000",
       },
     },
+    typography: {
+      fontFamily: "'Prompt', sans-serif",
+    }
   });
 
   return (
@@ -66,22 +72,6 @@ export default function Layout({ children, snackbarMessage, handleCloseSnackbar 
         </Box>
         <FooterLayout />
       </Box>
-
-      {/* Snackbar Sticky to Bottom-Left */}
-      <Snackbar
-          open={!!snackbarMessage}
-          autoHideDuration={3000}
-          onClose={handleCloseSnackbar}
-          message={snackbarMessage}
-          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-          sx={{
-            position: "fixed", // Ensures it sticks to the bottom left
-            bottom: 0,
-            left: 0,
-            margin: "16px", // Adds margin from the edges
-            zIndex: 1500,   // Keeps it on top of other elements
-          }}
-        />
     </ThemeProvider>
   );
 }

@@ -1,8 +1,11 @@
 import { Box, Typography, Grid, Link } from '@mui/material';
 import useBearStore from "@/store/useBearStore";
+import { useTranslation } from 'react-i18next';
 
 const FooterLayout = () => {
   const isDarkMode = useBearStore((state) => state.isDarkMode);
+
+  const { t } = useTranslation(['aboutUs']);
 
   return (
     <Box
@@ -21,7 +24,7 @@ const FooterLayout = () => {
         </Grid>
         <Grid item xs={12} sm={6}>
           <Link href="/about" underline="hover" sx={{ color: 'white' }}>
-            About Us
+            {t('title')}
           </Link>
         </Grid>
       </Grid>
