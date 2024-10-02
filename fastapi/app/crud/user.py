@@ -108,7 +108,7 @@ def add_stock_to_favorites(db, user_id: int, stock_id: int):
         cursor.close()
 
 def get_user_by_email(conn, email: str):
-    with conn.cursor() as cur:
+    with conn.cursor(cursor_factory=RealDictCursor) as cur:
         query = sql.SQL("""
             SELECT id, username, email, password_hash
             FROM users
@@ -121,12 +121,11 @@ def get_user_by_email(conn, email: str):
         if result is None:
             return None
 
-        # Return the result as a dictionary including password hash
         return {
-            "id": result[0],          # user_id
-            "username": result[1],     # username
-            "email": result[2],        # email
-            "password_hash": result[3] # password hash for update
+            "username": result['username'],     # username
+            "id": result['id'],          # user_id
+            "email": result['email'],        # email
+            "password_hash": result['password_hash'] # password hash for update
         }
 
 def get_user_by_id(conn, user_id: int):

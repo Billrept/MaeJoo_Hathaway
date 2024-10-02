@@ -13,6 +13,7 @@ const TwoFactorAuth = () => {
   const [referenceCode, setReferenceCode] = useState('');
   const router = useRouter();
   const { login } = useAuth();  // Destructure the login function from useAuth
+  const [username, setUsername] = useState('');  // Add username state
 
   const { t } = useTranslation(['2fa']);
 
@@ -62,12 +63,15 @@ const TwoFactorAuth = () => {
         email,
         otp
       });
-        localStorage.setItem('token', response.data.access_token);
-        localStorage.setItem('user_id', response.data.user_id);
-        setSuccess(t('successVerifyText'));
         const token = response.data.access_token;
         const user_id = response.data.user_id;
-        login(user_id, token);
+        const username = response.data.username;
+        
+        localStorage.setItem('token', response.data.access_token);
+        localStorage.setItem('user_id', response.data.user_id);
+        localStorage.setItem('username', username);
+        setSuccess(t('successVerifyText'));
+        login(user_id, token, username);
         router.push('/dashboard');
       } catch (err) {
       console.error('Full Error Object:', err);

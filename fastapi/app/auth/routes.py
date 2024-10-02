@@ -16,11 +16,11 @@ class UserSignup(BaseModel):
     password: str
 
 class UserLogin(BaseModel):
-    email: str
+    email: EmailStr
     password: str
 
 class VerifyOtpRequest(BaseModel):
-    email: str
+    email: EmailStr
     otp: str
 
 class resendOtpRequest(BaseModel):
@@ -75,14 +75,13 @@ def login(user: UserLogin, background_tasks: BackgroundTasks, conn = Depends(get
     db_user = get_user_by_email(conn, user.email)
     if not db_user:
         raise HTTPException(status_code=400, detail="Invalid username or password")
-
     otp = generate_otp(user.email)
     background_tasks.add_task(send_otp_via_email, user.email, otp)
 
     return {
+        "username": db_user["username"],
         "message": "OTP sent to your email. Please verify OTP to complete login."
     }
-
 
 @router.post("/verify-otp")
 def verify_otp_endpoint(data: VerifyOtpRequest, conn = Depends(get_db_connection)):
@@ -93,7 +92,6 @@ def verify_otp_endpoint(data: VerifyOtpRequest, conn = Depends(get_db_connection
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
     access_token = create_access_token(data={"sub": data.email})
-
     return {
         "message": "OTP verified successfully",
         "user_id": db_user["id"],
@@ -127,7 +125,7 @@ async def get_reference_code_endpoint(email: str):
     reference_code = get_reference_code(email)
     if reference_code:
         return {"reference_code": reference_code}
-    
+
 @router.put("/update-username")
 def update_username(data: UpdateUsernameRequest, conn = Depends(get_db_connection)):
     user = get_user_by_id(conn, data.user_id)
@@ -158,19 +156,16 @@ def update_email(data: UpdateEmailRequest, conn = Depends(get_db_connection)):
         raise HTTPException(status_code=400, detail="Email is already in use")
     
     try:
-        # Update email in the database
+
         with conn.cursor() as cursor:
             cursor.execute("UPDATE users SET email = %s WHERE id = %s;", (data.email, data.user_id))
             conn.commit()
 
-        # Return the updated user information
         user['email'] = data.email
         return {"message": "Email updated successfully", "user": user}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error updating email: {str(e)}")
 
-
-# Route to update password
 @router.put("/update-password")
 def update_password(data: UpdatePasswordRequest, conn = Depends(get_db_connection)):
     # Retrieve the user by email
