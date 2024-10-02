@@ -222,7 +222,9 @@ const Dashboard = () => {
           <Button onClick={() => setSelectedRange('all')} className={selectedRange === 'all' ? 'Mui-selected' : ''}>{t('allButton')}</Button>
         </ButtonGroup>
       </Box>
-      <StockGraph prices={filteredGraphData.prices} dates={filteredGraphData.dates} ratio={3.5}/>
+      <Box component={Paper} sx={{padding:'1rem', transition: 'background-color 1.0s ease-in-out'}}>
+        <StockGraph prices={filteredGraphData.prices} dates={filteredGraphData.dates} ratio={3.5}/>
+      </Box>
       <TextField 
         label={t('search')}
         variant="outlined" 

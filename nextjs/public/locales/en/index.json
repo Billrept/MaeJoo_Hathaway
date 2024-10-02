@@ -6,5 +6,5 @@
     "arimaModel": "ARIMA Model",
     "garchModel": "GARCH Model",
     "arimaDescription": "The ARIMA model (AutoRegressive Integrated Moving Average) is a popular statistical method used for time series forecasting. It combines three components: AutoRegression (AR), Integration (I), and Moving Average (MA).",
-    "garchDescription": "The GARCH model (Generalized Autoregressive Conditional Heteroskedasticity) is a statistical model used for analyzing and forecasting the volatility of time series data. GARCH is used to model and predict variance (volatility) over time, particularly in financial markets."
+    "garchDescription": "The GARCH model (Generalized Autoregressive Conditional Heteroskedasticity) is a statistical model used for analyzing and forecasting the volatility of time series data. GARCH is used to model and predict variance (volatility) over time."
 }

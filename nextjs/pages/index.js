@@ -1,5 +1,5 @@
 import Grid from "@mui/material/Grid";
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography, Button,Paper } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 
 const Home = () =>  {
@@ -7,18 +7,18 @@ const Home = () =>  {
 
   return (
     <>
-      <Box sx={{ minHeight: '100vh', paddingLeft: '15vw', paddingRight: '15vw', bgcolor: 'background.default', paddingTop:'10vh', transition: "background-color 1.5s ease-in-out, color 1.5s ease-in-out"}}>
+      <Box sx={{ minHeight: '100vh', paddingX: '7vw', bgcolor: 'background.default', paddingTop:'10vh', transition: "background-color 1.5s ease-in-out, color 1.5s ease-in-out"}}>
         <main>
+          <Paper sx={{marginX:'4vw',paddingX: '8vw', paddingY:'10vh', transition: 'background-color 1.5s ease-in-out'}}>
           <Grid container wrap="nowrap" direction="row" alignItems="center" justifyContent="space-around">
-            
             <Grid item size={{xs:12, md:4}}>
-              <Typography text variant="h2" gutterBottom>
+              <Typography text variant="h3" gutterBottom>
                 {t('welcome')}
               </Typography>
-              <Typography text variant="body1">
+              <Typography>
                 {t('description')}
               </Typography>
-              <Button href='/login' variant="contained" sx={{ color:'#ffffff', backgroundColor:'#2da14c', marginTop: '1rem' }}>
+              <Button href='/login' variant="contained" sx={{ color:'#ffffff', backgroundColor:'#2da14c', marginTop: '3rem' }}>
                 {t('button')}
               </Button>
             </Grid>
@@ -32,28 +32,29 @@ const Home = () =>  {
                 />
               </Box>
             </Grid>
-
           </Grid>
-
-          <Typography variant="h4" gutterBottom sx={{ marginTop: '10rem', marginBottom: '5rem', fontWeight: 'bold' }}>
+          </Paper>
+          <Paper sx={{marginX:'4vw',paddingX: '8vw', paddingY:'8vh', marginTop:'5vh', marginBottom:'10vh', transition: 'background-color 1.5s ease-in-out'}}>
+          <Typography variant="h4" gutterBottom sx={{ marginBottom: '5rem', fontWeight: 'bold', textAlign: 'center' }}>
             {t('model')}
           </Typography>
-
-          <Grid container wrap="nowrap" direction="row" alignItems="top" justifyContent="space-around">
+          <Grid container wrap="nowrap" direction="row" alignItems="top" justifyContent="space-around" spacing={10}>
             <Grid item xs={12} md={6} sx={{ textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-              <Typography variant="h6">{t('arimaModel')}</Typography>
+              <Typography variant="h6" sx={{textDecoration:'underline'}}>{t('arimaModel')}</Typography>
+              <br/>
               <Typography>
                 {t('arimaDescription')}
               </Typography>
             </Grid>
-
             <Grid item xs={12} md={6} sx={{ textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-              <Typography variant="h6">{t('garchModel')}</Typography>
+              <Typography variant="h6" sx={{textDecoration:'underline'}}>{t('garchModel')}</Typography>
+              <br/>
               <Typography>
                 {t('garchDescription')}
               </Typography>
             </Grid>
           </Grid>
+          </Paper>
         </main>
       </Box>
     </>
