@@ -56,6 +56,7 @@ const Market = () => {
   const [predictedPrice, setPredictedPrice] = useState(null);
   const [predictedVolatility, setPredictedVolatility] = useState(null);
   const [token, setToken] = useState(null);
+  const [transitionEnabled, setTransitionEnabled] = useState(true);
 
   // State for sorting
   const [sortBy, setSortBy] = useState('ticker');
@@ -265,10 +266,8 @@ const Market = () => {
         message={snackbarMessage}
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
         sx={{
-          position: "fixed",
-          bottom: 0,
-          left: 0,
-          margin: "16px",
+          margin: "16px",  // Optional margin if you want some spacing
+          marginBottom:'8rem'
         }}
       />
 
@@ -413,9 +412,11 @@ const Market = () => {
                   <TableCell
                     align="center"
                     onClick={() => handleSort('ticker')}
+                    onMouseLeave={handleMouseLeave}
                     sx={{
                       cursor: 'pointer',
-                      transition: "background-color 1.5s ease-in-out, color 1.5s ease-in-out", // Smooth transition for header cell background and color
+                      transition: transitionEnabled ? 'background-color 1.0s ease-in-out, color 1.0s ease-in-out' : 'none', // Smooth transition for header cell background and color
+                      '&:hover': { backgroundColor: isDarkMode ? '#444' : '#ddd', transition:'none' },
                     }}
                   >
                     {t('stock')} {sortBy === "ticker" && (sortDirection === "asc" ? "▲" : "▼")}
@@ -423,9 +424,11 @@ const Market = () => {
                   <TableCell
                     align="center"
                     onClick={() => handleSort('pricing')}
+                    onMouseLeave={handleMouseLeave}
                     sx={{
                       cursor: 'pointer',
-                      transition: "background-color 1.5s ease-in-out, color 1.5s ease-in-out", // Smooth transition for header cell background and color
+                      transition: transitionEnabled ? 'background-color 1.0s ease-in-out, color 1.0s ease-in-out' : 'none', // Smooth transition for header cell background and color
+                      '&:hover': { backgroundColor: isDarkMode ? '#444' : '#ddd', transition:'none' },
                     }}
                   >
                     {t('currentPricing')} {sortBy === "pricing" && (sortDirection === "asc" ? "▲" : "▼")}
