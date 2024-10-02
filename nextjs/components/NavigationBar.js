@@ -9,10 +9,9 @@ import {
   Menu,
   MenuItem,
   Typography,
-  FormControlLabel,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import AccountCircle from "@mui/icons-material/AccountCircle"; 
+import AccountCircle from "@mui/icons-material/AccountCircle";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import FunctionsIcon from "@mui/icons-material/Functions";
@@ -20,7 +19,7 @@ import WbSunnyIcon from "@mui/icons-material/WbSunny";
 import Brightness2Icon from "@mui/icons-material/Brightness2";
 import useBearStore from "@/store/useBearStore";
 import { useState, useEffect } from "react";
-import { useAuth } from "@/context/auth";  // Import useAuth hook from AuthProvider
+import { useAuth } from "@/context/auth";
 import axios from 'axios';
 import LanguageSwitcher from "./languageSwitcher";
 import { useTranslation } from 'react-i18next';
@@ -30,7 +29,8 @@ const NavigationLayout = ({ children }) => {
   const isDarkMode = useBearStore((state) => state.isDarkMode);
   const toggleDarkMode = useBearStore((state) => state.toggleDarkMode);
   const appName = useBearStore((state) => state.appName);
-  const { userId, isLoggedIn, logout, setIsLoggedIn, username } = useAuth();  // Destructure values from the useAuth hook
+  const { isLoggedIn, logout, setIsLoggedIn } = useAuth();
+  const [username, setUsername] = useState('');
 
   const [showSun, setShowSun] = useState(!isDarkMode);
   const [showMoon, setShowMoon] = useState(isDarkMode);
@@ -41,7 +41,13 @@ const NavigationLayout = ({ children }) => {
 
   const { t } = useTranslation(['navbar']);
 
-  // Check token validity periodically
+  useEffect(() => {
+    const storedUsername = localStorage.getItem('username');
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+  }, []);
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     const interval = setInterval(() => {
@@ -51,19 +57,19 @@ const NavigationLayout = ({ children }) => {
           .then((response) => {
             if (!response.data.valid) {
               logout();
-              setIsLoggedIn(false);  // Update isLoggedIn when token is invalid
+              setIsLoggedIn(false);
               router.push('/login');
             }
           })
           .catch(() => {
             logout();
-            setIsLoggedIn(false);  // Update isLoggedIn on error
+            setIsLoggedIn(false);
             router.push('/login');
           });
       }
-    }, 5 * 60 * 1000); // Check every 5 minutes
+    }, 5 * 60 * 1000);
 
-    return () => clearInterval(interval);  // Cleanup the interval on component unmount
+    return () => clearInterval(interval);
   }, [logout, router, setIsLoggedIn]);
 
   const handleMenuClick = (event) => {
@@ -75,19 +81,18 @@ const NavigationLayout = ({ children }) => {
   };
 
   useEffect(() => {
-    setIsSwitchDisabled(true); // Disable switch when toggling
+    setIsSwitchDisabled(true);
 
     if (isDarkMode) {
-      setShowSun(false); // Hide the sun first
-      setTimeout(() => setShowMoon(true), 300); // Delay showing the moon
+      setShowSun(false);
+      setTimeout(() => setShowMoon(true), 300);
     } else {
-      setShowMoon(false); // Hide the moon first
-      setTimeout(() => setShowSun(true), 300); // Delay showing the sun
+      setShowMoon(false);
+      setTimeout(() => setShowSun(true), 300);
     }
 
-    // Re-enable the switch after the animation completes
     setTimeout(() => {
-      setIsSwitchDisabled(false); // Enable switch after 600ms
+      setIsSwitchDisabled(false);
     }, 600);
   }, [isDarkMode]);
 
@@ -100,12 +105,11 @@ const NavigationLayout = ({ children }) => {
       <AppBar
         position="sticky"
         sx={{
-          padding: { xs: "10px", md: "0px" },  // Add padding on small screens only
+          padding: { xs: "10px", md: "0px" },
           backgroundColor: isDarkMode ? "#333" : "#68BB59",
         }}
       >
         <Toolbar>
-          {/* Functions Icon */}
           <Link href={"/"}>
             <FunctionsIcon
               sx={{
@@ -140,7 +144,6 @@ const NavigationLayout = ({ children }) => {
 
           <LanguageSwitcher></LanguageSwitcher>
 
-          {/* Cash Mode Switch and Dark Mode Switch */}
           <Box
             sx={{
               display: 'flex',
@@ -150,7 +153,6 @@ const NavigationLayout = ({ children }) => {
               marginRight: '20px',
             }}
           >
-            {/* Sun Icon */}
             <IconButton
               disableRipple
               sx={{
@@ -166,7 +168,6 @@ const NavigationLayout = ({ children }) => {
               <WbSunnyIcon fontSize="small" sx={{ color: '#FFD700' }} />
             </IconButton>
 
-            {/* Moon Icon */}
             <IconButton
               disableRipple
               sx={{
@@ -182,15 +183,13 @@ const NavigationLayout = ({ children }) => {
               <Brightness2Icon fontSize="small" sx={{ color: '#ffffff' }} />
             </IconButton>
 
-            {/* Dark Mode Switch */}
             <Switch
               checked={isDarkMode}
               onChange={handleToggle}
-              disabled={isSwitchDisabled} // Disable switch while animation is in progress
+              disabled={isSwitchDisabled}
             />
           </Box>
 
-          {/* Account Circle and Username */}
           {isLoggedIn ? (
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <Typography
@@ -201,13 +200,12 @@ const NavigationLayout = ({ children }) => {
                   marginRight: "10px",
                 }}
               >
-                User ID: {username}
+                Username: {username}
               </Typography>
               <IconButton color="inherit">
                 <AccountCircle />
               </IconButton>
 
-              {/* Menu Icon */}
               <IconButton
                 edge="start"
                 color="inherit"
@@ -219,16 +217,16 @@ const NavigationLayout = ({ children }) => {
               </IconButton>
 
               <Menu
-                anchorEl={anchorEl} // Anchor for the menu
-                open={menuOpen} // Whether the menu is open
-                onClose={handleMenuClose} // Close handler
+                anchorEl={anchorEl}
+                open={menuOpen}
+                onClose={handleMenuClose}
                 anchorOrigin={{
                   vertical: "bottom",
-                  horizontal: "center", // Align the menu horizontally in the center of the anchor (MenuIcon)
+                  horizontal: "center",
                 }}
                 transformOrigin={{
                   vertical: "top",
-                  horizontal: "center", // Transform the menu starting from its center
+                  horizontal: "center",
                 }}
                 MenuListProps={{
                   "aria-labelledby": "basic-button",

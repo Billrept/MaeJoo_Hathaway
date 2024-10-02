@@ -24,15 +24,56 @@ const AccountSettings = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const [avatar, setAvatar] = useState(null);
   const { t } = useTranslation(['settings', 'common']);
   
   useEffect(() => {
     setUsername(localStorage.getItem('username'));
     setEmail(localStorage.getItem('email'));
+    fetchProfilePicture();
   }, []);
 
-  const handleAvatarChange = () => {
-    console.log('Change avatar');
+  const fetchProfilePicture = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:8000/auth/profile_picture', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: 'blob',
+      });
+      const imageUrl = URL.createObjectURL(response.data);
+      setAvatar(imageUrl);
+    } catch (error) {
+      console.error('Error fetching profile picture:', error.response ? error.response.data : error.message);
+    }
+  };
+
+  const handleAvatarChange = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      try {
+        const user_id = localStorage.getItem('user_id');
+        const token = localStorage.getItem('token');
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('user_id', user_id);
+        const response = await axios.post(
+          'http://localhost:8000/auth/upload_profile_picture',
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log('Avatar uploaded successfully:', response.data);
+        setAvatar(URL.createObjectURL(file));
+      } catch (error) {
+        console.error('Error uploading avatar:', error.response ? error.response.data : error.message);
+      }
+    }
   };
 
   const handlePasswordChange = (e) => {
@@ -49,12 +90,10 @@ const AccountSettings = () => {
     }
   };
 
-  // Function to update username
   const updateUsername = async () => {
     try {
       const user_id = localStorage.getItem('user_id');
       const token = localStorage.getItem('token');
-
       const response = await axios.put(
         'http://localhost:8000/auth/update-username',
         { user_id, username },
@@ -66,12 +105,10 @@ const AccountSettings = () => {
     }
   };
 
-  // Function to update email
   const updateEmail = async () => {
     try {
       const user_id = localStorage.getItem('user_id');
       const token = localStorage.getItem('token');
-
       const response = await axios.put(
         'http://localhost:8000/auth/update-email',
         { user_id, email },
@@ -95,16 +132,14 @@ const AccountSettings = () => {
   
     try {
       const user_id = localStorage.getItem('user_id');
-      const email = localStorage.getItem('email'); // Retrieve email from localStorage or other source
+      const email = localStorage.getItem('email');
       const token = localStorage.getItem('token');
-  
       const payload = {
         user_id,
-        email,  // Add email to the payload
+        email,
         current_password: currentPassword,
         new_password: password,
       };
-      
       const response = await axios.put(
         'http://localhost:8000/auth/update-password',
         payload,
@@ -135,8 +170,6 @@ const AccountSettings = () => {
       <Typography variant="h5" gutterBottom>
         {t('settings:accountSettings')}
       </Typography>
-
-      {/* Account Circle with Edit Button */}
       <Box sx={{ display: 'flex', marginBottom: '16px' }}>
         <Avatar
           sx={{
@@ -144,13 +177,13 @@ const AccountSettings = () => {
             height: 40,
             backgroundColor: '#68BB59',
           }}
+          src={avatar}
         />
-        <IconButton onClick={handleAvatarChange} sx={{ marginLeft: '20px' }}>
+        <IconButton component="label" sx={{ marginLeft: '20px' }}>
           <EditIcon />
+          <input type="file" accept="image/*" hidden onChange={handleAvatarChange} />
         </IconButton>
       </Box>
-
-      {/* Username Field */}
       <Box sx={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
         <TextField
           fullWidth
@@ -158,8 +191,8 @@ const AccountSettings = () => {
           variant="outlined"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          disabled={!isUsernameEditable} // Disable unless editable
-          onBlur={() => { if (isUsernameEditable) updateUsername(); }} // Auto-save onBlur
+          disabled={!isUsernameEditable}
+          onBlur={() => { if (isUsernameEditable) updateUsername(); }}
         />
         <IconButton
           onClick={() => {
@@ -170,8 +203,6 @@ const AccountSettings = () => {
           {isUsernameEditable ? <SaveIcon /> : <EditIcon />}
         </IconButton>
       </Box>
-
-      {/* Email Field */}
       <Box sx={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
         <TextField
           fullWidth
@@ -179,8 +210,8 @@ const AccountSettings = () => {
           variant="outlined"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          disabled={!isEmailEditable} // Disable unless editable
-          onBlur={() => { if (isEmailEditable) updateEmail(); }} // Auto-save onBlur
+          disabled={!isEmailEditable}
+          onBlur={() => { if (isEmailEditable) updateEmail(); }}
         />
         <IconButton
           onClick={() => {
@@ -191,8 +222,6 @@ const AccountSettings = () => {
           {isEmailEditable ? <SaveIcon /> : <EditIcon />}
         </IconButton>
       </Box>
-
-      {/* Current Password Field */}
       <Box sx={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
       <TextField
           fullWidth
@@ -222,8 +251,6 @@ const AccountSettings = () => {
           {isPasswordEditable ? <SaveIcon /> : <EditIcon />}
         </IconButton>
       </Box>
-
-      {/* New Password Field */}
       <Box sx={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
       <TextField
           fullWidth
@@ -247,8 +274,6 @@ const AccountSettings = () => {
           }}
         />
       </Box>
-
-      {/* Confirm Password Field */}
       <Box sx={{ marginBottom: '16px', display: 'flex', alignItems: 'center' }}>
       <TextField
           fullWidth
@@ -272,7 +297,6 @@ const AccountSettings = () => {
           }}
         />
       </Box>
-
     </Box>
   );
 };

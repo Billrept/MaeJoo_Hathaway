@@ -70,3 +70,5 @@ webencodings==0.5.1
 websockets==13.0.1
 yfinance
 python-jose
+pillow
+python-multipart

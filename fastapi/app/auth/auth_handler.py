@@ -12,60 +12,44 @@ import hashlib
 import pyotp
 import smtplib
 
-# Password context for hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-# OAuth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
-
-# JWT secret and algorithm
 SECRET_KEY = "1wakrai6_kmitlzaza"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
-# Secret key for OTP generation
 SERVER_SECRET_KEY = "123456"
-
-# In-memory storage for reference codes (replace with a database in production)
 reference_codes = {}
 
-# Store reference code in lowercase email
 def store_reference_code(email: str, reference_code: str):
-    email_lower = email.lower()  # Ensure lowercase email for consistency
+    email_lower = email.lower()
     reference_codes[email_lower] = reference_code
-    print(f"Stored reference code for {email_lower}: {reference_code}")  # Debug print
+    print(f"Stored reference code for {email_lower}: {reference_code}")
 
-# Get reference code by lowercase email
 def get_reference_code(email: str):
-    email_lower = email.lower()  # Ensure lowercase email for consistency
+    email_lower = email.lower()
     reference_code = reference_codes.get(email_lower)
-    print(f"Retrieved reference code for {email_lower}: {reference_code}")  # Debug print
+    print(f"Retrieved reference code for {email_lower}: {reference_code}")
     return reference_code
 
-# Generate a random alphanumeric reference code
 def generate_reference_code(length=8):
     letters_and_digits = string.ascii_uppercase + string.digits
     return ''.join(random.choice(letters_and_digits) for i in range(length))
 
-# Generate a unique OTP secret for a user
 def generate_otp_secret(user_identifier: str):
     hash_value = hashlib.sha256(f"{user_identifier}{SERVER_SECRET_KEY}".encode()).hexdigest()
     return pyotp.random_base32()[:16]
 
-# In-memory storage for OTP secrets (replace with a database in production)
 otp_secrets = {}
 
-# Generate OTP for a user
 def generate_otp(user_identifier: str) -> str:
-    user_identifier = user_identifier.lower()  # Ensure lowercase email
+    user_identifier = user_identifier.lower()
     otp_secret = generate_otp_secret(user_identifier)
     otp_secrets[user_identifier] = otp_secret
     totp = pyotp.TOTP(otp_secret)
     return totp.now()
 
-# Verify OTP for a user
 def verify_otp(user_identifier: str, otp: str) -> bool:
-    user_identifier = user_identifier.lower()  # Ensure lowercase email
+    user_identifier = user_identifier.lower()
     otp_secret = otp_secrets.get(user_identifier)
     if not otp_secret:
         return False
@@ -78,15 +62,19 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 def get_password_hash(password):
     return pwd_context.hash(password)
 
-def get_current_user(token: str = Depends(oauth2_scheme)) -> Dict[str, str]:
+def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
-            raise HTTPException(status_code=401, detail="Invalid token")
-        return {"username": username}
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            raise 401
+        return user_id
     except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+        raise HTTPException(
+            status_code=401,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
@@ -99,7 +87,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     return encoded_jwt
 
 def send_otp_via_email(email: str, otp: str) -> str:
-    email = email.lower()  # Ensure lowercase email
+    email = email.lower()
     try:
         sender_email = "maejoohathaway@gmail.com"
         sender_password = "ijzx anng ineu wzog"
@@ -116,7 +104,6 @@ def send_otp_via_email(email: str, otp: str) -> str:
         body = f"Your OTP code is: {otp}\nref-- {reference_code}"
         message.attach(MIMEText(body, 'plain'))
 
-        # Send the email
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
         server.login(sender_email, sender_password)

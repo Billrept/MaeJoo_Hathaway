@@ -63,27 +63,34 @@ const TwoFactorAuth = () => {
         email,
         otp
       });
-        const token = response.data.access_token;
-        const user_id = response.data.user_id;
-        const username = response.data.username;
-        
-        localStorage.setItem('token', response.data.access_token);
-        localStorage.setItem('user_id', response.data.user_id);
-        localStorage.setItem('username', username);
-        setSuccess(t('successVerifyText'));
-        login(user_id, token, username);
-        router.push('/dashboard');
-      } catch (err) {
+    
+      const token = response.data.access_token;
+      const user_id = response.data.user_id;
+      const username = response.data.username;  // Retrieve the username from the response
+    
+      // Store token, user_id, and username in localStorage
+      localStorage.setItem('token', token);
+      localStorage.setItem('user_id', user_id);
+      localStorage.setItem('username', username);  // Store username properly
+    
+      setSuccess(t('successVerifyText'));
+    
+      // Log in the user
+      login(user_id, token, username);
+    
+      // Redirect to dashboard
+      router.push('/dashboard');
+    } catch (err) {
       console.error('Full Error Object:', err);
-
+    
       const errorMessage = err.response && err.response.data && typeof err.response.data === 'object' 
         ? err.response.data.detail 
         : err.message || 'An error occurred during OTP verification.';
-        
+    
       console.error('Error verifying OTP:', errorMessage);
-      
+    
       setError(errorMessage);  
-    }
+    }    
   };
 
 

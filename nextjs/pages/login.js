@@ -42,6 +42,7 @@ const Login = () => {
         password,
       });
       localStorage.setItem('email', email);
+      const username = response.data.username;
       localStorage.setItem('username', response.data.username);
       console.log("response: ",response.data);
       router.push('/2fa');

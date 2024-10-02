@@ -1,15 +1,24 @@
-from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
+from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks, UploadFile, File
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, EmailStr, constr
 from .auth_handler import *
+from PIL import Image
 from app.database import get_db_connection
+from io import BytesIO
 from app.crud.user import create_user, get_user_by_email, update_user, get_user_by_id
 from sqlalchemy.orm import Session
 from typing import List, Optional
+import os
 
 router = APIRouter()
 
+PROFILE_PIC_DIR = "fastapi/app/profile_pics"
+
 OTP_SECRET = "123456"
 
+if not os.path.exists(PROFILE_PIC_DIR):
+    os.makedirs(PROFILE_PIC_DIR)
+    
 class UserSignup(BaseModel):
     username: str
     email: str
@@ -88,17 +97,22 @@ def verify_otp_endpoint(data: VerifyOtpRequest, conn = Depends(get_db_connection
     otp = data.otp.strip()
     if not verify_otp(data.email, otp):
         raise HTTPException(status_code=400, detail="Invalid or expired OTP.")
+    
     db_user = get_user_by_email(conn, data.email)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
+    
     access_token = create_access_token(data={"sub": data.email})
+    
     return {
         "message": "OTP verified successfully",
         "user_id": db_user["id"],
+        "username": db_user["username"],
         "access_token": access_token,
         "token_type": "bearer",
         "success": True
     }
+
 
 @router.post("/resend-otp")
 async def resend_otp(data: resendOtpRequest):
@@ -186,3 +200,34 @@ def update_password(data: UpdatePasswordRequest, conn = Depends(get_db_connectio
         return {"message": "Password updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error updating password: {str(e)}")
+    
+@router.post("/upload_profile_picture")
+async def upload_profile_picture(
+    file: UploadFile = File(...), current_user: str = Depends(get_current_user)
+):
+    if file.content_type not in ["image/jpeg", "image/png"]:
+        raise HTTPException(
+            status_code=400, detail="Invalid file type. Upload JPEG or PNG."
+        )
+
+    try:
+        image = Image.open(file.file)
+        image = image.convert("RGB")
+
+        image.thumbnail((1920, 1080))
+
+        file_path = os.path.join(PROFILE_PIC_DIR, f"{current_user}_profile_pic.webp")
+        image.save(file_path, "WEBP", quality=85)
+
+        return {"detail": "Profile picture uploaded successfully."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to upload image.")
+
+
+@router.get("/profile_picture/")
+async def get_profile_picture(current_user: str = Depends(get_current_user)):
+    file_path = os.path.join(PROFILE_PIC_DIR, f"{current_user}_profile_pic.webp")
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Profile picture not found.")
+
+    return FileResponse(file_path)
