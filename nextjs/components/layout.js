@@ -23,6 +23,9 @@ export default function Layout({ children, snackbarMessage, handleCloseSnackbar 
         primary: "#ffffff",
       },
     },
+    typography: {
+      fontFamily: "'Prompt', sans-serif",
+    }
   });
 
   const lightTheme = createTheme({
@@ -36,6 +39,9 @@ export default function Layout({ children, snackbarMessage, handleCloseSnackbar 
         primary: "#000000",
       },
     },
+    typography: {
+      fontFamily: "'Prompt', sans-serif",
+    }
   });
 
   return (

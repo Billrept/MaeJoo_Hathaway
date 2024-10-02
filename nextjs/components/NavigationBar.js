@@ -123,7 +123,7 @@ const NavigationLayout = ({ children }) => {
           <Typography
             variant="body1"
             sx={{
-              fontSize: "22px",
+              fontSize: "26px",
               fontWeight: 500,
               color: "#ffffff",
               padding: "0 10px",
@@ -290,7 +290,7 @@ const NavigationLink = ({ href, label }) => {
       <Typography
         variant="body1"
         sx={{
-          fontSize: "14px",
+          fontSize: "16px",
           fontWeight: 500,
           color: "#fff",
           padding: "0 10px",

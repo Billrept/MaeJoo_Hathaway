@@ -16,7 +16,7 @@ const Home = () =>  {
                 {t('welcome')}
               </Typography>
               <Typography text variant="body1">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                {t('description')}
               </Typography>
               <Button href='/login' variant="contained" sx={{ color:'#ffffff', backgroundColor:'#2da14c', marginTop: '1rem' }}>
                 {t('button')}
@@ -36,21 +36,21 @@ const Home = () =>  {
           </Grid>
 
           <Typography variant="h4" gutterBottom sx={{ marginTop: '10rem', marginBottom: '5rem', fontWeight: 'bold' }}>
-            Prediction Models
+            {t('model')}
           </Typography>
 
-          <Grid container wrap="nowrap" direction="row" alignItems="center" justifyContent="space-around">
-            <Grid item xs={12} md={6} sx={{ textAlign: 'center' }}>
-              <Typography variant="h6">ARIMA MODEL</Typography>
+          <Grid container wrap="nowrap" direction="row" alignItems="top" justifyContent="space-around">
+            <Grid item xs={12} md={6} sx={{ textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <Typography variant="h6">{t('arimaModel')}</Typography>
               <Typography>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                {t('arimaDescription')}
               </Typography>
             </Grid>
 
-            <Grid item xs={12} md={6} sx={{ textAlign: 'center' }}>
-              <Typography variant="h6">GARCH MODEL</Typography>
+            <Grid item xs={12} md={6} sx={{ textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <Typography variant="h6">{t('garchModel')}</Typography>
               <Typography>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                {t('garchDescription')}
               </Typography>
             </Grid>
           </Grid>

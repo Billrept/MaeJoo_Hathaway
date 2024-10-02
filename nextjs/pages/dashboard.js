@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Box, ButtonGroup, Button } from '@mui/material';
-import StockGraph from '../components/stockData'; // Import the graph component to display stock data
+import StockGraph from '../components/stockData'; 
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import { useAuth } from "@/context/auth";
@@ -113,14 +113,24 @@ const Dashboard = () => {
     }
     setSortConfig({ key, direction });
   };
-
+  
+  // Modify the sorting function to handle both string and numeric values
   const sortedRows = React.useMemo(() => {
     if (sortConfig.key) {
       const sorted = [...rows].sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
+        let aValue = a[sortConfig.key];
+        let bValue = b[sortConfig.key];
+  
+        // Handle percentage or numeric columns like currentPricing and change
+        if (sortConfig.key === 'currentPricing' || sortConfig.key === 'change') {
+          aValue = parseFloat(aValue.toString().replace('%', '')) || 0; // Convert to a float, handle NaN
+          bValue = parseFloat(bValue.toString().replace('%', '')) || 0;
+        }
+  
+        if (aValue < bValue) {
           return sortConfig.direction === 'asc' ? -1 : 1;
         }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
+        if (aValue > bValue) {
           return sortConfig.direction === 'asc' ? 1 : -1;
         }
         return 0;
