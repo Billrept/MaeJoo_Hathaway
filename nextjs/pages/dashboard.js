@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import {
   TextField, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Box, ButtonGroup, Button
 } from '@mui/material';
-import StockGraph from '../components/stockData'; // Existing graph
+import StockGraph from '../components/stockData';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import { useAuth } from "@/context/auth";
 import useBearStore from "@/store/useBearStore";
 import { useTranslation } from 'react-i18next';
-import TradingViewChart from '../components/TradingViewChart'; // The technical graph
+import TradingViewChart from '../components/TradingViewChart';
 
 const Dashboard = () => {
   const router = useRouter();

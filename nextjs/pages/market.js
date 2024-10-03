@@ -403,7 +403,7 @@ const Market = () => {
               width: "100%",
               maxWidth: "1200px",
               padding: "1rem",
-              height: showTechnicalGraph ? "64vh" : "55vh", // Adjust height based on graph type
+              height: showTechnicalGraph ? "64vh" : "55vh",
               transition: "background-color 1.5s ease-in-out, height 0.5s ease-in-out",
               margin: "0 auto",
             }}
