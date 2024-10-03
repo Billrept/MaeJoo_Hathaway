@@ -4,13 +4,14 @@ from utils.downsampling import downsample
 from utils.quantize import split_into_blocks, apply_dct_to_blocks, quantize_blocks, quant_matrix_luminance, quant_matrix_chroma
 from utils.dequantize import dequantize_blocks, apply_idct_to_blocks, reconstruct_from_blocks
 from utils.huffman import huffman_coding
+import cv2
 
 def main():
-    downscale_constant = 3
-    quantization_factor = 1.0  # Adjust this value to increase or decrease quality (1.0 is default quality)
+    downscale_constant = 10
+    quantization_factor = 1.2 # Adjust this value to increase or decrease quality (1.0 is default quality)
 
     # Open image as array
-    image = Image.open("./images/input.jpg").convert("YCbCr")
+    image = Image.open("./images/input2.jpg").convert("YCbCr")
     ycbcr_array = np.array(image)
 
     # Separate layer into Y, Cb, Cr
@@ -33,7 +34,7 @@ def main():
     dct_Cr_blocks = apply_dct_to_blocks(Cr_blocks)
     quantized_Cr_blocks = quantize_blocks(dct_Cr_blocks, quant_matrix_chroma, quantization_factor)
 
-    huffman_coding(quantized_Y_blocks, quantized_Cb_blocks, quantized_Cr_blocks)
+    # huffman_coding(quantized_Y_blocks, quantized_Cb_blocks, quantized_Cr_blocks)
 
     # Dequantize blocks
     dequantized_Y_blocks = dequantize_blocks(quantized_Y_blocks, quant_matrix_luminance)
@@ -62,7 +63,7 @@ def main():
     # Stack channels and save the reconstructed image
     image_reconstructed = np.stack([Y_reconstructed, Cb_reconstructed_upsampled, Cr_reconstructed_upsampled], axis=2)
     image_output = Image.fromarray(image_reconstructed.astype('uint8'), 'YCbCr').convert('RGB')
-    image_output.save('D:/image_compression/images/output_reconstructed.jpg')
+    image_output.save('./images/output.jpg')
 
 if __name__ == "__main__":
     main()
