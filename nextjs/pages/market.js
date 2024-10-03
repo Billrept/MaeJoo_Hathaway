@@ -21,6 +21,7 @@ import {
 import StarIcon from "@mui/icons-material/Star";
 import useBearStore from "@/store/useBearStore";
 import StockGraph from "../components/stockData";
+import TradingViewChart from "../components/TradingViewChart"; // Importing the TradingView chart component
 import { useTranslation } from 'react-i18next';
 
 const tickers = [
@@ -61,6 +62,9 @@ const Market = () => {
   // State for sorting
   const [sortBy, setSortBy] = useState('ticker');
   const [sortDirection, setSortDirection] = useState('asc');
+  
+  // New state to toggle between graphs
+  const [showTechnicalGraph, setShowTechnicalGraph] = useState(false); // Toggle state
 
   const { t } = useTranslation(['common']);
 
@@ -266,8 +270,8 @@ const Market = () => {
         message={snackbarMessage}
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
         sx={{
-          margin: "16px",  // Optional margin if you want some spacing
-          marginBottom:'8rem'
+          margin: "16px",
+          marginBottom: '8rem',
         }}
       />
 
@@ -321,13 +325,13 @@ const Market = () => {
             "& .MuiButton-root": {
               color: "#ffffff",
               backgroundColor: "#2da14c",
-              borderColor: "#000000", // Black border between buttons
+              borderColor: "#000000",
               "&:hover": {
-                backgroundColor: "#1e7d36", // Color on hover
+                backgroundColor: "#1e7d36",
               },
             },
             "& .MuiButton-root.Mui-selected": {
-              backgroundColor: "#145524", // Change color for selected buttons
+              backgroundColor: "#145524",
             },
           }}
         >
@@ -368,6 +372,15 @@ const Market = () => {
             {t('allButton')}
           </Button>
         </ButtonGroup>
+
+        {/* Toggle between default and technical graph */}
+        <Button
+          variant="contained"
+          onClick={() => setShowTechnicalGraph(!showTechnicalGraph)}
+          sx={{ marginLeft: '1rem' }}
+        >
+          {showTechnicalGraph ? t('defaultGraph') : t('technicalGraph')}
+        </Button>
       </Box>
 
       <Box
@@ -384,13 +397,19 @@ const Market = () => {
         <Box
           component={Paper}
           sx={{
-            width: "65vw",
+            width: "100%",
+            maxWidth: "1200px",
             padding: "1rem",
-            height: "56vh",
+            height: "70vh",
             transition: "background-color 1.5s ease-in-out",
+            margin: "0 auto",
           }}
         >
-          <StockGraph prices={filteredGraphData.prices} dates={filteredGraphData.dates} ratio={2}/>
+          {showTechnicalGraph ? (
+            <TradingViewChart ticker={currentStock.ticker || "AAPL"} />
+          ) : (
+            <StockGraph prices={filteredGraphData.prices} dates={filteredGraphData.dates} ratio={2} />
+          )}
         </Box>
         <Box
           component={Paper}
@@ -406,7 +425,7 @@ const Market = () => {
               <TableHead>
                 <TableRow
                   sx={{
-                    transition: "background-color 1.5s ease-in-out, color 1.5s ease-in-out", // Smooth transition for header row background and color
+                    transition: "background-color 1.5s ease-in-out, color 1.5s ease-in-out",
                   }}
                 >
                   <TableCell
@@ -415,8 +434,8 @@ const Market = () => {
                     onMouseLeave={handleMouseLeave}
                     sx={{
                       cursor: 'pointer',
-                      transition: transitionEnabled ? 'background-color 1.0s ease-in-out, color 1.0s ease-in-out' : 'none', // Smooth transition for header cell background and color
-                      '&:hover': { backgroundColor: isDarkMode ? '#444' : '#ddd', transition:'none' },
+                      transition: transitionEnabled ? 'background-color 1.0s ease-in-out, color 1.0s ease-in-out' : 'none',
+                      '&:hover': { backgroundColor: isDarkMode ? '#444' : '#ddd', transition: 'none' },
                     }}
                   >
                     {t('stock')} {sortBy === "ticker" && (sortDirection === "asc" ? "▲" : "▼")}
@@ -427,8 +446,8 @@ const Market = () => {
                     onMouseLeave={handleMouseLeave}
                     sx={{
                       cursor: 'pointer',
-                      transition: transitionEnabled ? 'background-color 1.0s ease-in-out, color 1.0s ease-in-out' : 'none', // Smooth transition for header cell background and color
-                      '&:hover': { backgroundColor: isDarkMode ? '#444' : '#ddd', transition:'none' },
+                      transition: transitionEnabled ? 'background-color 1.0s ease-in-out, color 1.0s ease-in-out' : 'none',
+                      '&:hover': { backgroundColor: isDarkMode ? '#444' : '#ddd', transition: 'none' },
                     }}
                   >
                     {t('currentPricing')} {sortBy === "pricing" && (sortDirection === "asc" ? "▲" : "▼")}
@@ -451,7 +470,7 @@ const Market = () => {
                       sx={{
                         display: "flex",
                         alignItems: "center",
-                        transition: "color 1.5s ease-in-out", // Transition for color
+                        transition: "color 1.5s ease-in-out",
                       }}
                     >
                       <Tooltip title={!token ? t('tooltip') : ""} disableInteractive>
@@ -477,7 +496,7 @@ const Market = () => {
                     <TableCell
                       align="center"
                       sx={{
-                        transition: "background-color 1.5s ease-in-out, color 1.5s ease-in-out", // Smooth transition for color and background
+                        transition: "background-color 1.5s ease-in-out, color 1.5s ease-in-out",
                       }}
                     >
                       {row.pricing}
@@ -490,86 +509,84 @@ const Market = () => {
         </Box>
       </Box>
       <Box
+        sx={{
+          display: 'block',
+          paddingTop: '40px',
+          paddingRight: '10vw',
+          paddingLeft: '10vw',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          gap: 2,
+          transition: 'background-color 1.5s ease-in-out',
+        }}
+      >
+        <Box component={Paper}>
+          <TableContainer>
+            <Table stickyHeader>
+              <TableHead>
+                <TableRow
+                  sx={{
+                    transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out',
+                  }}
+                >
+                  <TableCell
+                    align="center"
                     sx={{
-                        display: 'block',
-                        paddingTop: '40px',
-                        paddingRight: '10vw',
-                        paddingLeft: '10vw',
-                        justifyContent: 'space-between',
-                        alignItems: 'flex-start',
-                        gap: 2,
-                        transition: 'background-color 1.5s ease-in-out',
+                      width: '50%',
+                      color: isDarkMode ? '#ffffff' : '#000000',
+                      transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out',
                     }}
-                    >
-                    <Box component={Paper}>
-                        <TableContainer>
-                        <Table stickyHeader>
-                            {/* Table Head with Transition */}
-                            <TableHead>
-                            <TableRow
-                                sx={{
-                                transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out',
-                                }}
-                            >
-                                <TableCell
-                                align="center"
-                                sx={{
-                                    width: '50%',
-                                    color: isDarkMode ? '#ffffff' : '#000000', // Adjust text color
-                                    transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out',
-                                }}
-                                >
-                                {t('predictedPrice')}
-                                </TableCell>
-                                <TableCell
-                                align="center"
-                                sx={{
-                                    width: '50%',
-                                    color: isDarkMode ? '#ffffff' : '#000000',
-                                    transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out',
-                                }}
-                                >
-                                {t('predictedVolatility')}
-                                </TableCell>
-                            </TableRow>
-                            </TableHead>
+                  >
+                    {t('predictedPrice')}
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    sx={{
+                      width: '50%',
+                      color: isDarkMode ? '#ffffff' : '#000000',
+                      transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out',
+                    }}
+                  >
+                    {t('predictedVolatility')}
+                  </TableCell>
+                </TableRow>
+              </TableHead>
 
-                            {/* Table Body with Transition */}
-                            <TableBody>
-                            <TableRow
-                                sx={{
-                                transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out',
-                                backgroundColor: isDarkMode ? '#2B2B2B' : '#ffffff', // Adjust based on dark mode
-                                }}
-                            >
-                                <TableCell
-                                align="center"
-                                sx={{
-                                    width: '50%',
-                                    transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out',
-                                }}
-                                >
-                                <Typography>
-                                    {predictedPrice !== null ? predictedPrice : 'N/A'}
-                                </Typography>
-                                </TableCell>
-                                <TableCell
-                                align="center"
-                                sx={{
-                                    width: '50%',
-                                    transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out',
-                                }}
-                                >
-                                <Typography>
-                                    {predictedVolatility !== null ? predictedVolatility : 'N/A'}
-                                </Typography>
-                                </TableCell>
-                            </TableRow>
-                            </TableBody>
-                        </Table>
-                        </TableContainer>
-                    </Box>
-                    </Box>
+              <TableBody>
+                <TableRow
+                  sx={{
+                    transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out',
+                    backgroundColor: isDarkMode ? '#2B2B2B' : '#ffffff',
+                  }}
+                >
+                  <TableCell
+                    align="center"
+                    sx={{
+                      width: '50%',
+                      transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out',
+                    }}
+                  >
+                    <Typography>
+                      {predictedPrice !== null ? predictedPrice : 'N/A'}
+                    </Typography>
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    sx={{
+                      width: '50%',
+                      transition: 'background-color 1.5s ease-in-out, color 1.5s ease-in-out',
+                    }}
+                  >
+                    <Typography>
+                      {predictedVolatility !== null ? predictedVolatility : 'N/A'}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      </Box>
     </Box>
   );
 };

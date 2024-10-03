@@ -7,7 +7,6 @@ from app.database import get_db_connection
 from io import BytesIO
 from app.crud.user import create_user, get_user_by_email, update_user, get_user_by_id
 from sqlalchemy.orm import Session
-from typing import List, Optional
 import os
 
 router = APIRouter()
