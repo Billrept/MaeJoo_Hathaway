@@ -24,7 +24,7 @@ import StockGraph from "../components/stockData";
 import TradingViewChart from "../components/TradingViewChart"; // Importing the TradingView chart component
 import { useTranslation } from 'react-i18next';
 
-const tickers = [
+const tickers =  [
   "AAPL", "ABNB", "ADBE", "ADI", "ADP", "ADSK", "AEP", "AMAT", "AMD", "AMGN",
   "AMZN", "ANSS", "ARM", "ASML", "AVGO", "AZN", "BIIB", "BKNG", "BKR", "CCEP",
   "CDNS", "CDW", "CEG", "CHTR", "CMCSA", "COST", "CPRT", "CRWD", "CSCO", "CSGP",
@@ -263,154 +263,159 @@ const Market = () => {
       }}
     >
       {/* Snackbar Sticky to Bottom-Left */}
-      <Snackbar
-        open={!!snackbarMessage}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
-        message={snackbarMessage}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-        sx={{
-          margin: "16px",
-          marginBottom: '8rem',
-        }}
-      />
-
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          paddingRight: "10vw",
-          paddingLeft: "10vw",
-          paddingTop: "50px",
-          paddingBottom: "20px",
-        }}
-      >
-        <Typography variant="h3" gutterBottom>
-          {t('marketTitle')}
-        </Typography>
-        <TextField
-          label={t('search')}
-          variant="outlined"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+        <Snackbar
+          open={!!snackbarMessage}
+          autoHideDuration={3000}
+          onClose={handleCloseSnackbar}
+          message={snackbarMessage}
+          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
           sx={{
-            bgcolor: "background.default",
-            width: "300px",
-            marginTop: "1rem",
-            marginBottom: "1rem",
-            transition: "background-color 1.5s ease-in-out",
+            margin: "16px",
+            marginBottom: '8rem',
           }}
         />
-      </Box>
 
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: "1rem",
-          marginLeft: "10vw",
-          marginRight: "34.8vw",
-          alignItems: "center",
-        }}
-      >
-        <Typography variant="subtitle1" color="textSecondary">
-        {currentStock ? `${t('displayedStock')} ${currentStock.ticker}` : t('missingStock')}
-        </Typography>
-
-        <ButtonGroup
-          variant="contained"
-          aria-label="outlined primary button group"
+        <Box
           sx={{
-            "& .MuiButton-root": {
-              color: "#ffffff",
-              backgroundColor: "#2da14c",
-              borderColor: "#000000",
-              "&:hover": {
-                backgroundColor: "#1e7d36",
-              },
-            },
-            "& .MuiButton-root.Mui-selected": {
-              backgroundColor: "#145524",
-            },
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            paddingRight: "10vw",
+            paddingLeft: "10vw",
+            paddingTop: "20px", // Reduced padding to move text up
+            paddingBottom: "20px",
           }}
         >
-          <Button
-            onClick={() => setSelectedRange("week")}
-            className={selectedRange === "week" ? "Mui-selected" : ""}
+          <Typography variant="h3" gutterBottom>
+            {t('marketTitle')}
+          </Typography>
+          <TextField
+            label={t('search')}
+            variant="outlined"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            sx={{
+          bgcolor: "background.default",
+          width: "300px",
+          marginTop: "1rem",
+          marginBottom: "1rem",
+          transition: "background-color 1.5s ease-in-out",
+            }}
+          />
+        </Box>
+
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: "1rem",
+            marginLeft: "10vw",
+            marginRight: "34.8vw",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="subtitle1" color="textSecondary">
+            {currentStock ? `${t('displayedStock')} ${currentStock.ticker}` : t('missingStock')}
+          </Typography>
+
+          {/* Hide range buttons when Technical Graph is shown */}
+        {!showTechnicalGraph && (
+          <ButtonGroup
+            variant="contained"
+            aria-label="outlined primary button group"
+            sx={{
+              "& .MuiButton-root": {
+                color: "#ffffff",
+                backgroundColor: "#2da14c",
+                borderColor: "#000000",
+                "&:hover": {
+                  backgroundColor: "#1e7d36",
+                },
+              },
+              "& .MuiButton-root.Mui-selected": {
+                backgroundColor: "#145524",
+              },
+            }}
           >
-            {t('7dButton')}
-          </Button>
-          <Button
-            onClick={() => setSelectedRange("month")}
-            className={selectedRange === "month" ? "Mui-selected" : ""}
-          >
-            {t('1mButton')}
-          </Button>
-          <Button
-            onClick={() => setSelectedRange("threeMonths")}
-            className={selectedRange === "threeMonths" ? "Mui-selected" : ""}
-          >
-            {t('3mButton')}
-          </Button>
-          <Button
-            onClick={() => setSelectedRange("sixMonths")}
-            className={selectedRange === "sixMonths" ? "Mui-selected" : ""}
-          >
-            {t('6mButton')}
-          </Button>
-          <Button
-            onClick={() => setSelectedRange("year")}
-            className={selectedRange === "year" ? "Mui-selected" : ""}
-          >
-            {t('1yButton')}
-          </Button>
-          <Button
-            onClick={() => setSelectedRange("all")}
-            className={selectedRange === "all" ? "Mui-selected" : ""}
-          >
-            {t('allButton')}
-          </Button>
-        </ButtonGroup>
+            <Button
+              onClick={() => setSelectedRange("week")}
+              className={selectedRange === "week" ? "Mui-selected" : ""}
+            >
+              {t('7dButton')}
+            </Button>
+            <Button
+              onClick={() => setSelectedRange("month")}
+              className={selectedRange === "month" ? "Mui-selected" : ""}
+            >
+              {t('1mButton')}
+            </Button>
+            <Button
+              onClick={() => setSelectedRange("threeMonths")}
+              className={selectedRange === "threeMonths" ? "Mui-selected" : ""}
+            >
+              {t('3mButton')}
+            </Button>
+            <Button
+              onClick={() => setSelectedRange("sixMonths")}
+              className={selectedRange === "sixMonths" ? "Mui-selected" : ""}
+            >
+              {t('6mButton')}
+            </Button>
+            <Button
+              onClick={() => setSelectedRange("year")}
+              className={selectedRange === "year" ? "Mui-selected" : ""}
+            >
+              {t('1yButton')}
+            </Button>
+            <Button
+              onClick={() => setSelectedRange("all")}
+              className={selectedRange === "all" ? "Mui-selected" : ""}
+            >
+              {t('allButton')}
+            </Button>
+          </ButtonGroup>
+        )}
 
         {/* Toggle between default and technical graph */}
-        <Button
-          variant="contained"
-          onClick={() => setShowTechnicalGraph(!showTechnicalGraph)}
-          sx={{ marginLeft: '1rem' }}
-        >
-          {showTechnicalGraph ? t('defaultGraph') : t('technicalGraph')}
-        </Button>
-      </Box>
+          <Button
+            variant="contained"
+            onClick={() => setShowTechnicalGraph(!showTechnicalGraph)}
+            sx={{ marginLeft: '1rem' }}
+          >
+            {showTechnicalGraph ? t('defaultGraph') : t('technicalGraph')}
+          </Button>
+              </Box>
 
-      <Box
-        sx={{
-          display: "flex",
-          paddingRight: "10vw",
-          paddingLeft: "10vw",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          gap: 2,
-          transition: "background-color 1.5s ease-in-out",
-        }}
-      >
-        <Box
-          component={Paper}
+              <Box
           sx={{
-            width: "100%",
-            maxWidth: "1200px",
-            padding: "1rem",
-            height: "70vh",
+            display: "flex",
+            paddingRight: "10vw",
+            paddingLeft: "10vw",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            gap: 2,
             transition: "background-color 1.5s ease-in-out",
-            margin: "0 auto",
           }}
-        >
-          {showTechnicalGraph ? (
-            <TradingViewChart ticker={currentStock.ticker || "AAPL"} />
-          ) : (
-            <StockGraph prices={filteredGraphData.prices} dates={filteredGraphData.dates} ratio={2} />
-          )}
-        </Box>
+              >
+          <Box
+            component={Paper}
+            sx={{
+              width: "100%",
+              maxWidth: "1200px",
+              padding: "1rem",
+              height: showTechnicalGraph ? "64vh" : "55vh", // Adjust height based on graph type
+              transition: "background-color 1.5s ease-in-out, height 0.5s ease-in-out",
+              margin: "0 auto",
+            }}
+          >
+            {showTechnicalGraph ? (
+              <TradingViewChart ticker={currentStock.ticker || "AAPL"} theme={isDarkMode ? 'dark' : 'light'} />
+            ) : (
+              <StockGraph prices={filteredGraphData.prices} dates={filteredGraphData.dates} ratio={2} />
+            )}
+          </Box>
+
+          {/* Table for stocks */}
         <Box
           component={Paper}
           sx={{
