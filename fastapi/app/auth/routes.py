@@ -12,7 +12,7 @@ import os
 
 router = APIRouter()
 
-PROFILE_PIC_DIR = "fastapi/app/profile_pics"
+PROFILE_PIC_DIR = "./profile_pics"
 
 OTP_SECRET = "123456"
 
@@ -200,7 +200,7 @@ def update_password(data: UpdatePasswordRequest, conn = Depends(get_db_connectio
         return {"message": "Password updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error updating password: {str(e)}")
-    
+
 @router.post("/upload_profile_picture")
 async def upload_profile_picture(
     file: UploadFile = File(...), current_user: str = Depends(get_current_user)
@@ -209,7 +209,6 @@ async def upload_profile_picture(
         raise HTTPException(
             status_code=400, detail="Invalid file type. Upload JPEG or PNG."
         )
-
     try:
         image = Image.open(file.file)
         image = image.convert("RGB")
@@ -223,8 +222,7 @@ async def upload_profile_picture(
     except Exception as e:
         raise HTTPException(status_code=500, detail="Failed to upload image.")
 
-
-@router.get("/profile_picture/")
+@router.get("/profile_picture")
 async def get_profile_picture(current_user: str = Depends(get_current_user)):
     file_path = os.path.join(PROFILE_PIC_DIR, f"{current_user}_profile_pic.webp")
     if not os.path.exists(file_path):
