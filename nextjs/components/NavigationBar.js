@@ -43,9 +43,13 @@ const NavigationLayout = ({ children }) => {
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username');
+    console.log("StoredUsername: ", storedUsername)
+    console.log("localStorage: ", localStorage.getItem('username'))
+    setAnchorEl(null);
     if (storedUsername) {
       setUsername(storedUsername);
     }
+    return () => setAnchorEl(null);
   }, []);
 
   useEffect(() => {
