@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  nextjs:
+    build:
+      context: ./nextjs
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./nextjs:/src
+      - /src/node_modules
+    working_dir: /src
+    command: npm run dev
+    depends_on:
+      - fastapi
+      - postgres
+    networks:
+      - app-network
+
+  fastapi:
+    build:
+      context: ./fastapi  # <-- Updated to the parent directory of the `app` folder
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./fastapi:/app  # <-- Updated to reflect the path to `app` inside `fastapi`# <-- Updated to make sure it works in the `/app/app` directory
+    environment:
+      DB_HOST: postgres
+      DB_NAME: advcompro
+      DB_USER: temp
+      DB_PASSWORD: temp
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: temp
+      POSTGRES_PASSWORD: temp
+      POSTGRES_DB: advcompro
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge
