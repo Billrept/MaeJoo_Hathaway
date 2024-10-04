@@ -10,6 +10,7 @@ def arima_prediction(close_prices):
     predicted_price = float(model_fit.forecast(steps=1)[0])
     return predicted_price
 
+
 # GARCH prediction function
 def garch_prediction(close_prices):
     close_prices_series = pd.Series(close_prices)

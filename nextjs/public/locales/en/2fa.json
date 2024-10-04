@@ -1,0 +1,13 @@
+{
+    "title": "Two-Factor Authentication",
+    "body": "Please enter the OTP sent to your email",
+    "refCode": "Reference Code:",
+    "otpTextField": "Enter OTP",
+    "verifyButton": "Verify",
+    "ctaText": "Need a new code? ",
+    "link": "resend code",
+    "fetchErrorText": "Error fetching reference code:",
+    "resendSuccessText": "OTP has been resent successfully.",
+    "resendErrorText": "Failed to resend code. Please try again.",
+    "successVerifyText": "OTP verified successfully!"
+}

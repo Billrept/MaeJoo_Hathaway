@@ -65,9 +65,10 @@ tzlocal==5.2
 ujson==5.10.0
 urllib3==2.2.3
 uvicorn==0.30.6
-uvloop==0.20.0
 watchfiles==0.24.0
 webencodings==0.5.1
 websockets==13.0.1
-yfinance==0.2.43
+yfinance
 python-jose
+pillow
+python-multipart
