@@ -117,49 +117,58 @@ const Dashboard = () => {
     setSortConfig({ key, direction });
   };
 
+  const selectionSort = (rows, key, direction) => {
+    const length = rows.length;
+    for (let i = 0; i < length - 1; i++) {
+      let indexToSwap = i;
+
+      for (let j = i + 1; j < length; j++) {
+        let shouldSwap = false;
+
+        if (key === 'change') {
+          const aChange = rows[indexToSwap].currentPricing && rows[indexToSwap].predictedPrice
+            ? (Number(rows[indexToSwap].predictedPrice) - Number(rows[indexToSwap].currentPricing)) / Number(rows[indexToSwap].currentPricing) * 100
+            : 0;
+          const bChange = rows[j].currentPricing && rows[j].predictedPrice
+            ? (Number(rows[j].predictedPrice) - Number(rows[j].currentPricing)) / Number(rows[j].currentPricing) * 100
+            : 0;
+
+          shouldSwap = direction === 'asc' ? bChange < aChange : bChange > aChange;
+        } else {
+          let aValue = rows[indexToSwap][key];
+          let bValue = rows[j][key];
+
+          if (key === 'currentPricing' || key === 'predictedPrice') {
+            aValue = parseFloat(aValue) || 0;
+            bValue = parseFloat(bValue) || 0;
+          }
+
+          if (typeof aValue === 'string' && typeof bValue === 'string') {
+            shouldSwap = direction === 'asc'
+              ? bValue.localeCompare(aValue) < 0
+              : bValue.localeCompare(aValue) > 0;
+          } else {
+            shouldSwap = direction === 'asc' ? bValue < aValue : bValue > aValue;
+          }
+        }
+
+        if (shouldSwap) {
+          indexToSwap = j;
+        }
+      }
+
+      if (indexToSwap !== i) {
+        const temp = rows[i];
+        rows[i] = rows[indexToSwap];
+        rows[indexToSwap] = temp;
+      }
+    }
+    return rows;
+  };
+
   const sortedRows = React.useMemo(() => {
     if (sortConfig.key) {
-      const sorted = [...rows].sort((a, b) => {
-        let aValue = a[sortConfig.key];
-        let bValue = b[sortConfig.key];
-
-        if (sortConfig.key === 'change') {
-          const aChange = a.currentPricing && a.predictedPrice
-            ? (Number(a.predictedPrice) - Number(a.currentPricing)) / Number(a.currentPricing) * 100
-            : 0;
-          const bChange = b.currentPricing && b.predictedPrice
-            ? (Number(b.predictedPrice) - Number(b.currentPricing)) / Number(b.currentPricing) * 100
-            : 0;
-
-          if (aChange < bChange) {
-            return sortConfig.direction === 'asc' ? -1 : 1;
-          }
-          if (aChange > bChange) {
-            return sortConfig.direction === 'asc' ? 1 : -1;
-          }
-          return 0;
-        }
-
-        if (sortConfig.key === 'currentPricing') {
-          aValue = parseFloat(aValue) || 0;
-          bValue = parseFloat(bValue) || 0;
-        }
-
-        if (typeof aValue === 'string' && typeof bValue === 'string') {
-          return sortConfig.direction === 'asc'
-            ? aValue.localeCompare(bValue)
-            : bValue.localeCompare(aValue);
-        }
-
-        if (aValue < bValue) {
-          return sortConfig.direction === 'asc' ? -1 : 1;
-        }
-        if (aValue > bValue) {
-          return sortConfig.direction === 'asc' ? 1 : -1;
-        }
-        return 0;
-      });
-      return sorted;
+      return selectionSort([...rows], sortConfig.key, sortConfig.direction);
     }
     return rows;
   }, [rows, sortConfig]);

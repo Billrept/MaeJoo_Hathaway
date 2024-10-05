@@ -172,18 +172,39 @@ const Market = () => {
     }
   };
 
-  const sortedRows = [...rows].sort((a, b) => {
-    if (sortBy === 'ticker') {
-      return sortDirection === 'asc'
-        ? a.ticker.localeCompare(b.ticker)
-        : b.ticker.localeCompare(a.ticker);
-    } else if (sortBy === 'pricing') {
-      return sortDirection === 'asc'
-        ? a.pricing - b.pricing
-        : b.pricing - a.pricing;
+  const selectionSortRows = (rows) => {
+    const length = rows.length;
+
+    for (let i = 0; i < length - 1; i++) {
+      let indexToSwap = i;
+
+      for (let j = i + 1; j < length; j++) {
+        let shouldSwap = false;
+
+        if (sortBy === 'ticker') {
+          const compare = rows[j].ticker.localeCompare(rows[indexToSwap].ticker);
+          shouldSwap = sortDirection === 'asc' ? compare < 0 : compare > 0;
+        } else if (sortBy === 'pricing') {
+          const compare = rows[j].pricing - rows[indexToSwap].pricing;
+          shouldSwap = sortDirection === 'asc' ? compare < 0 : compare > 0;
+        }
+
+        if (shouldSwap) {
+          indexToSwap = j;
+        }
+      }
+
+      if (indexToSwap !== i) {
+        let temp = rows[i];
+        rows[i] = rows[indexToSwap];
+        rows[indexToSwap] = temp;
+      }
     }
-    return 0;
-  });
+
+    return rows;
+  };
+
+  const sortedRows = selectionSortRows([...rows]);
 
   const filteredRows = sortedRows.filter((row) =>
     row.ticker.toLowerCase().includes(search.toLowerCase())
