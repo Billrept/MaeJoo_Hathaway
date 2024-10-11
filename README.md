@@ -1,9 +1,9 @@
 # MaeJoo_Hathaway
 
-This project is developed for the GUI chapter of the Advanced Computer Programming class under the Department of Robotics and AI Engineering, School of Engineering, KMITL.
+This project is developed for the GUI chapter of the Advanced Computer Programming and Introduction to Algorithms class under the Department of Robotics and AI Engineering, School of Engineering, KMITL.
 
 ## Overview
-MaeJoo_Hathaway is a project primarily written in JavaScript and Python. It aims to [describe the main purpose or functionality of the project].
+MaeJoo_Hathaway is a project primarily written in JavaScript and Python. It aims to integrate advanced data analysis algorithms, such as ARIMA and GARCH models, for monitoring and managing financial or stock data. By leveraging these models, the platform provides insights into historical trends and volatility of stock prices without predicting future values. It features interactive tools like graphs and dashboards, enabling users to visualize stock performance and make informed decisions based on past market behavior..
 
 ## Getting Started
 
